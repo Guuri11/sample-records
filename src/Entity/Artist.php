@@ -44,7 +44,7 @@ class Artist
     private $is_from;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=750, nullable=true)
      */
     private $bio;
 
