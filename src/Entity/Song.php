@@ -3,9 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SongRepository")
+ * @Vich\Uploadable
  */
 class Song
 {
@@ -30,6 +34,35 @@ class Song
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $video_src;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    private $songFileName;
+
+    /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     *
+     * @Vich\UploadableField(mapping="songs_img", fileNameProperty="imageName", size="imageSize")
+     *
+     * @var File|null
+     */
+    private $imageFile;
+
+    /**
+     * @ORM\Column(type="string")
+     *
+     * @var string|null
+     */
+    private $imageName;
+
+    /**
+     * @ORM\Column(type="integer")
+     *
+     * @var int|null
+     */
+    private $imageSize;
+
 
     /**
      * @ORM\Column(type="datetime")
@@ -155,5 +188,57 @@ class Song
         $this->album = $album;
 
         return $this;
+    }
+
+    public function getSongFileName()
+    {
+        return $this->songFileName;
+    }
+
+    public function setSongFileName($songFileName)
+    {
+        $this->songFileName = $songFileName;
+
+        return $this;
+    }
+
+    /**
+     * @param File|UploadedFile|null $imageFile
+     * @throws \Exception
+     */
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updated_at = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    public function setImageSize(?int $imageSize): void
+    {
+        $this->imageSize = $imageSize;
+    }
+
+    public function getImageSize(): ?int
+    {
+        return $this->imageSize;
     }
 }

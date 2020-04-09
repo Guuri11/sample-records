@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Album index{% endblock %}
+
+{% block body %}
+    <h1>Album index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Duration</th>
+                <th>Released_at</th>
+                <th>ImageName</th>
+                <th>ImageSize</th>
+                <th>Created_at</th>
+                <th>Updated_at</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for album in albums %}
+            <tr>
+                <td>{{ album.id }}</td>
+                <td>{{ album.name }}</td>
+                <td>{{ album.price }}</td>
+                <td>{{ album.duration }}</td>
+                <td>{{ album.releasedAt ? album.releasedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ album.imageName }}</td>
+                <td>{{ album.imageSize }}</td>
+                <td>{{ album.createdAt ? album.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ album.updatedAt ? album.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('album_show', {'id': album.id}) }}">show</a>
+                    <a href="{{ path('album_edit', {'id': album.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('album_new') }}">Create new</a>
+{% endblock %}

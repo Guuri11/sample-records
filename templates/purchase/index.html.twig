@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Purchase index{% endblock %}
+
+{% block body %}
+    <h1>Purchase index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Serial_number</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Received</th>
+                <th>Address</th>
+                <th>Town</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Comment</th>
+                <th>Final_price</th>
+                <th>Created_at</th>
+                <th>Updated_at</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for purchase in purchases %}
+            <tr>
+                <td>{{ purchase.id }}</td>
+                <td>{{ purchase.serialNumber }}</td>
+                <td>{{ purchase.date ? purchase.date|date('Y-m-d') : '' }}</td>
+                <td>{{ purchase.time ? purchase.time|date('H:i:s') : '' }}</td>
+                <td>{{ purchase.received ? 'Yes' : 'No' }}</td>
+                <td>{{ purchase.address }}</td>
+                <td>{{ purchase.town }}</td>
+                <td>{{ purchase.city }}</td>
+                <td>{{ purchase.country }}</td>
+                <td>{{ purchase.comment }}</td>
+                <td>{{ purchase.finalPrice }}</td>
+                <td>{{ purchase.createdAt ? purchase.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ purchase.updatedAt ? purchase.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('purchase_show', {'id': purchase.id}) }}">show</a>
+                    <a href="{{ path('purchase_edit', {'id': purchase.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="14">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('purchase_new') }}">Create new</a>
+{% endblock %}

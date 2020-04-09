@@ -6,11 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @Vich\Uploadable
  */
-class User implements UserInterface
+class User implements UserInterface, \Serializable
 {
     /**
      * @ORM\Id()
@@ -79,6 +83,52 @@ class User implements UserInterface
      * @ORM\Column(type="datetime")
      */
     private $created_at;
+
+    /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     *
+     * @Vich\UploadableField(mapping="users_profile", fileNameProperty="profileImage", size="profileSize")
+     *
+     * @var File|null
+     */
+    private $profileFile;
+
+    /**
+     * @ORM\Column(type="string")
+     *
+     * @var string|null
+     */
+    private $profileImage;
+
+    /**
+     * @ORM\Column(type="integer")
+     *
+     * @var int|null
+     */
+    private $profileSize;
+
+    /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     *
+     * @Vich\UploadableField(mapping="users_header", fileNameProperty="headerImage", size="headerSize")
+     *
+     * @var File|null
+     */
+    private $headerFile;
+
+    /**
+     * @ORM\Column(type="string")
+     *
+     * @var string|null
+     */
+    private $headerImage;
+
+    /**
+     * @ORM\Column(type="integer")
+     *
+     * @var int|null
+     */
+    private $headerSize;
 
     /**
      * @ORM\Column(type="datetime")
@@ -359,5 +409,103 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @param File|UploadedFile|null $profileFile
+     * @throws \Exception
+     */
+    public function setProfileFile(?File $profileFile = null): void
+    {
+        $this->profileFile = $profileFile;
+
+        if (null !== $profileFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updated_at = new \DateTimeImmutable();
+        }
+    }
+
+    public function getProfileFile(): ?File
+    {
+        return $this->profileFile;
+    }
+
+    public function setProfileImage(?string $profileImage): void
+    {
+        $this->profileImage = $profileImage;
+    }
+
+    public function getProfileImage(): ?string
+    {
+        return $this->profileImage;
+    }
+
+    public function setProfileSize(?int $profileSize): void
+    {
+        $this->profileSize = $profileSize;
+    }
+
+    public function getProfileSize(): ?int
+    {
+        return $this->profileSize;
+    }
+
+    /**
+     * @param File|UploadedFile|null $headerFile
+     * @throws \Exception
+     */
+    public function setHeaderFile(?File $headerFile = null): void
+    {
+        $this->headerFile = $headerFile;
+
+        if (null !== $headerFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updated_at = new \DateTimeImmutable();
+        }
+    }
+
+    public function getHeaderFile(): ?File
+    {
+        return $this->headerFile;
+    }
+
+    public function setHeaderImage(?string $headerImage): void
+    {
+        $this->headerImage = $headerImage;
+    }
+
+    public function getHeaderImage(): ?string
+    {
+        return $this->headerImage;
+    }
+
+    public function setHeaderSize(?int $headerSize): void
+    {
+        $this->headerSize = $headerSize;
+    }
+
+    public function getHeaderSize(): ?int
+    {
+        return $this->headerSize;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function serialize()
+    {
+        // add $this->salt too if you don't use Bcrypt or Argon2i
+        return serialize([$this->id, $this->email, $this->password, $this->roles]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function unserialize($serialized)
+    {
+        // add $this->salt too if you don't use Bcrypt or Argon2i
+        [$this->id, $this->email, $this->password, $this->roles] = unserialize($serialized, ['allowed_classes' => false]);
     }
 }
