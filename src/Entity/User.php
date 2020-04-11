@@ -16,7 +16,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @Vich\Uploadable
  * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
  */
-class User implements UserInterface, \Serializable
+class User implements UserInterface, \Serializable, \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -509,5 +509,37 @@ class User implements UserInterface, \Serializable
     {
         // add $this->salt too if you don't use Bcrypt or Argon2i
         [$this->id, $this->email, $this->password, $this->roles] = unserialize($serialized, ['allowed_classes' => false]);
+    }
+
+    public function __toString()
+    {
+        return (string) $this->getEmail();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'name'=>$this->getName(),
+            'surname'=>$this->getSurname(),
+            'email'=>$this->getEmail(),
+            'password'=>$this->getPassword(),
+            'role'=>$this->getRoles(),
+            'address'=>$this->getAddress(),
+            'postal_code'=>$this->getPostalCode(),
+            'town'=>$this->getTown(),
+            'city'=>$this->getCity(),
+            'phone'=>$this->getPhone(),
+            'credit_card'=>$this->getCreditCard(),
+            'profile_image'=>$this->getProfileFile(),
+            'header_image'=>$this->getHeaderFile(),
+            'comments'=>$this->getComments(),
+            'purchases'=>$this->getPurchases(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt()
+        ];
     }
 }

@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TicketRepository")
  */
-class Ticket
+class Ticket implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -144,5 +144,21 @@ class Ticket
         $this->event = $event;
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'serial_number'=>$this->getSerialNumber(),
+            'event'=>$this->getEvent(),
+            'price'=>$this->getPrice(),
+            'purchases'=>$this->getPurchases(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt()
+        ];
     }
 }

@@ -35,6 +35,8 @@ class TagController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $tag->setCreatedAt(new \DateTime('now'));
+            $tag->setUpdatedAt(new \DateTime('now'));
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($tag);
             $entityManager->flush();
@@ -67,6 +69,7 @@ class TagController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $tag->setUpdatedAt(new \DateTime('now'));
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('tag_index');

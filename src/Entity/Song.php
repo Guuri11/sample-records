@@ -11,7 +11,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="App\Repository\SongRepository")
  * @Vich\Uploadable
  */
-class Song
+class Song implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -240,5 +240,26 @@ class Song
     public function getImageSize(): ?int
     {
         return $this->imageSize;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'name'=>$this->getName(),
+            'artist'=>$this->getArtist(),
+            'album'=>$this->getAlbum(),
+            'duration'=>$this->getDuration(),
+            'video_src'=>$this->getVideoSrc(),
+            'song_file'=>$this->getSongFileName(),
+            'img_name'=>$this->getImageName(),
+            'img_size'=>$this->getImageSize(),
+            'released_at'=>$this->getReleasedAt(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt()
+        ];
     }
 }

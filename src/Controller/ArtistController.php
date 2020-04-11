@@ -35,6 +35,8 @@ class ArtistController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $artist->setCreatedAt(new \DateTime('now'));
+            $artist->setUpdatedAt(new \DateTime('now'));
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($artist);
             $entityManager->flush();
@@ -67,6 +69,7 @@ class ArtistController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $artist->setUpdatedAt(new \DateTime('now'));
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('artist_index');

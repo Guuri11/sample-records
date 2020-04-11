@@ -34,7 +34,10 @@
                 <td>{{ artist.bio }}</td>
                 <td>{{ artist.createdAt ? artist.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ artist.updatedAt ? artist.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ artist.imageName }}</td>
+                <td>
+                    <img  src="{{ vich_uploader_asset(artist, 'imageFile') | imagine_filter('my_thumb') }}"
+                          alt="{{ artist.alias }}" />
+                </td>
                 <td>{{ artist.imageSize }}</td>
                 <td>
                     <a href="{{ path('artist_show', {'id': artist.id}) }}">show</a>

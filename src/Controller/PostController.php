@@ -35,6 +35,8 @@ class PostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $post->setCreatedAt(new \DateTime('now'));
+            $post->setUpdatedAt(new \DateTime('now'));
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($post);
             $entityManager->flush();
@@ -67,6 +69,7 @@ class PostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $post->setUpdatedAt(new \DateTime('now'));
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('post_index');

@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
  */
-class Comment
+class Comment implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -17,7 +17,7 @@ class Comment
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=500)
      */
     private $comment;
 
@@ -140,5 +140,20 @@ class Comment
 
         return $this;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'comment'=>$this->getComment(),
+            'user'=>$this->getUser(),
+            'event'=>$this->getEvent(),
+            'product'=>$this->getProduct(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt()
+        ];
+    }
 }

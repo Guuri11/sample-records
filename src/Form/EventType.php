@@ -27,8 +27,6 @@ class EventType extends AbstractType
                 'asset_helper' => true,
                 'imagine_pattern' => 'my_thumb'
             ])
-            ->add('created_at')
-            ->add('updated_at')
             ->add('artist')
         ;
     }

@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Artist;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Vich\UploaderBundle\Form\Type\VichImageType;
@@ -16,7 +17,11 @@ class ArtistType extends AbstractType
             ->add('name')
             ->add('alias')
             ->add('surname')
-            ->add('birth')
+            ->add('birth',BirthdayType::class, [
+                'placeholder' => [
+                    'year' => 'Year', 'month' => 'Month', 'day' => 'Day',
+                ]])
+
             ->add('is_from')
             ->add('bio')
             ->add('imageFile', VichImageType::class, [
@@ -27,8 +32,6 @@ class ArtistType extends AbstractType
                 'asset_helper' => true,
                 'imagine_pattern' => 'my_thumb'
             ])
-            ->add('created_at')
-            ->add('updated_at')
 
         ;
     }

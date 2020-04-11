@@ -13,7 +13,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  * @Vich\Uploadable
  */
-class Product
+class Product implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -53,7 +53,7 @@ class Product
     private $avaiable;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=800)
      */
     private $description;
 
@@ -358,4 +358,33 @@ class Product
         return $this->imageSize;
     }
 
+    public function __toString()
+    {
+        return (string) $this->getName();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'name'=>$this->getName(),
+            'category'=>$this->getCategory(),
+            'artist'=>$this->getArtist(),
+            'price'=>$this->getPrice(),
+            'discount'=>$this->getDiscount(),
+            'size'=>$this->getSize(),
+            'stock'=>$this->getStock(),
+            'avaiable'=>$this->getAvaiable(),
+            'description'=>$this->getDescription(),
+            'comment'=>$this->getComments(),
+            'purchases'=>$this->getPurchases(),
+            'img_name'=>$this->getImageName(),
+            'img_size'=>$this->getImageSize(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt()
+        ];
+    }
 }

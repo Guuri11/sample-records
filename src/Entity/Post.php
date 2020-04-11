@@ -12,7 +12,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
  * @Vich\Uploadable
  */
-class Post
+class Post implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -27,7 +27,7 @@ class Post
     private $title;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=1200)
      */
     private $description;
 
@@ -251,5 +251,25 @@ class Post
     public function getImageSize(): ?int
     {
         return $this->imageSize;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->getId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'title'=>$this->getTitle(),
+            'description'=>$this->getDescription(),
+            'img_name'=>$this->getImageName(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt()
+        ];
     }
 }

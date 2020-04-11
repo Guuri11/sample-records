@@ -13,7 +13,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="App\Repository\AlbumRepository")
  * @Vich\Uploadable
  */
-class Album
+class Album implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -33,7 +33,7 @@ class Album
     private $price;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $duration;
 
@@ -258,6 +258,27 @@ class Album
 
     public function __toString()
     {
-        return $this->name;
+        return (string)$this->name;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'name'=>$this->getName(),
+            'artist'=>$this->getArtist(),
+            'price'=>$this->getPrice(),
+            'duration'=>$this->getDuration(),
+            'released_at'=>$this->getReleasedAt(),
+
+            'img_name'=>$this->getImageName(),
+            'img_size'=>$this->getImageSize(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt(),
+            'songs'=>$this->getSongs()
+        ];
     }
 }

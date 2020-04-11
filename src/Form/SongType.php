@@ -41,8 +41,6 @@ class SongType extends AbstractType
                 'imagine_pattern' => 'my_thumb'
             ])
             ->add('released_at')
-            ->add('created_at')
-            ->add('updated_at')
             ->add('artist')
             ->add('album')
         ;

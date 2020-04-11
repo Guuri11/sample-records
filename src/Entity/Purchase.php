@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PurchaseRepository")
  */
-class Purchase
+class Purchase implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -59,7 +59,7 @@ class Purchase
     private $country;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=550, nullable=true)
      */
     private $comment;
 
@@ -310,5 +310,27 @@ class Purchase
         }
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'serial_number'=>$this->getSerialNumber(),
+            'date'=>$this->getDate(),
+            'time'=>$this->getTime(),
+            'received'=>$this->getReceived(),
+            'address'=>$this->getAddress(),
+            'town'=>$this->getTown(),
+            'city'=>$this->getCity(),
+            'country'=>$this->getCountry(),
+            'comment'=>$this->getComment(),
+            'final_price'=>$this->getFinalPrice(),
+            'user'=>$this->getUser(),
+            'ticket'=>$this->getTicket(),
+            'product'=>$this->getProduct(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt()
+        ];
     }
 }

@@ -36,6 +36,8 @@ class SongController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $song->setCreatedAt(new \DateTime('now'));
+            $song->setUpdatedAt(new \DateTime('now'));
             $songFile = $form['songFile']->getData();
             $songFileName = $fileUploader->upload($songFile);
             $song->setSongFileName($songFileName);
@@ -72,6 +74,8 @@ class SongController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $song->setUpdatedAt(new \DateTime('now'));
+
             $songFile = $form['songFile']->getData();
             if ($songFile){
                 $songFileName = $fileUploader->upload($songFile);

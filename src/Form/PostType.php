@@ -15,8 +15,6 @@ class PostType extends AbstractType
         $builder
             ->add('title')
             ->add('description')
-            ->add('created_at')
-            ->add('updated_at')
             ->add('imageFile', VichImageType::class, [
                 'required' => false,
                 'allow_delete' => true,

@@ -20,8 +20,6 @@ class ProductType extends AbstractType
             ->add('stock')
             ->add('avaiable')
             ->add('description')
-            ->add('created_at')
-            ->add('updated_at')
             ->add('imageFile', VichImageType::class, [
                 'required' => false,
                 'allow_delete' => true,

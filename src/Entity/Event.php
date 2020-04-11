@@ -13,7 +13,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="App\Repository\EventRepository")
  * @Vich\Uploadable
  */
-class Event
+class Event implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -326,5 +326,35 @@ class Event
     public function getImageSize(): ?int
     {
         return $this->imageSize;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->getName();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'name'=>$this->getName(),
+            'place'=>$this->getPlace(),
+            'city'=>$this->getCity(),
+            'country'=>$this->getCountry(),
+            'date'=>$this->getDate(),
+            'prefix_serial_number'=>$this->getPrefixSerialNumber(),
+            'artist'=>$this->getArtist(),
+            'comments'=>$this->getComments(),
+            'tickets'=>$this->getTickets(),
+            'img_name'=>$this->getImageName(),
+            
+            'img_size'=>$this->getImageSize(),
+            'created_at'=>$this->getCreatedAt(),
+            'updated_at'=>$this->getUpdatedAt()
+
+        ];
     }
 }

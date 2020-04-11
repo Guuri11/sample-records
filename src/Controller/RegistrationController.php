@@ -29,6 +29,8 @@ class RegistrationController extends AbstractController
                     $form->get('plainPassword')->getData()
                 )
             );
+            $user->setCreatedAt(new \DateTime('now'));
+            $user->setUpdatedAt(new \DateTime('now'));
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
@@ -36,7 +38,7 @@ class RegistrationController extends AbstractController
 
             // do anything else you need here, like send an email
 
-            return $this->redirectToRoute('default/index.html.twig');
+            return $this->redirectToRoute('homepage');
         }
 
         return $this->render('registration/register.html.twig', [
