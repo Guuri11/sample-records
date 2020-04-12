@@ -23,6 +23,7 @@ class DefaultController extends AbstractController
         $logger = new CustomLog('SR-INFO','test.log');
         $logger->info('hola mundo');
 
+
         // now pass the array of link object to the view
         return $this->render('default/index.html.twig', [
             'artists' => $artists,

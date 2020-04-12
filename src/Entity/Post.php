@@ -266,6 +266,9 @@ class Post implements \JsonSerializable
         return [
             'id'=>$this->getId(),
             'title'=>$this->getTitle(),
+            'artist'=>$this->getArtist(),
+            'tags'=>$this->getTag()->toArray(),
+            'comments'=>$this->getComments(),
             'description'=>$this->getDescription(),
             'img_name'=>$this->getImageName(),
             'created_at'=>$this->getCreatedAt(),

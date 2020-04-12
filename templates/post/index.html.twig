@@ -15,6 +15,7 @@
                 <th>Updated_at</th>
                 <th>ImageName</th>
                 <th>ImageSize</th>
+                <th>Tags</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -28,6 +29,7 @@
                 <td>{{ post.updatedAt ? post.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ post.imageName }}</td>
                 <td>{{ post.imageSize }}</td>
+                <td>{{ post.tag }}</td>
                 <td>
                     <a href="{{ path('post_show', {'id': post.id}) }}">show</a>
                     <a href="{{ path('post_edit', {'id': post.id}) }}">edit</a>

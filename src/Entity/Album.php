@@ -273,7 +273,6 @@ class Album implements \JsonSerializable
             'price'=>$this->getPrice(),
             'duration'=>$this->getDuration(),
             'released_at'=>$this->getReleasedAt(),
-
             'img_name'=>$this->getImageName(),
             'img_size'=>$this->getImageSize(),
             'created_at'=>$this->getCreatedAt(),

@@ -19,6 +19,7 @@ class EventType extends AbstractType
             ->add('country')
             ->add('date')
             ->add('prefix_serial_number')
+            ->add('ticketQuantity')
             ->add('imageFile', VichImageType::class, [
                 'required' => false,
                 'allow_delete' => true,

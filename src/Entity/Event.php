@@ -101,6 +101,11 @@ class Event implements \JsonSerializable
      */
     private $artist;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $ticket_quantity;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -349,12 +354,24 @@ class Event implements \JsonSerializable
             'artist'=>$this->getArtist(),
             'comments'=>$this->getComments(),
             'tickets'=>$this->getTickets(),
+            'ticket_quantity'=>$this->getTicketQuantity(),
             'img_name'=>$this->getImageName(),
-            
             'img_size'=>$this->getImageSize(),
             'created_at'=>$this->getCreatedAt(),
             'updated_at'=>$this->getUpdatedAt()
 
         ];
+    }
+
+    public function getTicketQuantity(): ?int
+    {
+        return $this->ticket_quantity;
+    }
+
+    public function setTicketQuantity(?int $ticket_quantity): self
+    {
+        $this->ticket_quantity = $ticket_quantity;
+
+        return $this;
     }
 }

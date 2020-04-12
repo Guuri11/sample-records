@@ -437,11 +437,11 @@ class Artist implements \JsonSerializable
             'alias'=>$this->getAlias(),
             'surname'=>$this->getSurname(),
             'is_from'=>$this->getIsFrom(),
+            'bio'=>$this->getBio(),
             'birth'=>$this->getBirth()->format('Y-m-d'),
             'created_at'=>$this->getCreatedAt(),
             'updated_at'=>$this->getUpdatedAt(),
             'img_name'=>$this->getImageName(),
-            
             'img_size'=>$this->getImageSize(),
             'songs'=>$this->getSongs(),
             'posts'=>$this->getPosts(),
