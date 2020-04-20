@@ -5,8 +5,11 @@ namespace App\Controller\Api\V1;
 use App\Entity\Comment;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
+use App\Repository\PostRepository;
 use App\Repository\ProductRepository;
+use App\Repository\PurchaseRepository;
 use App\Repository\UserRepository;
+use App\Service\ApiUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,41 +18,74 @@ use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as SWG;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class CommentController
  * @package App\Controller\V1
- * @Route("/api/v1/comment")
+ * @Route("/api/v1.0/comment")
+ * @SWG\Tag(name="comment")
  */
 class CommentController extends AbstractController
 {
     /**
      * @Route("/", name="api_comment_retrieve", methods={"GET"})
      * @SWG\ Response(
-     *      response=201,
+     *      response=200,
      *      description="Get all comments",
      * @SWG\ Schema(
      *          type="object",
      * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
      *      )
      * )
+     * @param Request $request
      * @param CommentRepository $commentRepository
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
-    public function index(CommentRepository $commentRepository) : JsonResponse
+    public function index(Request $request, CommentRepository $commentRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        $comment = $commentRepository->findAll();
-        return new JsonResponse($comment,Response::HTTP_OK);
+        // Get params
+        $apiUtils->getRequestParams($request);
+
+        // Sanitize data
+        $apiUtils->setParameters($apiUtils->sanitizeData($apiUtils->getParameters()));
+
+
+        // Get result
+        try {
+            $results = $commentRepository->getRequestResult($apiUtils->getParameters());
+        } catch (\Exception $e) {
+            $apiUtils->errorResponse($e, "Comentarios no encontrados");
+            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+        }
+        $apiUtils->successResponse("OK",$results);
+        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
     }
 
     /**
      * @Route("/{id}", name="api_comment_show", methods={"GET"})
      * @param Comment $comment
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
+     * @SWG\ Response(
+     *      response=200,
+     *      description="Get one comment",
+     * @SWG\ Schema(
+     *          type="object",
+     * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
+     *      )
+     * )
      */
-    public function show(Comment $comment): JsonResponse
+    public function show(Comment $comment, ApiUtils $apiUtils): JsonResponse
     {
-        return new JsonResponse($comment,Response::HTTP_OK);
+        if ($comment === null){
+            $apiUtils->notFoundResponse("Comentario no encontrado");
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        }
+        $apiUtils->successResponse("OK", $comment);
+        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
+
     }
 
     /**
@@ -63,89 +99,174 @@ class CommentController extends AbstractController
      *      )
      * )
      * @param Request $request
+     * @param UserRepository $userRepository
+     * @param EventRepository $eventRepository
+     * @param ProductRepository $productRepository
+     * @param PurchaseRepository $purchaseRepository
+     * @param PostRepository $postRepository
+     * @param ApiUtils $apiUtils
+     * @param ValidatorInterface $validator
      * @return JsonResponse
      */
     public function new(Request $request, UserRepository $userRepository,
-                        EventRepository $eventRepository, ProductRepository $productRepository): JsonResponse
+                        EventRepository $eventRepository, ProductRepository $productRepository,
+                        PurchaseRepository $purchaseRepository, PostRepository $postRepository,
+                        ApiUtils $apiUtils, ValidatorInterface $validator): JsonResponse
     {
         $comment = new Comment();
-        $data = [];
-        if ($content = $request->getContent()){
-            $data = json_decode($content,true);
-        }
-        
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+
         try {
             $comment->setComment($data['comment']);
             $comment->setUser($userRepository->find($data['user']));
             if (isset($data['event']))
                 $comment->setEvent($eventRepository->find($data['event']));
+            if (isset($data['post']))
+                $comment->setPost($postRepository->find($data['post']));
             if (isset($data['product']))
                 $comment->setProduct($productRepository->find($data['product']));
+            if (isset($data['purchase']))
+                $comment->setPurchase($purchaseRepository->find($data['purchase']));
             $comment->setCreatedAt(new \DateTime());
             $comment->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
-            $error['code'] = $e->getCode();
-            $error['message'] = $e->getMessage();
-            return new JsonResponse($error,Response::HTTP_BAD_REQUEST);
+            $apiUtils->errorResponse($e, "No se pudo insertar los valores al comentario", $comment);
+            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($comment);
-        $em->flush();
 
-        return new JsonResponse($comment, Response::HTTP_CREATED);
+        // Check errors, if there is any errror return it
+        try {
+            $apiUtils->validateData($validator, $comment);
+        } catch (\Exception $e) {
+            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Upload obj to the database
+        try {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($comment);
+            $em->flush();
+        } catch (\Exception $e) {
+            $apiUtils->errorResponse($e, "No se pudo crear el comentario en la bbdd", null, $comment);
+
+            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Comentario creado!",$comment);
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
     /**
      * @Route("/edit/{id}", name="api_comment_update", methods={"PUT"})
-     *  @SWG\ Response(
-     *      response=201,
+     * @SWG\ Response(
+     *      response=202,
      *      description="updates a new Comment object",
      * @SWG\ Schema(
      *          type="object",
      * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
      *      )
      * )
+     * @param Request $request
+     * @param Comment $comment
+     * @param UserRepository $userRepository
+     * @param EventRepository $eventRepository
+     * @param ProductRepository $productRepository
+     * @param PurchaseRepository $purchaseRepository
+     * @param ApiUtils $apiUtils
+     * @param PostRepository $postRepository
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
      */
     public function edit(Request $request, Comment $comment, UserRepository $userRepository,
-                         EventRepository $eventRepository, ProductRepository $productRepository): JsonResponse
+                         EventRepository $eventRepository, ProductRepository $productRepository,
+                        PurchaseRepository $purchaseRepository, ApiUtils $apiUtils,
+                         PostRepository $postRepository, ValidatorInterface $validator): JsonResponse
     {
-        $data = [];
+        // Get request data
+        $apiUtils->getContent($request);
 
-        if ($content = $request->getContent()){
-            $data = json_decode($content,true);
-        }
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
         try {
             $comment->setComment($data['comment']);
             $comment->setUser($userRepository->find($data['user']));
             if (isset($data['event']))
                 $comment->setEvent($eventRepository->find($data['event']));
+            if (isset($data['post']))
+                $comment->setPost($postRepository->find($data['post']));
             if (isset($data['product']))
                 $comment->setProduct($productRepository->find($data['product']));
+            if (isset($data['purchase']))
+                $comment->setPurchase($purchaseRepository->find($data['purchase']));
             $comment->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
-            $error['code'] = $e->getCode();
-            $error['message'] = $e->getMessage();
-            return new JsonResponse($error,400,['Content-type'=>'application/json']);
+            $apiUtils->errorResponse($e, "No se pudo actualizar los valores del comentario", $comment);
+            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
         }
-        $em = $this->getDoctrine()->getManager();
-        $em->flush();
 
-        return new JsonResponse($comment, Response::HTTP_OK,['Content-type'=>'application/json']);
+        // Check errors, if there is any errror return it
+        try {
+            $apiUtils->validateData($validator,$comment);
+        } catch (\Exception $e) {
+            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Update obj to the database
+        try {
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+        }catch (\Exception $e) {
+            $apiUtils->errorResponse($e,"No se pudo actualizar el comentario en la bbdd",null,$comment);
+            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Comentario editado!");
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
-     * @Route("/delete/{id}", name="api_artist_delete", methods={"DELETE"})
+     * @Route("/delete/{id}", name="api_comment_delete", methods={"DELETE"})
+     * @SWG\ Response(
+     *      response=202,
+     *      description="Deletes a comment",
+     * @SWG\ Schema(
+     *          type="object",
+     * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
+     *      )
+     * )
+     * @param Request $request
+     * @param Comment $comment
+     * @param ApiUtils $apiUtils
+     * @return JsonResponse
      */
-    public function delete(Request $request, Comment $comment): JsonResponse
+    public function delete(Request $request, Comment $comment, ApiUtils $apiUtils): JsonResponse
     {
-        if ($comment === null)
-            return new JsonResponse(['message'=>'Link not found'],
-                Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($comment);
-        $entityManager->flush();
+        try {
+            if ($comment === null){
+                $apiUtils->notFoundResponse("Comentario no encontrado");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+            }
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($comment);
+            $entityManager->flush();
 
-        return new JsonResponse($comment, Response::HTTP_OK,['Content-type'=>'application/json']);
+        }catch (\Exception $e) {
+            $apiUtils->errorResponse($e,"No se pudo borrar el comentario de la base de datos",null,$comment);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Comentario borrado!");
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 }

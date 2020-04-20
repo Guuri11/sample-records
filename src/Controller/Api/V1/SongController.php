@@ -2,11 +2,11 @@
 
 namespace App\Controller\Api\V1;
 
-use App\Entity\Album;
 use App\Entity\Song;
 use App\Repository\AlbumRepository;
 use App\Repository\ArtistRepository;
 use App\Repository\SongRepository;
+use App\Service\ApiUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,41 +15,68 @@ use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as SWG;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Exception;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class SongController
  * @package App\Controller\V1
- * @Route("/api/v1/song")
+ * @Route("/api/v1.0/song")
+ * @SWG\Tag(name="song")
  */
 class SongController extends AbstractController
 {
     /**
      * @Route("/", name="api_song_retrieve", methods={"GET"})
      * @SWG\ Response(
-     *      response=201,
+     *      response=200,
      *      description="Get all songs",
+     * )
+     * @param Request $request
+     * @param SongRepository $songRepository
+     * @param ApiUtils $apiUtils
+     * @return JsonResponse
+     */
+    public function index(Request $request ,SongRepository $songRepository, ApiUtils $apiUtils) : JsonResponse
+    {
+        // Get params
+        $apiUtils->getRequestParams($request);
+
+        // Sanitize data
+        $apiUtils->setParameters($apiUtils->sanitizeData($apiUtils->getParameters()));
+
+        // Get result
+        try {
+            $results = $songRepository->getRequestResult($apiUtils->getParameters());
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, "Canciones no encontradas");
+            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+        }
+        $apiUtils->successResponse("OK",$results);
+        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/{id}", name="api_song_show", methods={"GET"})
+     * @SWG\ Response(
+     *      response=200,
+     *      description="Get one song",
      * @SWG\ Schema(
      *          type="object",
      * @SWG\ Property(property="song", ref=@Model(type=Song::class, groups={"serialized"}))
      *      )
      * )
-     * @param SongRepository $songRepository
-     * @return JsonResponse
-     */
-    public function index(SongRepository $songRepository) : JsonResponse
-    {
-        $song = $songRepository->findAll();
-        return new JsonResponse($song,Response::HTTP_OK);
-    }
-
-    /**
-     * @Route("/{id}", name="api_song_show", methods={"GET"})
      * @param Song $song
      * @return JsonResponse
      */
-    public function show(Song $song): JsonResponse
+    public function show(Song $song, ApiUtils $apiUtils): JsonResponse
     {
-        return new JsonResponse($song,Response::HTTP_OK);
+        if ($song === null){
+            $apiUtils->notFoundResponse("Canción no encontrada");
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        }
+        $apiUtils->successResponse("OK", $song);
+        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
     }
 
     /**
@@ -63,95 +90,165 @@ class SongController extends AbstractController
      *      )
      * )
      * @param Request $request
+     * @param ArtistRepository $artistRepository
+     * @param AlbumRepository $albumRepository
+     * @param ValidatorInterface $validator
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
     public function new(Request $request, ArtistRepository $artistRepository,
-                        AlbumRepository $albumRepository): JsonResponse
+                        AlbumRepository $albumRepository, ValidatorInterface $validator,
+                        ApiUtils $apiUtils): JsonResponse
     {
         $song = new Song();
-        $data = [];
-        if ($content = $request->getContent()){
-            $data = json_decode($content,true);
-        }
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
         
         try {
             $song->setName($data['name']);
             $song->setArtist($artistRepository->find($data['artist']));
-            $song->setAlbum($albumRepository->find($data['album']));
+            if ($data['album'] !== null)
+                $song->setAlbum($albumRepository->find($data['album']));
             $song->setDuration($data['duration']);
-            $song->setSongFileName($data['song_file']);
+            $song->setSongFileName($data['songFileName']);
             $song->setVideoSrc($data['video_src']);
             $song->setReleasedAt(new \DateTime($data['released_at']));
-            $song->setImageName($data['img']);
-            $song->setImageSize($data['img_size']);
+            $song->setImageName($data['imageName']);
+            $song->setImageSize($data['imageSize']);
             $song->setCreatedAt(new \DateTime());
             $song->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $error['code'] = $e->getCode();
-            $error['message'] = $e->getMessage();
-            return new JsonResponse($error,Response::HTTP_BAD_REQUEST);
+        }catch (Exception $e){
+            $apiUtils->errorResponse($e, "No se pudo insertar los valores a la canción", $song);
+            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($song);
-        $em->flush();
+        // Check errors, if there is any error return it
+        try {
+            $apiUtils->validateData($validator, $song);
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+        }
 
-        return new JsonResponse($song, Response::HTTP_CREATED);
+        // Upload obj to the database
+        try {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($song);
+            $em->flush();
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, "No se pudo crear la canción en la bbdd", null, $song);
+
+            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Canción creada!",$song);
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
     /**
      * @Route("/edit/{id}", name="api_song_update", methods={"PUT"})
-     *  @SWG\ Response(
-     *      response=201,
+     * @SWG\ Response(
+     *      response=202,
      *      description="updates a new Song object",
      * @SWG\ Schema(
      *          type="object",
      * @SWG\ Property(property="song", ref=@Model(type=Song::class, groups={"serialized"}))
      *      )
      * )
+     * @param Request $request
+     * @param Song $song
+     * @param ArtistRepository $artistRepository
+     * @param AlbumRepository $albumRepository
+     * @param ValidatorInterface $validator
+     * @param ApiUtils $apiUtils
+     * @return JsonResponse
      */
     public function edit(Request $request, Song $song, ArtistRepository $artistRepository,
-                         AlbumRepository $albumRepository): JsonResponse
+                         AlbumRepository $albumRepository, ValidatorInterface $validator,
+                        ApiUtils $apiUtils): JsonResponse
     {
-        $data = [];
+        // Get request data
+        $apiUtils->getContent($request);
 
-        if ($content = $request->getContent()){
-            $data = json_decode($content,true);
-        }
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
         try {
             $song->setName($data['name']);
             $song->setArtist($artistRepository->find($data['artist']));
-            $song->setAlbum($albumRepository->find($data['album']));
+            if ($data['album'] !== null)
+                $song->setAlbum($albumRepository->find($data['album']));
             $song->setDuration($data['duration']);
             $song->setSongFileName($data['song_file']);
             $song->setVideoSrc($data['video_src']);
             $song->setReleasedAt(new \DateTime($data['released_at']));
-            $song->setImageName($data['img']);
-            $song->setImageSize($data['img_size']);
+            $song->setImageName($data['imageName']);
+            $song->setImageSize($data['imageSize']);
             $song->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $error['code'] = $e->getCode();
-            $error['message'] = $e->getMessage();
-            return new JsonResponse($error,400,['Content-type'=>'application/json']);
-        }
-        $em = $this->getDoctrine()->getManager();
-        $em->flush();
+        }catch (Exception $e){
+            $apiUtils->errorResponse($e, "No se pudo actualizar los valores a la canción", $song);
 
-        return new JsonResponse($song, Response::HTTP_OK,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+        }
+        // Check errors, if there is any errror return it
+        try {
+            $apiUtils->validateData($validator,$song);
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Update obj to the database
+        try {
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+        }catch (Exception $e) {
+            $apiUtils->errorResponse($e,"No se pudo actualizar la canción en la bbdd",null,$song);
+
+            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Canción editada!");
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
      * @Route("/delete/{id}", name="api_song_delete", methods={"DELETE"})
+     * @SWG\ Response(
+     *      response=202,
+     *      description="Delete a song",
+     * @SWG\ Schema(
+     *          type="object",
+     * @SWG\ Property(property="song", ref=@Model(type=Song::class, groups={"serialized"}))
+     *      )
+     * )
+     * @param Request $request
+     * @param Song $song
+     * @param ApiUtils $apiUtils
+     * @return JsonResponse
      */
-    public function delete(Request $request, Song $song): JsonResponse
+    public function delete(Request $request, Song $song, ApiUtils $apiUtils): JsonResponse
     {
-        if ($song === null)
-            return new JsonResponse(['message'=>'Link not found'],
-                Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($song);
-        $entityManager->flush();
+        try {
+            if ($song === null){
+                $apiUtils->notFoundResponse("Canción no encontrada");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+            }
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($song);
+            $entityManager->flush();
 
-        return new JsonResponse($song, Response::HTTP_OK,['Content-type'=>'application/json']);
+        }catch (Exception $e) {
+            $apiUtils->errorResponse($e,"No se pudo borrar la canción de la base de datos",null,$song);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Canción borrada!");
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 }

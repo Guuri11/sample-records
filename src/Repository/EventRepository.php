@@ -19,32 +19,57 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-    // /**
-    //  * @return Event[] Returns an array of Event objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param $params
+     * @return \Doctrine\ORM\QueryBuilder
+     * API request result
+     */
+    public function getRequestResult($params)
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $result = $this->createQueryBuilder('e');
+        if (key_exists("search",$params)) {
+            $result->where('e.name LIKE :search')
+                ->setParameter('search', '%'.$params['search'].'%');
+        }
+        if (key_exists("first",$params)) {
+            $result->andWhere('e.id >= :id_event')
+                ->setParameter('id_event',$params['first']);
+        }
+        if (key_exists("artist",$params)) {
+            $result->andWhere('e.artist = :id_artist')
+                ->setParameter('id_artist',$params['artist']);
+        }
+        if (key_exists("until",$params)) {
+            $result->andWhere('e.date >= :date')
+                ->setParameter('date',$params['until']);
+        }
+        if (key_exists("last",$params)) {
+            $result->setMaxResults($params['last']);
+        }
+        if (key_exists("ord",$params)) {
+            $result->orderBy('e.id', $params['ord']);
+        }
+        if (count($result->getQuery()->getResult()) > 0 )
+            return $result->getQuery()->getResult();
+        else
+            throw new \Exception("No se ha encontrado ningún resultado");
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Event
+    /**
+     * @param $search
+     * @throws \Exception
+     */
+    public function getSearchRequest($search)
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $result = $this->createQueryBuilder('e');
+        if ($search) {
+            $result->where('e.name LIKE :search')
+                ->setParameter('search', '%'.$search.'%');
+        }
+        if ($result->getQuery()->getResult())
+            return $result->getQuery()->getResult();
+        else
+            return null;
     }
-    */
+
 }

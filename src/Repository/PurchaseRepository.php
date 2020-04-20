@@ -19,32 +19,33 @@ class PurchaseRepository extends ServiceEntityRepository
         parent::__construct($registry, Purchase::class);
     }
 
-    // /**
-    //  * @return Purchase[] Returns an array of Purchase objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param $params
+     * @return \Doctrine\ORM\QueryBuilder
+     * API request result
+     */
+    public function getRequestResult($params)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $result = $this->createQueryBuilder('p');
+        if (key_exists("search",$params)) {
+            $result->where('p.serial_number LIKE :search')
+                ->setParameter('search', '%'.$params['search'].'%');
+        }
+        if (key_exists("first",$params)) {
+            $result->andWhere('p.id >= :id')
+                ->setParameter('id',$params['first']);
+        }
+        if (key_exists("last",$params)) {
+            $result->setMaxResults($params['last']);
+        }
+        if (key_exists("ord",$params)) {
+            $result->orderBy('p.id', $params['ord']);
+        }
+        if (count($result->getQuery()->getResult()) > 0 )
+            return $result->getQuery()->getResult();
+        else
+            throw new \Exception("No se ha encontrado ningún resultado");
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Purchase
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+
 }

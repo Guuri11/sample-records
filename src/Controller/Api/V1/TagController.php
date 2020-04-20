@@ -3,8 +3,9 @@
 namespace App\Controller\Api\V1;
 
 use App\Entity\Tag;
-use App\Repository\ArtistRepository;
+use App\Form\TagType;
 use App\Repository\TagRepository;
+use App\Service\ApiUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,47 +14,80 @@ use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as SWG;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Exception;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 /**
  * Class TagController
  * @package App\Controller\V1
- * @Route("/api/v1/tag")
+ * @SWG\Tag(name="tag")
+ * @Route("/api/v1.0/tag")
  */
 class TagController extends AbstractController
 {
     /**
      * @Route("/", name="api_tag_retrieve", methods={"GET"})
      * @SWG\ Response(
-     *      response=201,
+     *      response=200,
      *      description="Get all tags",
      * @SWG\ Schema(
      *          type="object",
      * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
      *      )
      * )
+     * @param Request $request
      * @param TagRepository $tagRepository
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
-    public function index(TagRepository $tagRepository) : JsonResponse
+    public function index(Request $request, TagRepository $tagRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        $tag = $tagRepository->findAll();
-        return new JsonResponse($tag,Response::HTTP_OK);
+        // Get params
+        $apiUtils->getRequestParams($request);
+
+        // Sanitize data
+        $apiUtils->setParameters($apiUtils->sanitizeData($apiUtils->getParameters()));
+
+        // Get result
+        try {
+            $results = $tagRepository->getRequestResult($apiUtils->getParameters());
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, "Tags no encontrados");
+            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+        }
+        $apiUtils->successResponse("OK",$results);
+        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
     }
 
     /**
      * @Route("/{id}", name="api_tag_show", methods={"GET"})
+     * @SWG\ Response(
+     *      response=200,
+     *      description="Get one tag",
+     * @SWG\ Schema(
+     *          type="object",
+     * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
+     *      )
+     * )
      * @param Tag $tag
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
-    public function show(Tag $tag): JsonResponse
+    public function show(Tag $tag, ApiUtils $apiUtils): JsonResponse
     {
-        return new JsonResponse($tag,Response::HTTP_OK);
+        if ($tag === null){
+            $apiUtils->notFoundResponse("Tag no encontrado");
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        }
+        $apiUtils->successResponse("OK",$tag);
+        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
     }
 
     /**
      * @Route("/new", name="api_tag_new", methods={"POST"})
      * @SWG\ Response(
-     *      response=201,
+     *      response=202,
      *      description="Creates a new Tag object",
      * @SWG\ Schema(
      *          type="object",
@@ -61,36 +95,55 @@ class TagController extends AbstractController
      *      )
      * )
      * @param Request $request
+     * @param ValidatorInterface $validator
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
-    public function new(Request $request): JsonResponse
+    public function new(Request $request, ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
         $tag = new Tag();
-        $data = [];
-        if ($content = $request->getContent()){
-            $data = json_decode($content,true);
-        }
-        
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
         try {
             $tag->setTag($data['tag']);
             $tag->setCreatedAt(new \DateTime());
             $tag->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $error['code'] = $e->getCode();
-            $error['message'] = $e->getMessage();
-            return new JsonResponse($error,Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e){
+            $apiUtils->errorResponse($e, "No se pudo insertar los valores al tag", $tag);
+            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($tag);
-        $em->flush();
 
-        return new JsonResponse($tag, Response::HTTP_CREATED);
+        // Check errors, if there is any error return it
+        try {
+            $apiUtils->validateData($validator, $tag);
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Upload obj to the database
+        try {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($tag);
+            $em->flush();
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, "No se pudo crear el tag en la bbdd", null, $tag);
+
+            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Tag creado!",$tag);
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
     /**
      * @Route("/edit/{id}", name="api_tag_update", methods={"PUT"})
-     *  @SWG\ Response(
+     * @SWG\ Response(
      *      response=201,
      *      description="updates a new Tag object",
      * @SWG\ Schema(
@@ -98,40 +151,75 @@ class TagController extends AbstractController
      * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
      *      )
      * )
+     * @param Request $request
+     * @param Tag $tag
+     * @param ApiUtils $apiUtils
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
      */
-    public function edit(Request $request, Tag $tag): JsonResponse
+    public function edit(Request $request, Tag $tag, ApiUtils $apiUtils, ValidatorInterface $validator): JsonResponse
     {
-        $data = [];
+        // Get request data
+        $apiUtils->getContent($request);
 
-        if ($content = $request->getContent()){
-            $data = json_decode($content,true);
-        }
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
         try {
             $tag->setTag($data['tag']);
             $tag->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $error['code'] = $e->getCode();
-            $error['message'] = $e->getMessage();
-            return new JsonResponse($error,400,['Content-type'=>'application/json']);
+        } catch (Exception $e){
+            $apiUtils->errorResponse($e, "No se pudo editar los valores del tag", $tag);
+            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
-        $em = $this->getDoctrine()->getManager();
-        $em->flush();
 
-        return new JsonResponse($tag, Response::HTTP_OK,['Content-type'=>'application/json']);
+        // Update obj to the database
+        try {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->flush();
+        }catch (\Exception $e){
+            $apiUtils->errorResponse($e,"No se pudo actualizar el tag en la bbdd",null,$tag);
+
+            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Tag editado!");
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
      * @Route("/delete/{id}", name="api_tag_delete", methods={"DELETE"})
+     * @SWG\ Response(
+     *      response=201,
+     *      description="Delete a tag",
+     * @SWG\ Schema(
+     *          type="object",
+     * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
+     *      )
+     * )
+     * @param Request $request
+     * @param Tag $tag
+     * @param ApiUtils $apiUtils
+     * @return JsonResponse
      */
-    public function delete(Request $request, Tag $tag): JsonResponse
+    public function delete(Request $request, Tag $tag, ApiUtils $apiUtils): JsonResponse
     {
-        if ($tag === null)
-            return new JsonResponse(['message'=>'Link not found'],
-                Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($tag);
-        $entityManager->flush();
+        try {
+            if ($tag === null){
+                $apiUtils->notFoundResponse("Tag no encontrado");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+            }
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($tag);
+            $entityManager->flush();
 
-        return new JsonResponse($tag, Response::HTTP_OK,['Content-type'=>'application/json']);
+        }catch (Exception $e) {
+            $apiUtils->errorResponse($e,"No se pudo borrar el tag de la base de datos",null,$tag);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Tag borrado!");
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 }

@@ -17,22 +17,8 @@ class ArtistType extends AbstractType
             ->add('name')
             ->add('alias')
             ->add('surname')
-            ->add('birth',BirthdayType::class, [
-                'placeholder' => [
-                    'year' => 'Year', 'month' => 'Month', 'day' => 'Day',
-                ]])
-
             ->add('is_from')
             ->add('bio')
-            ->add('imageFile', VichImageType::class, [
-                'required' => false,
-                'allow_delete' => true,
-                'download_uri' => true,
-                'image_uri' => true,
-                'asset_helper' => true,
-                'imagine_pattern' => 'my_thumb'
-            ])
-
         ;
     }
 
@@ -40,6 +26,10 @@ class ArtistType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Artist::class,
+            'csrf_protection' => false,
+            'csrf_field_name' => '_token',
+            // a unique key to help generate the secret token
+            'csrf_token_id'   => 'artist_item',
         ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
@@ -18,6 +19,7 @@ class Comment implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=500)
+     * @Assert\NotBlank(message="Comentario requerido")
      */
     private $comment;
 
@@ -50,6 +52,11 @@ class Comment implements \JsonSerializable
      * @ORM\ManyToOne(targetEntity="App\Entity\Post", inversedBy="comments")
      */
     private $post;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Purchase", mappedBy="comment", cascade={"persist", "remove"})
+     */
+    private $purchase;
 
 
     public function getId(): ?int
@@ -151,9 +158,29 @@ class Comment implements \JsonSerializable
             'comment'=>$this->getComment(),
             'user'=>$this->getUser(),
             'event'=>$this->getEvent(),
+            'post'=>$this->getPost(),
             'product'=>$this->getProduct(),
+            'purchase'=>$this->getPurchase(),
             'created_at'=>$this->getCreatedAt(),
             'updated_at'=>$this->getUpdatedAt()
         ];
+    }
+
+    public function getPurchase(): ?Purchase
+    {
+        return $this->purchase;
+    }
+
+    public function setPurchase(?Purchase $purchase): self
+    {
+        $this->purchase = $purchase;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newComment = null === $purchase ? null : $this;
+        if ($purchase->getComment() !== $newComment) {
+            $purchase->setComment($newComment);
+        }
+
+        return $this;
     }
 }

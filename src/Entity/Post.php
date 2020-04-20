@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
  * @Vich\Uploadable
@@ -23,11 +25,15 @@ class Post implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Título requerido")
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=1200)
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Length(min="0",minMessage="La descripción no puede estar vacia",
+     *     max="1200", maxMessage="El límite de carácteres es 1200")
      */
     private $description;
 
@@ -48,6 +54,7 @@ class Post implements \JsonSerializable
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Artist", inversedBy="posts")
+     * @Assert\NotBlank(message="Selecciona el artista del album")
      */
     private $artist;
 
@@ -62,11 +69,15 @@ class Post implements \JsonSerializable
      * @Vich\UploadableField(mapping="posts", fileNameProperty="imageName", size="imageSize")
      *
      * @var File|null
+     * * @Assert\File(uploadErrorMessage="Error al subir la imagen",
+     *     mimeTypesMessage="Tipo de archivo no válido",
+     *     mimeTypes={"image/png","image/jpeg","image/jpg"})
      */
     private $imageFile;
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\NotNull(message="Inserta una imagen para el evento")
      *
      * @var string|null
      */

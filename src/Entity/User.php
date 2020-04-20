@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -27,27 +28,38 @@ class User implements UserInterface, \Serializable, \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\Email(message="Este email no es válido")
+     * @Assert\NotBlank(message="Email requerido")
+
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
+     *
      */
     private $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="Contraseña requerida")
+     * @Assert\Length(min="6",minMessage="La contraseña debe tener al menos 6 carácteres")
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z ]*$/",
+     *     message="El nombre solo debería contener letras"
+     * )
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=75)
+     * @ORM\Column(type="string", length=75, nullable=true)
      */
     private $surname;
 
@@ -92,6 +104,9 @@ class User implements UserInterface, \Serializable, \JsonSerializable
      * @Vich\UploadableField(mapping="users_profile", fileNameProperty="profileImage", size="profileSize")
      *
      * @var File|null
+     * @Assert\File(uploadErrorMessage="Error al subir la imagen",
+     *     mimeTypesMessage="Tipo de archivo no válido",
+     *     mimeTypes={"image/png","image/jpeg","image/jpg"})
      */
     private $profileFile;
 
@@ -105,6 +120,7 @@ class User implements UserInterface, \Serializable, \JsonSerializable
     /**
      * @ORM\Column(type="integer", nullable=true)
      *
+     *
      * @var int|null
      */
     private $profileSize;
@@ -115,6 +131,9 @@ class User implements UserInterface, \Serializable, \JsonSerializable
      * @Vich\UploadableField(mapping="users_header", fileNameProperty="headerImage", size="headerSize")
      *
      * @var File|null
+     * @Assert\File(uploadErrorMessage="Error al subir la imagen",
+     *     mimeTypesMessage="Tipo de archivo no válido",
+     *     mimeTypes={"image/png","image/jpeg","image/jpg"})
      */
     private $headerFile;
 

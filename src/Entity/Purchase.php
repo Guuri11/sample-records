@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PurchaseRepository")
@@ -20,6 +22,11 @@ class Purchase implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z0-9]*$/",
+     *     message="El numero de serie solo pueden tener letras y números"
+     * )
      */
     private $serial_number;
 
@@ -40,31 +47,38 @@ class Purchase implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Dirección del pedido requerido")
+     * @Assert\Length(min="0",max="255",minMessage="Dirección del pedido requerido", maxMessage="Máxim 255 carácteres")
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(max="255", maxMessage="Máxim 255 carácteres")
      */
     private $town;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(max="255", maxMessage="Máxim 255 carácteres")
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Dirección del pedido requerido")
+     * @Assert\Length(max="255", maxMessage="Máxim 255 carácteres")
      */
     private $country;
 
     /**
-     * @ORM\Column(type="string", length=550, nullable=true)
-     */
-    private $comment;
-
-    /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="Precio requerido")
+     * @Assert\Type(
+     *     type="float",
+     *     message="El precio debe de ser un número"
+     * )
+     * @Assert\PositiveOrZero(message="El precio debe de ser mayor/igual de 0")
      */
     private $final_price;
 
@@ -93,10 +107,17 @@ class Purchase implements \JsonSerializable
      */
     private $product;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Comment", inversedBy="purchase", cascade={"persist", "remove"})
+     * @ORM\Column(nullable=true)
+     */
+    private $comment;
+
     public function __construct()
     {
         $this->ticket = new ArrayCollection();
         $this->product = new ArrayCollection();
+        $this->comment = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -196,18 +217,6 @@ class Purchase implements \JsonSerializable
     public function setCountry(string $country): self
     {
         $this->country = $country;
-
-        return $this;
-    }
-
-    public function getComment(): ?string
-    {
-        return $this->comment;
-    }
-
-    public function setComment(?string $comment): self
-    {
-        $this->comment = $comment;
 
         return $this;
     }
@@ -332,5 +341,17 @@ class Purchase implements \JsonSerializable
             'created_at'=>$this->getCreatedAt(),
             'updated_at'=>$this->getUpdatedAt()
         ];
+    }
+
+    public function getComment(): ?ArrayCollection
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?Comment $comment): self
+    {
+        $this->comment = $comment;
+
+        return $this;
     }
 }

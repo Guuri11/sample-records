@@ -19,6 +19,7 @@ class CommentType extends AbstractType
             ->add('event')
             ->add('product')
             ->add('post')
+            ->add('purchase')
         ;
     }
 
@@ -26,6 +27,10 @@ class CommentType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Comment::class,
+            'csrf_protection' => false,
+            'csrf_field_name' => '_token',
+            // a unique key to help generate the secret token
+            'csrf_token_id'   => 'comment_item',
         ]);
     }
 }

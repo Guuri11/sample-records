@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TagRepository")
@@ -20,6 +22,11 @@ class Tag implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z]*$/",
+     *     message="El tag solo debería contener letras"
+     * )
      */
     private $tag;
 
@@ -114,7 +121,7 @@ class Tag implements \JsonSerializable
 
     public function __toString()
     {
-        return (string) $this->tag;
+        return (string )$this->tag;
     }
 
 

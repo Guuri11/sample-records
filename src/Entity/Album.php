@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AlbumRepository")
@@ -24,21 +25,39 @@ class Album implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z0-9 ]*$/",
+     *     message="El nombre del album solo debería contener letras"
+     * )
      */
     private $name;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="Precio requerido")
+     * @Assert\Type(
+     *     type="float",
+     *     message="El precio debe de ser un número"
+     * )
+     * @Assert\PositiveOrZero(message="El precio debe de ser mayor/igual de 0")
      */
     private $price;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Type(
+     *     type="integer",
+     *     message="La duración debe de ser un número"
+     * )
+     * @Assert\PositiveOrZero(message="La duración debe de ser mayor de 0")
      */
     private $duration;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\NotBlank(message="Fecha de lanzamiento requerido")
+
      */
     private $released_at;
 
@@ -48,6 +67,10 @@ class Album implements \JsonSerializable
      * @Vich\UploadableField(mapping="albums", fileNameProperty="imageName", size="imageSize")
      *
      * @var File|null
+     *
+     * @Assert\File(uploadErrorMessage="Error al subir la imagen",
+     *     mimeTypesMessage="Tipo de archivo no válido",
+     *     mimeTypes={"image/png","image/jpeg","image/jpg"})
      */
     private $imageFile;
 
@@ -55,6 +78,7 @@ class Album implements \JsonSerializable
      * @ORM\Column(type="string")
      *
      * @var string|null
+     *
      */
     private $imageName;
 
@@ -82,6 +106,7 @@ class Album implements \JsonSerializable
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Artist", inversedBy="albums")
+     * @Assert\NotBlank(message="Selecciona el artista del album")
      */
     private $artist;
 

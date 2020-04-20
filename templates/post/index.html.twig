@@ -29,7 +29,7 @@
                 <td>{{ post.updatedAt ? post.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ post.imageName }}</td>
                 <td>{{ post.imageSize }}</td>
-                <td>{{ post.tag }}</td>
+                <td>{{ post.tag.count }}</td>
                 <td>
                     <a href="{{ path('post_show', {'id': post.id}) }}">show</a>
                     <a href="{{ path('post_edit', {'id': post.id}) }}">edit</a>

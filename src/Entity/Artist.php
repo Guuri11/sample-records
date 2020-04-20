@@ -8,10 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ArtistRepository")
  * @Vich\Uploadable
+ *
  */
 class Artist implements \JsonSerializable
 {
@@ -24,21 +27,30 @@ class Artist implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=20, nullable=true)
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z ]*$/",
+     *     message="El nombre solo deberia contener letras"
+     * )
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Assert\NotBlank(message="Alias requerido")
      */
     private $alias;
 
     /**
      * @ORM\Column(type="string", length=75, nullable=true)
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z ]*$/",
+     *     message="El apellido del artista solo deberia contener letras"
+     * )
      */
     private $surname;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
     private $birth;
 
@@ -68,6 +80,11 @@ class Artist implements \JsonSerializable
      * @Vich\UploadableField(mapping="artists", fileNameProperty="imageName", size="imageSize")
      *
      * @var File|null
+     *
+     * @Assert\File(uploadErrorMessage="Ha habido un error al subir la imagen",
+     *     mimeTypesMessage="Tipo de archivo no válido, solo puede ser png, jpeg y jpg.",
+     *     mimeTypes={"image/png","image/jpeg","image/jpg"})
+     * @Assert\NotNull(message="Inserte la imagen del artista")
      */
     private $imageFile;
 
@@ -438,7 +455,6 @@ class Artist implements \JsonSerializable
             'surname'=>$this->getSurname(),
             'is_from'=>$this->getIsFrom(),
             'bio'=>$this->getBio(),
-            'birth'=>$this->getBirth()->format('Y-m-d'),
             'created_at'=>$this->getCreatedAt(),
             'updated_at'=>$this->getUpdatedAt(),
             'img_name'=>$this->getImageName(),

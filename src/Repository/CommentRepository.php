@@ -19,32 +19,47 @@ class CommentRepository extends ServiceEntityRepository
         parent::__construct($registry, Comment::class);
     }
 
-    // /**
-    //  * @return Comment[] Returns an array of Comment objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param $params
+     * @return \Doctrine\ORM\QueryBuilder
+     * API request result
+     */
+    public function getRequestResult($params)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $result = $this->createQueryBuilder('c');
+        if (key_exists("search",$params)) {
+            $result->where('c.comment LIKE :search')
+                ->setParameter('search', '%'.$params['search'].'%');
+        }
+        if (key_exists("first",$params)) {
+            $result->andWhere('c.id >= :id_comment')
+                ->setParameter('id_comment',$params['first']);
+        }
+        if (key_exists("post",$params)) {
+            $result->andWhere('c.post = :id_post')
+                ->setParameter('id_post',$params['post']);
+        }
+        if (key_exists("product",$params)) {
+            $result->andWhere('c.product = :id_product')
+                ->setParameter('id_product',$params['product']);
+        }
+        if (key_exists("purchase",$params)) {
+            $result->andWhere('c.purchase = :id_purchase')
+                ->setParameter('id_purchase',$params['purchase']);
+        }
+        if (key_exists("event",$params)) {
+            $result->andWhere('c.event = :id_event')
+                ->setParameter('id_event',$params['event']);
+        }
+        if (key_exists("last",$params)) {
+            $result->setMaxResults($params['last']);
+        }
+        if (key_exists("ord",$params)) {
+            $result->orderBy('c.id', $params['ord']);
+        }
+        if (count($result->getQuery()->getResult()) > 0 )
+            return $result->getQuery()->getResult();
+        else
+            throw new \Exception("No se ha encontrado ningún resultado");
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Comment
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

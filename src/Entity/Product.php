@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
@@ -24,16 +26,29 @@ class Product implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Nombre requerido")
      */
     private $name;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="Precio requerido")
+     * @Assert\Type(
+     *     type="float",
+     *     message="El precio debe de ser un número"
+     * )
+     * @Assert\PositiveOrZero(message="El precio debe de ser mayor de 0")
      */
     private $price;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Assert\NotBlank(message="Precio requerido")
+     * @Assert\Type(
+     *     type="float",
+     *     message="El precio debe de ser un número"
+     * )
+     * @Assert\PositiveOrZero(message="El descuento no puede ser negativo")
      */
     private $discount;
 
@@ -44,6 +59,12 @@ class Product implements \JsonSerializable
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Regex(
+     *     pattern="/^[0-9 ]*$/",
+     *     message="El stock debe de ser un número"
+     * )
+     * @Assert\PositiveOrZero(message="El stock debe ser mayor/igual de 0")
      */
     private $stock;
 
@@ -54,6 +75,9 @@ class Product implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=800)
+     * @Assert\NotBlank(message="Descripción requerida")
+     * @Assert\Length(min="0",minMessage="La descripción no puede estar vacia",
+     *     max="800", maxMessage="El límite de carácteres es 800")
      */
     private $description;
 
@@ -74,6 +98,7 @@ class Product implements \JsonSerializable
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Artist", inversedBy="products")
+     *
      */
     private $artist;
 
@@ -93,6 +118,9 @@ class Product implements \JsonSerializable
      * @Vich\UploadableField(mapping="products", fileNameProperty="imageName", size="imageSize")
      *
      * @var File|null
+     * @Assert\File(uploadErrorMessage="Error al subir la imagen",
+     *     mimeTypesMessage="Tipo de archivo no válido",
+     *     mimeTypes={"image/png","image/jpeg","image/jpg"})
      */
     private $imageFile;
 

@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SongRepository")
@@ -22,11 +23,21 @@ class Song implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z0-9 ]*$/",
+     *     message="El nombre de la canción solo debería contener letras"
+     * )
      */
     private $name;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Type(
+     *     type="integer",
+     *     message="La duración debe de ser un número"
+     * )
+     * @Assert\PositiveOrZero(message="La duración debe de ser mayor de 0")
      */
     private $duration;
 
@@ -37,6 +48,7 @@ class Song implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string")
+     *
      */
     private $songFileName;
 
@@ -46,6 +58,9 @@ class Song implements \JsonSerializable
      * @Vich\UploadableField(mapping="songs_img", fileNameProperty="imageName", size="imageSize")
      *
      * @var File|null
+     * * @Assert\File(uploadErrorMessage="Error al subir la imagen",
+     *     mimeTypesMessage="Tipo de archivo no válido",
+     *     mimeTypes={"image/png","image/jpeg","image/jpg"})
      */
     private $imageFile;
 
@@ -53,6 +68,7 @@ class Song implements \JsonSerializable
      * @ORM\Column(type="string")
      *
      * @var string|null
+     * @Assert\NotNull(message="Inserta una imagen")
      */
     private $imageName;
 
@@ -81,6 +97,7 @@ class Song implements \JsonSerializable
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Artist", inversedBy="songs")
+     * @Assert\NotBlank(message="Selecciona el artista del album")
      */
     private $artist;
 

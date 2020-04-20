@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EventRepository")
@@ -24,31 +26,50 @@ class Event implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Nombre del evento requerido")
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Lugar del evento requerido")
      */
     private $place;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank(message="Ciudad del evento requerido")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z ]*$/",
+     *     message="La ciudad solo debería contener letras"
+     * )
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="País del evento requerido")
+     * @Assert\Regex(
+     *     pattern="/^[ña-zA-Z ]*$/",
+     *     message="El país solo debería contener letras"
+     * )
      */
     private $country;
 
     /**
      * @ORM\Column(type="date")
+     * @Assert\NotNull(message="Fecha del evento requerido")
+     * @Assert\NotBlank(message="Fecha del evento requerido")
      */
     private $date;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z0-9]*$/",
+     *     message="El prefijo de los tickets solo pueden tener letras y números"
+     * )
      */
     private $prefix_serial_number;
 
@@ -58,12 +79,15 @@ class Event implements \JsonSerializable
      * @Vich\UploadableField(mapping="events", fileNameProperty="imageName", size="imageSize")
      *
      * @var File|null
+     * @Assert\File(uploadErrorMessage="Error al subir la imagen",
+     *     mimeTypesMessage="Tipo de archivo no válido",
+     *     mimeTypes={"image/png","image/jpeg","image/jpg"})
      */
     private $imageFile;
 
     /**
      * @ORM\Column(type="string")
-     *
+     * @Assert\NotNull(message="Inserta una imagen para el evento")
      * @var string|null
      */
     private $imageName;
@@ -98,6 +122,7 @@ class Event implements \JsonSerializable
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Artist", inversedBy="events")
+     * @Assert\NotBlank(message="Selecciona el artista del album")
      */
     private $artist;
 
@@ -346,12 +371,12 @@ class Event implements \JsonSerializable
         return [
             'id'=>$this->getId(),
             'name'=>$this->getName(),
+            'artist'=>$this->getArtist(),
             'place'=>$this->getPlace(),
             'city'=>$this->getCity(),
             'country'=>$this->getCountry(),
             'date'=>$this->getDate(),
             'prefix_serial_number'=>$this->getPrefixSerialNumber(),
-            'artist'=>$this->getArtist(),
             'comments'=>$this->getComments(),
             'tickets'=>$this->getTickets(),
             'ticket_quantity'=>$this->getTicketQuantity(),

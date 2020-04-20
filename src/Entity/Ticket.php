@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TicketRepository")
@@ -20,11 +22,21 @@ class Ticket implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Nombre requerido")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z0-9]*$/",
+     *     message="El numero de serie solo pueden tener letras y números"
+     * )
      */
     private $serial_number;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\Type(
+     *     type="float",
+     *     message="El precio debe de ser un número"
+     * )
+     * @Assert\PositiveOrZero(message="El precio debe de ser mayor/igual de 0")
      */
     private $price;
 
@@ -144,6 +156,11 @@ class Ticket implements \JsonSerializable
         $this->event = $event;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return (string)$this->getSerialNumber();
     }
 
     /**

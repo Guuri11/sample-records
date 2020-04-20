@@ -20,6 +20,10 @@ class CategoryType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Category::class,
+            'csrf_protection' => false,
+            'csrf_field_name' => '_token',
+            // a unique key to help generate the secret token
+            'csrf_token_id'   => 'category_item',
         ]);
     }
 }

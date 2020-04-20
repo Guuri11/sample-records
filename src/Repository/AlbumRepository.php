@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Album;
+use App\Service\ApiSampleRecordsException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,32 +20,37 @@ class AlbumRepository extends ServiceEntityRepository
         parent::__construct($registry, Album::class);
     }
 
-    // /**
-    //  * @return Album[] Returns an array of Album objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param $params
+     * @return \Doctrine\ORM\QueryBuilder
+     * API request result
+     */
+    public function getRequestResult($params)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $result = $this->createQueryBuilder('a');
+        if (key_exists("search",$params)) {
+            $result->where('a.name LIKE :search')
+                ->setParameter('search', '%'.$params['search'].'%');
+        }
+        if (key_exists("first",$params)) {
+            $result->andWhere('a.id >= :id')
+                ->setParameter('id',$params['first']);
+        }
+        if (key_exists("artist",$params)) {
+            $result->andWhere('a.artist >= :id_artist')
+                ->setParameter('id_artist',$params['artist']);
+        }
+        if (key_exists("last",$params)) {
+            $result->setMaxResults($params['last']);
+        }
+        if (key_exists("ord",$params)) {
+            $result->orderBy('a.id', $params['ord']);
+        }
+        if (count($result->getQuery()->getResult()) > 0 )
+            return $result->getQuery()->getResult();
+        else
+            throw new \Exception("No se ha encontrado ningún resultado");
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Album
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+
 }

@@ -3,7 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Album;
+use App\Entity\Artist;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Vich\UploaderBundle\Form\Type\VichImageType;
@@ -13,19 +17,10 @@ class AlbumType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name')
+            ->add('name', TextType::class)
             ->add('artist')
             ->add('price')
             ->add('duration')
-            ->add('released_at')
-            ->add('imageFile', VichImageType::class, [
-                'required' => false,
-                'allow_delete' => true,
-                'download_uri' => true,
-                'image_uri' => true,
-                'asset_helper' => true,
-                'imagine_pattern' => 'my_thumb'
-            ])
         ;
     }
 
@@ -33,6 +28,7 @@ class AlbumType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Album::class,
+            'csrf_protection' => false
         ]);
     }
 }

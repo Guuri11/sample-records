@@ -28,7 +28,8 @@
                 <td>{{ album.price }}</td>
                 <td>{{ album.duration }}</td>
                 <td>{{ album.releasedAt ? album.releasedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ album.imageName }}</td>
+                <td><img  src="{{ vich_uploader_asset(album, 'imageFile') | imagine_filter('my_thumb') }}"
+                          alt="{{ album.imageName }}" /></td>
                 <td>{{ album.imageSize }}</td>
                 <td>{{ album.createdAt ? album.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ album.updatedAt ? album.updatedAt|date('Y-m-d H:i:s') : '' }}</td>

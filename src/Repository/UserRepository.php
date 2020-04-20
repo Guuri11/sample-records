@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\DBALException;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -36,32 +38,94 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
-    // /**
-    //  * @return User[] Returns an array of User objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param $params
+     * @return \Doctrine\ORM\QueryBuilder
+     * API request result
+     */
+    public function getRequestResult($params)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $result = $this->createQueryBuilder('u');
+        if (key_exists("search",$params)) {
+            $result->where('u.name LIKE :search')
+                ->orWhere('u.email LIKE :search')
+                ->orWhere('u.surname LIKE :search')
+                ->setParameter('search', '%'.$params['search'].'%');
+        }
+        if (key_exists("first",$params)) {
+            $result->andWhere('u.id >= :id')
+                ->setParameter('id',$params['first']);
+        }
+        if (key_exists("last",$params)) {
+            $result->setMaxResults($params['last']);
+        }
+        if (key_exists("ord",$params)) {
+            $result->orderBy('u.id', $params['ord']);
+        }
+        if (count($result->getQuery()->getResult()) > 0 )
+            return $result->getQuery()->getResult();
+        else
+            throw new \Exception("No se ha encontrado ningún resultado");
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?User
+    /**
+     * @param $email
+     * @return mixed[]
+     * @throws Exception
+     */
+    public function getInfo($email)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT name, surname, email, address, postal_code, town,
+                city,phone, credit_card FROM  user WHERE email = :email';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['email'=>$email]);
+
+        $results = $stmt->fetchAll();
+        if ($results)
+            return $results;
+        else
+            throw new Exception("Usuario no encontrado");
     }
-    */
+
+    /**
+     * @param $email
+     * @return mixed[]
+     * @throws Exception
+     */
+    public function getComments($email)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT comment FROM comment, user WHERE user.email = :email';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['email'=>$email]);
+
+        $results = $stmt->fetchAll();
+        if ($results)
+            return $results;
+        else
+            throw new Exception("No hay comentarios");
+    }
+
+    /**
+     * @param $email
+     * @return mixed[]
+     * @throws Exception
+     */
+    public function getPurchases($email)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT serial_number FROM purchase, user WHERE user.email = :email';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['email'=>$email]);
+
+        $results = $stmt->fetchAll();
+        if ($results)
+            return $results;
+        else
+            throw new Exception("No hay compras");
+    }
 }

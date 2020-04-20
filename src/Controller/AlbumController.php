@@ -83,6 +83,9 @@ class AlbumController extends AbstractController
 
     /**
      * @Route("/{id}", name="album_delete", methods={"DELETE"})
+     * @param Request $request
+     * @param Album $album
+     * @return Response
      */
     public function delete(Request $request, Album $album): Response
     {

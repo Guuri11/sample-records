@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
@@ -20,6 +22,11 @@ class Category implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="El nombre de la categoria es necesario")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z ]*$/",
+     *     message="El nombre de la categoría solo deberia contener letras"
+     * )
      */
     private $name;
 

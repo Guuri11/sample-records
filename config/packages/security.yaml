@@ -16,12 +16,11 @@ security:
             security: false
         main:
             anonymous: lazy
-            form_login:
-                login_path: login
-                check_path: login
-                csrf_token_generator: security.csrf.token_manager
+            json_login:
+                check_path: /api/v1.0/user/login
+
             logout:
-                path: logout
+                path: /api/v1.0/user/logout
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication

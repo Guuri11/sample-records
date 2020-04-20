@@ -19,32 +19,53 @@ class ArtistRepository extends ServiceEntityRepository
         parent::__construct($registry, Artist::class);
     }
 
-    // /**
-    //  * @return Artist[] Returns an array of Artist objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param $params
+     * @return \Doctrine\ORM\QueryBuilder
+     * API request result
+     */
+    public function getRequestResult($params)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $result = $this->createQueryBuilder('a');
+        if (key_exists("search",$params)) {
+            $result->where('a.name LIKE :search')
+                ->orWhere('a.alias LIKE :search')
+                ->orWhere('a.surname LIKE :search')
+                ->setParameter('search', '%'.$params['search'].'%');
+        }
+        if (key_exists("first",$params)) {
+            $result->andWhere('a.id >= :id')
+                ->setParameter('id',$params['first']);
+        }
+        if (key_exists("last",$params)) {
+            $result->setMaxResults($params['last']);
+        }
+        if (key_exists("ord",$params)) {
+            $result->orderBy('a.id', $params['ord']);
+        }
+        if (count($result->getQuery()->getResult()) > 0 )
+            return $result->getQuery()->getResult();
+        else
+            throw new \Exception("No se ha encontrado ningún resultado");
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Artist
+    /**
+     * @param $search
+     * @throws \Exception
+     */
+    public function getSearchRequest($search)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $result = $this->createQueryBuilder('a');
+        if ($search) {
+            $result->where('a.name LIKE :search')
+                ->orWhere('a.alias LIKE :search')
+                ->orWhere('a.surname LIKE :search')
+                ->setParameter('search', '%'.$search.'%');
+        }
+        if ($result->getQuery()->getResult())
+            return $result->getQuery()->getResult();
+        else
+            return null;
     }
-    */
+
 }
