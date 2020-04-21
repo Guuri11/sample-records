@@ -10,6 +10,7 @@
         "guzzlehttp/psr7": "^1.6",
         "liip/imagine-bundle": "^2.3",
         "nelmio/api-doc-bundle": "^3.6",
+        "nelmio/cors-bundle": "^2.0",
         "okta/jwt-verifier": "^0.4.0",
         "sensio/framework-extra-bundle": "^5.1",
         "spomky-labs/jose": "^7.1",
@@ -35,6 +36,7 @@
         "symfony/twig-pack": "*",
         "symfony/validator": "5.0.*",
         "symfony/web-link": "5.0.*",
+        "symfony/webpack-encore-bundle": "^1.7",
         "symfony/yaml": "5.0.*",
         "vich/uploader-bundle": "^1.13"
     },

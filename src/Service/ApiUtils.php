@@ -196,9 +196,9 @@ class ApiUtils
             // Setup the JWT Verifier
             $jwtVerifier = (new \Okta\JwtVerifier\JwtVerifierBuilder())
                 ->setAdaptor(new \Okta\JwtVerifier\Adaptors\SpomkyLabsJose())
-                ->setAudience('')
-                ->setClientId('')
-                ->setIssuer('')
+                ->setAudience('api://default')
+                ->setClientId('0oaa2rqjwqSSAxR8w4x6')
+                ->setIssuer('https://dev-837444.okta.com/oauth2/default')
                 ->build();
 
             // Verify the JWT from the Authorization Header.
