@@ -44,6 +44,12 @@ class ProductController extends AbstractController
      */
     public function index(Request $request, ProductRepository $productRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -77,6 +83,12 @@ class ProductController extends AbstractController
      */
     public function show(Product $product, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         if ($product === null){
             $apiUtils->notFoundResponse("Producto no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
@@ -107,6 +119,12 @@ class ProductController extends AbstractController
                         CategoryRepository $categoryRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $product = new Product();
         // Get request data
         $apiUtils->getContent($request);
@@ -182,6 +200,12 @@ class ProductController extends AbstractController
                         CategoryRepository $categoryRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -246,6 +270,11 @@ class ProductController extends AbstractController
      */
     public function delete(Request $request, Product $product, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
         try {
             if ($product === null){
                 $apiUtils->notFoundResponse("Producto no encontrado");

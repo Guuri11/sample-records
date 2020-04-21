@@ -39,6 +39,12 @@ class SongController extends AbstractController
      */
     public function index(Request $request ,SongRepository $songRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -71,6 +77,12 @@ class SongController extends AbstractController
      */
     public function show(Song $song, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         if ($song === null){
             $apiUtils->notFoundResponse("Canción no encontrada");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
@@ -100,6 +112,12 @@ class SongController extends AbstractController
                         AlbumRepository $albumRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $song = new Song();
         // Get request data
         $apiUtils->getContent($request);
@@ -171,6 +189,12 @@ class SongController extends AbstractController
                          AlbumRepository $albumRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -234,6 +258,11 @@ class SongController extends AbstractController
      */
     public function delete(Request $request, Song $song, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
         try {
             if ($song === null){
                 $apiUtils->notFoundResponse("Canción no encontrada");

@@ -14,6 +14,7 @@ use Swagger\Annotations as SWG;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Exception;
 
 /**
  * Class CategoryController
@@ -40,6 +41,12 @@ class CategoryController extends AbstractController
      */
     public function index(Request $request, CategoryRepository $categoryRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -49,7 +56,7 @@ class CategoryController extends AbstractController
         // Get result
         try {
             $results = $categoryRepository->getRequestResult($apiUtils->getParameters());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Categorias no encontradas");
             return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
         }
@@ -70,9 +77,20 @@ class CategoryController extends AbstractController
      * @param Category $category
      * @return JsonResponse
      */
-    public function show(Category $category): JsonResponse
+    public function show(Category $category, ApiUtils $apiUtils): JsonResponse
     {
-        return new JsonResponse($category,Response::HTTP_OK);
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
+        if ($category === null){
+            $apiUtils->notFoundResponse("Categoria no encontrado");
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        }
+        $apiUtils->successResponse("OK", $category);
+        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
     }
 
     /**
@@ -93,6 +111,12 @@ class CategoryController extends AbstractController
     public function new(Request $request, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $category = new Category();
 
         // Get request data
@@ -106,7 +130,7 @@ class CategoryController extends AbstractController
             $category->setName($data['name']);
             $category->setCreatedAt(new \DateTime());
             $category->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
+        }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores de la categoria", $category);
             return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
@@ -114,7 +138,7 @@ class CategoryController extends AbstractController
         // Check errors, if there is any errror return it
         try {
             $apiUtils->validateData($validator, $category);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
         }
@@ -124,7 +148,7 @@ class CategoryController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($category);
             $em->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear la categoria en la bbdd", null, $category);
 
             return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
@@ -153,6 +177,12 @@ class CategoryController extends AbstractController
     public function edit(Request $request, Category $category, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -164,7 +194,7 @@ class CategoryController extends AbstractController
         try {
             $category->setName($data['name']);
             $category->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
+        }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la categoria", $category);
 
             return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
@@ -173,7 +203,7 @@ class CategoryController extends AbstractController
         // Check errors, if there is any errror return it
         try {
             $apiUtils->validateData($validator,$category);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
         }
@@ -182,7 +212,7 @@ class CategoryController extends AbstractController
         try {
             $em = $this->getDoctrine()->getManager();
             $em->flush();
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar la categoria en la bbdd",null,$category);
 
             return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
@@ -209,6 +239,12 @@ class CategoryController extends AbstractController
      */
     public function delete(Request $request, Category $category, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         try {
             if ($category === null){
                 $apiUtils->notFoundResponse("Categoria no encontrado");
@@ -218,7 +254,7 @@ class CategoryController extends AbstractController
             $entityManager->remove($category);
             $entityManager->flush();
 
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo borrar la categoria de la base de datos",null,$category);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
         }

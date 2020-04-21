@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Repository\ArtistRepository;
 use App\Service\ApiUtils;
 use App\Repository\EventRepository;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,6 +42,12 @@ class EventController extends AbstractController
      */
     public function index(Request $request, EventRepository $eventRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -74,6 +81,12 @@ class EventController extends AbstractController
      */
     public function show(Event $event, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         if ($event === null){
             $apiUtils->notFoundResponse("Evento no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
@@ -102,6 +115,12 @@ class EventController extends AbstractController
     public function new(Request $request, ArtistRepository $artistRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $event = new Event();
         // Get request data
         $apiUtils->getContent($request);
@@ -172,6 +191,12 @@ class EventController extends AbstractController
     public function edit(Request $request, Event $event, ArtistRepository $artistRepository, ValidatorInterface $validato,
                         ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -218,15 +243,29 @@ class EventController extends AbstractController
      * @param Event $event
      * @return JsonResponse
      */
-    public function delete(Request $request, Event $event): JsonResponse
+    public function delete(Request $request, Event $event, ApiUtils $apiUtils): JsonResponse
     {
-        if ($event === null)
-            return new JsonResponse(['message'=>'Link not found'],
-                Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($event);
-        $entityManager->flush();
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
 
-        return new JsonResponse($event, Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        try {
+            if ($event === null){
+                $apiUtils->notFoundResponse("Evento no encontrado");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+            }
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($event);
+            $entityManager->flush();
+
+        }catch (Exception $e) {
+            $apiUtils->errorResponse($e,"No se pudo borrar el evento de la base de datos",null,$event);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Evento borrado!");
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 }

@@ -45,6 +45,12 @@ class PostController extends AbstractController
      */
     public function index(Request $request ,PostRepository $postRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -77,6 +83,12 @@ class PostController extends AbstractController
      */
     public function show(Post $post, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         if ($post === null){
             $apiUtils->notFoundResponse("Noticia no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
@@ -106,6 +118,12 @@ class PostController extends AbstractController
     public function new(Request $request, ArtistRepository $artistRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils, TagRepository $tagRepository): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $post = new Post();
         // Get request data
         $apiUtils->getContent($request);
@@ -159,7 +177,7 @@ class PostController extends AbstractController
     /**
      * @Route("/edit/{id}", name="api_post_update", methods={"PUT"})
      * @SWG\ Response(
-     *      response=2002,
+     *      response=202,
      *      description="updates a new Post object",
      * @SWG\ Schema(
      *          type="object",
@@ -177,6 +195,12 @@ class PostController extends AbstractController
     public function edit(Request $request, Post $post, ArtistRepository $artistRepository, TagRepository $tagRepository,
                         ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -241,6 +265,12 @@ class PostController extends AbstractController
      */
     public function delete(Request $request, Post $post, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         try {
             if ($post === null){
                 $apiUtils->notFoundResponse("Noticia no encontrada");

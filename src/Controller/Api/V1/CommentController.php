@@ -10,6 +10,7 @@ use App\Repository\ProductRepository;
 use App\Repository\PurchaseRepository;
 use App\Repository\UserRepository;
 use App\Service\ApiUtils;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -45,6 +46,12 @@ class CommentController extends AbstractController
      */
     public function index(Request $request, CommentRepository $commentRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -55,7 +62,7 @@ class CommentController extends AbstractController
         // Get result
         try {
             $results = $commentRepository->getRequestResult($apiUtils->getParameters());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Comentarios no encontrados");
             return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
         }
@@ -79,6 +86,12 @@ class CommentController extends AbstractController
      */
     public function show(Comment $comment, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         if ($comment === null){
             $apiUtils->notFoundResponse("Comentario no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
@@ -113,6 +126,12 @@ class CommentController extends AbstractController
                         PurchaseRepository $purchaseRepository, PostRepository $postRepository,
                         ApiUtils $apiUtils, ValidatorInterface $validator): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $comment = new Comment();
         // Get request data
         $apiUtils->getContent($request);
@@ -135,7 +154,7 @@ class CommentController extends AbstractController
                 $comment->setPurchase($purchaseRepository->find($data['purchase']));
             $comment->setCreatedAt(new \DateTime());
             $comment->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
+        }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al comentario", $comment);
             return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
@@ -143,7 +162,7 @@ class CommentController extends AbstractController
         // Check errors, if there is any errror return it
         try {
             $apiUtils->validateData($validator, $comment);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
         }
@@ -153,7 +172,7 @@ class CommentController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($comment);
             $em->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el comentario en la bbdd", null, $comment);
 
             return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
@@ -190,6 +209,12 @@ class CommentController extends AbstractController
                         PurchaseRepository $purchaseRepository, ApiUtils $apiUtils,
                          PostRepository $postRepository, ValidatorInterface $validator): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -209,7 +234,7 @@ class CommentController extends AbstractController
             if (isset($data['purchase']))
                 $comment->setPurchase($purchaseRepository->find($data['purchase']));
             $comment->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
+        }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores del comentario", $comment);
             return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
         }
@@ -217,7 +242,7 @@ class CommentController extends AbstractController
         // Check errors, if there is any errror return it
         try {
             $apiUtils->validateData($validator,$comment);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
         }
@@ -226,7 +251,7 @@ class CommentController extends AbstractController
         try {
             $em = $this->getDoctrine()->getManager();
             $em->flush();
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar el comentario en la bbdd",null,$comment);
             return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
         }
@@ -252,6 +277,12 @@ class CommentController extends AbstractController
      */
     public function delete(Request $request, Comment $comment, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         try {
             if ($comment === null){
                 $apiUtils->notFoundResponse("Comentario no encontrado");
@@ -261,7 +292,7 @@ class CommentController extends AbstractController
             $entityManager->remove($comment);
             $entityManager->flush();
 
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo borrar el comentario de la base de datos",null,$comment);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
         }

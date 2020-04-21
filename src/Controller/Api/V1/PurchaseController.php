@@ -9,6 +9,7 @@ use App\Repository\PurchaseRepository;
 use App\Repository\TicketRepository;
 use App\Repository\UserRepository;
 use App\Service\ApiUtils;
+use App\Service\CustomLog;
 use App\Utils\SerialNumber;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -48,6 +49,12 @@ class PurchaseController extends AbstractController
      */
     public function index(Request $request, PurchaseRepository $purchaseRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -81,6 +88,12 @@ class PurchaseController extends AbstractController
      */
     public function show(Purchase $purchase, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         if ($purchase === null){
             $apiUtils->notFoundResponse("Compra no encontrada");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
@@ -110,6 +123,12 @@ class PurchaseController extends AbstractController
     public function new(Request $request, UserRepository $userRepository, TicketRepository $ticketRepository,
                         ProductRepository $productRepository, ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $purchase = new Purchase();
         $data = [];
         if ($content = $request->getContent()){
@@ -192,6 +211,12 @@ class PurchaseController extends AbstractController
                         TicketRepository $ticketRepository, ProductRepository $productRepository,
                         ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -268,6 +293,12 @@ class PurchaseController extends AbstractController
      */
     public function delete(Request $request, Purchase $purchase, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         try {
             if ($purchase === null){
                 $apiUtils->notFoundResponse("Compra no encontrada");
@@ -308,6 +339,12 @@ class PurchaseController extends AbstractController
     public function buy(Request $request, ProductRepository $productRepository, TicketRepository $ticketRepository,
                         ApiUtils $apiUtils, SerialNumber $serialNumber, PurchaseRepository $purchaseRepository,
                         UserRepository $userRepository): JsonResponse {
+
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
 
         $response = [];
         $errors = [];
@@ -431,6 +468,9 @@ class PurchaseController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
 
+
+        $log = new CustomLog("purchases","purchases");
+        $log->info($data['name']."(".$data['email'].") ha realizado una compra: ".$purchase->getSerialNumber());
         $apiUtils->successResponse("¡Compra creada!",$purchase);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED, ['Content-type' => 'application/json']);
     }

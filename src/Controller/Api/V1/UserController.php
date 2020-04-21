@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Service\ApiUtils;
+use App\Service\CustomLog;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -44,6 +45,14 @@ class UserController extends AbstractController
      */
     public function index(Request $request, UserRepository $userRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -73,10 +82,19 @@ class UserController extends AbstractController
      *      )
      * )
      * @param User $user
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
     public function show(User $user, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         if ($user === null){
             $apiUtils->notFoundResponse("Usuario no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
@@ -103,6 +121,14 @@ class UserController extends AbstractController
      */
     public function new(Request $request, ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $user = new User();
 
         // Get request data
@@ -153,6 +179,8 @@ class UserController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
 
+        $log = new CustomLog("users_created","new_users");
+        $log->info($user->getEmail()." se ha registrado!");
         $apiUtils->successResponse("¡Usuario creado!",$user);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
@@ -176,6 +204,14 @@ class UserController extends AbstractController
      */
     public function edit(Request $request, User $user, ApiUtils $apiUtils, ValidatorInterface $validator): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -243,6 +279,14 @@ class UserController extends AbstractController
      */
     public function delete(Request $request, User $user, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         try {
             if ($user === null){
                 $apiUtils->notFoundResponse("Usuario no encontrado");
@@ -257,6 +301,8 @@ class UserController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
         }
 
+        $log = new CustomLog("deleted_users","deleted_users");
+        $log->info($user->getEmail()." ha sido eliminado!");
         $apiUtils->successResponse("¡Usuario borrado!");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
@@ -277,6 +323,12 @@ class UserController extends AbstractController
      */
     public function personalInfo(ApiUtils $apiUtils, UserRepository $userRepository)
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         try {
             $info = $userRepository->getInfo($this->getUser()->getUsername());
@@ -305,6 +357,12 @@ class UserController extends AbstractController
      */
     public function getComments(ApiUtils $apiUtils, UserRepository $userRepository)
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         try {
             $info = $userRepository->getComments($this->getUser()->getUsername());
@@ -333,6 +391,12 @@ class UserController extends AbstractController
      */
     public function purchases(ApiUtils $apiUtils, UserRepository $userRepository)
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         try {
             $info = $userRepository->getPurchases($this->getUser()->getUsername());
@@ -364,6 +428,12 @@ class UserController extends AbstractController
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, ApiUtils $apiUtils,
                             ValidatorInterface $validator): Response
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $user = new User();
 
         // Get request data
@@ -409,6 +479,8 @@ class UserController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
         }
 
+        $log = new CustomLog("new_users","new_users");
+        $log->info($user->getEmail()." se ha registrado!");
         $apiUtils->successResponse("¡Registro con existo!",$user);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
@@ -429,6 +501,12 @@ class UserController extends AbstractController
      */
     public function login(AuthenticationUtils $authenticationUtils, ApiUtils $apiUtils)
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
 
@@ -453,6 +531,8 @@ class UserController extends AbstractController
      */
     public function logout()
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         // controller can be blank: it will never be executed!
         throw new \Exception('Don\'t forget to activate logout in security.yaml');
     }
@@ -477,6 +557,12 @@ class UserController extends AbstractController
     public function changePassword(Request $request, ApiUtils $apiUtils, UserRepository $repository,
                                    UserPasswordEncoderInterface $passwordEncoder, ValidatorInterface $validator): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $user = $repository->findOneBy(['email'=>$this->getUser()->getUsername()]);
@@ -573,6 +659,12 @@ class UserController extends AbstractController
      */
     public function contact(Request $request,ApiUtils $apiUtils, \Swift_Mailer $mailer)
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 

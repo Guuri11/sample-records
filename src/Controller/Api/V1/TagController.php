@@ -43,6 +43,11 @@ class TagController extends AbstractController
      */
     public function index(Request $request, TagRepository $tagRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
         // Get params
         $apiUtils->getRequestParams($request);
 
@@ -76,6 +81,12 @@ class TagController extends AbstractController
      */
     public function show(Tag $tag, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         if ($tag === null){
             $apiUtils->notFoundResponse("Tag no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
@@ -101,6 +112,12 @@ class TagController extends AbstractController
      */
     public function new(Request $request, ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         $tag = new Tag();
         // Get request data
         $apiUtils->getContent($request);
@@ -159,6 +176,12 @@ class TagController extends AbstractController
      */
     public function edit(Request $request, Tag $tag, ApiUtils $apiUtils, ValidatorInterface $validator): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
@@ -205,6 +228,12 @@ class TagController extends AbstractController
      */
     public function delete(Request $request, Tag $tag, ApiUtils $apiUtils): JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         try {
             if ($tag === null){
                 $apiUtils->notFoundResponse("Tag no encontrado");

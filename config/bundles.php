@@ -17,4 +17,5 @@ return [
     Liip\ImagineBundle\LiipImagineBundle::class => ['all' => true],
     Nelmio\ApiDocBundle\NelmioApiDocBundle::class => ['all' => true],
     Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle::class => ['all' => true],
+    Auth0\JWTAuthBundle\JWTAuthBundle::class => ['all' => true],
 ];

@@ -46,6 +46,12 @@ class SearchController extends AbstractController
     public function getSearchRequest(Request $request, ArtistRepository $artistRepository, EventRepository $eventRepository,
                                      PostRepository $postRepository, ProductRepository $productRepository, ApiUtils $apiUtils) : JsonResponse
     {
+        // Check Oauth
+        if (!$apiUtils->isAuthorized()){
+            $response = ["success"=>false,"message"=>"Autentificación fallida"];
+            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+        }
+
         // Get request data
         $apiUtils->getContent($request);
 
