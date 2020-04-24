@@ -21,21 +21,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Class TagController
  * @package App\Controller\V1
- * @SWG\Tag(name="tag")
  * @Route("/api/v1.0/tag")
  */
 class TagController extends AbstractController
 {
     /**
      * @Route("/", name="api_tag_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all tags",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param TagRepository $tagRepository
      * @param ApiUtils $apiUtils
@@ -46,7 +37,7 @@ class TagController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
         // Get params
         $apiUtils->getRequestParams($request);
@@ -59,7 +50,7 @@ class TagController extends AbstractController
             $results = $tagRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Tags no encontrados");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -67,14 +58,6 @@ class TagController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_tag_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one tag",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Tag $tag
      * @param ApiUtils $apiUtils
      * @return JsonResponse
@@ -84,10 +67,10 @@ class TagController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($tag === null){
+        if ($tag === ""){
             $apiUtils->notFoundResponse("Tag no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -97,14 +80,6 @@ class TagController extends AbstractController
 
     /**
      * @Route("/new", name="api_tag_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Creates a new Tag object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ValidatorInterface $validator
      * @param ApiUtils $apiUtils
@@ -115,7 +90,7 @@ class TagController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $tag = new Tag();
@@ -131,7 +106,7 @@ class TagController extends AbstractController
             $tag->setUpdatedAt(new \DateTime());
         } catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al tag", $tag);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         // Check errors, if there is any error return it
@@ -150,7 +125,7 @@ class TagController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el tag en la bbdd", null, $tag);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Tag creado!",$tag);
@@ -160,14 +135,6 @@ class TagController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_tag_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="updates a new Tag object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Tag $tag
      * @param ApiUtils $apiUtils
@@ -179,7 +146,7 @@ class TagController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -194,7 +161,7 @@ class TagController extends AbstractController
             $tag->setUpdatedAt(new \DateTime());
         } catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo editar los valores del tag", $tag);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         // Update obj to the database
@@ -204,7 +171,7 @@ class TagController extends AbstractController
         }catch (\Exception $e){
             $apiUtils->errorResponse($e,"No se pudo actualizar el tag en la bbdd",null,$tag);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Tag editado!");
@@ -213,14 +180,6 @@ class TagController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_tag_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Delete a tag",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="tag", ref=@Model(type=Tag::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Tag $tag
      * @param ApiUtils $apiUtils
@@ -231,11 +190,11 @@ class TagController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($tag === null){
+            if ($tag === ""){
                 $apiUtils->notFoundResponse("Tag no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

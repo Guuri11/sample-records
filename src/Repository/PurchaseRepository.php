@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Purchase;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 
 /**
  * @method Purchase|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,8 +23,9 @@ class PurchaseRepository extends ServiceEntityRepository
 
     /**
      * @param $params
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      * API request result
+     * @throws Exception
      */
     public function getRequestResult($params)
     {
@@ -44,7 +47,7 @@ class PurchaseRepository extends ServiceEntityRepository
         if (count($result->getQuery()->getResult()) > 0 )
             return $result->getQuery()->getResult();
         else
-            throw new \Exception("No se ha encontrado ningún resultado");
+            throw new Exception("No se ha encontrado ningún resultado");
     }
 
 

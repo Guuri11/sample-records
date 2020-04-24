@@ -21,20 +21,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class EventController
  * @package App\Controller\V1
  * @Route("/api/v1.0/event")
- * @SWG\Tag(name="event")
  */
 class EventController extends AbstractController
 {
     /**
      * @Route("/", name="api_event_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all events",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="event", ref=@Model(type=Event::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param EventRepository $eventRepository
      * @param ApiUtils $apiUtils
@@ -45,7 +36,7 @@ class EventController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -59,7 +50,7 @@ class EventController extends AbstractController
             $results = $eventRepository->getRequestResult($apiUtils->getParameters());
         } catch (\Exception $e) {
             $apiUtils->errorResponse($e, "Eventos no encontrados");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -67,14 +58,6 @@ class EventController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_event_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one event",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="event", ref=@Model(type=Event::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Event $event
      * @param ApiUtils $apiUtils
      * @return JsonResponse
@@ -84,10 +67,10 @@ class EventController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($event === null){
+        if ($event === ""){
             $apiUtils->notFoundResponse("Evento no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -98,14 +81,6 @@ class EventController extends AbstractController
 
     /**
      * @Route("/new", name="api_event_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Event object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="event", ref=@Model(type=Event::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ArtistRepository $artistRepository
      * @param ValidatorInterface $validator
@@ -118,7 +93,7 @@ class EventController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $event = new Event();
@@ -139,13 +114,19 @@ class EventController extends AbstractController
             $event->setDate(new \DateTime($data['date']));
             $event->setPrefixSerialNumber($data['prefix_serial_number']);
             $event->setTicketQuantity($data['ticket_quantity']);
-            $event->setImageName($data['imageName']);
-            $event->setImageSize($data['imageSize']);
+            if ($data['imageFile'] !== "") {
+                $event->setImageFile($data['imageFile']);
+                $event->setImageName($data['imageName']);
+                $event->setImageSize($data['imageSize']);
+            } else {
+                $event->setImageName('event-default.png');
+                $event->setImageSize(123);
+            }
             $event->setCreatedAt(new \DateTime());
             $event->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al evento", $event);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
         // Check errors, if there is any errror return it
         try {
@@ -163,7 +144,7 @@ class EventController extends AbstractController
         } catch (\Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el evento en la bbdd", null, $event);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Evento creado!",$event);
@@ -173,14 +154,6 @@ class EventController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_event_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="updates a new Event object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="event", ref=@Model(type=Event::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Event $event
      * @param ArtistRepository $artistRepository
@@ -194,7 +167,7 @@ class EventController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -208,20 +181,23 @@ class EventController extends AbstractController
         try {
             $event->setName($data['name']);
             $event->setPlace($data['place']);
-            if ($data['city'] !== null)
+            if ($data['city'] !== "")
                 $event->setCity($data['city']);
             $event->setCountry($data['country']);
             $event->setDate(new \DateTime($data['date']));
             $event->setPrefixSerialNumber($data['prefix_serial_number']);
             $event->setTicketQuantity($data['ticket_quantity']);
             $event->setArtist($artistRepository->find($data['artist']));
-            $event->setImageName($data['imageName']);
-            $event->setImageSize($data['imageSize']);
+            if ($data['imageFile'] !== "") {
+                $event->setImageFile($data['imageFile']);
+                $event->setImageName($data['imageName']);
+                $event->setImageSize($data['imageSize']);
+            }
             $event->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $error['code'] = $e->getCode();
             $error['message'] = $e->getMessage();
-            return new JsonResponse($error,400,['Content-type'=>'application/json']);
+            return new JsonResponse($error,Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $em = $this->getDoctrine()->getManager();
         $em->flush();
@@ -231,14 +207,6 @@ class EventController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_event_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Delete a event",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="event", ref=@Model(type=Event::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Event $event
      * @return JsonResponse
@@ -248,11 +216,11 @@ class EventController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($event === null){
+            if ($event === ""){
                 $apiUtils->notFoundResponse("Evento no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

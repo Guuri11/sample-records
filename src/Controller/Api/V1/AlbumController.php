@@ -21,17 +21,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Class AlbumController
  * @package App\Controller\V1
- * @SWG\Tag(name="album")
  * @Route("/api/v1.0/album")
  */
 class AlbumController extends AbstractController
 {
     /**
      * @Route("/", name="api_album_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all albums"
-     * )
      * @param Request $request
      * @param AlbumRepository $albumRepository
      * @param ApiUtils $apiUtils
@@ -43,7 +38,7 @@ class AlbumController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -57,7 +52,7 @@ class AlbumController extends AbstractController
             $results = $albumRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Albums no encontrados");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -65,14 +60,6 @@ class AlbumController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_album_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one album",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="album", ref=@Model(type=Album::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Album $album
      * @param ApiUtils $apiUtils
      * @return JsonResponse
@@ -82,10 +69,10 @@ class AlbumController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
 
-        if ($album === null){
+        if ($album === ""){
             $apiUtils->notFoundResponse("Album no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -95,14 +82,6 @@ class AlbumController extends AbstractController
 
     /**
      * @Route("/new", name="api_album_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Album object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="album", ref=@Model(type=Album::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ArtistRepository $artistRepository
      * @param ValidatorInterface $validator
@@ -115,7 +94,7 @@ class AlbumController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $album = new Album();
@@ -133,17 +112,20 @@ class AlbumController extends AbstractController
             $album->setArtist($artistRepository->find($data['artist']));
             $album->setPrice($data['price']);
             $album->setDuration($data['duration']);
-            if ($data['imageFile'] !== null) {
+            if ($data['imageFile'] !== "") {
                 $album->setImageFile(new File($data['imageFile']));
                 $album->setImageName($data['imageName']);
                 $album->setImageSize($data['imageSize']);
+            }else {
+                $album->setImageName('artist-default.jpg');
+                $album->setImageSize(234);
             }
             $album->setReleasedAt(new DateTime($data['released_at']));
             $album->setUpdatedAt(new DateTime());
             $album->setCreatedAt(new DateTime());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al album", $album);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         // Check errors, if there is any error return it
@@ -162,7 +144,7 @@ class AlbumController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el album en la bbdd", null, $album);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Album creado!",$album);
@@ -171,14 +153,6 @@ class AlbumController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_album_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Updates a new Album object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="album", ref=@Model(type=Album::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Album $album
      * @param ArtistRepository $artistRepository
@@ -192,7 +166,7 @@ class AlbumController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -204,26 +178,26 @@ class AlbumController extends AbstractController
 
         // Process data
         try {
-            if ($data['name'] !== null)
+            if ($data['name'] !== "")
                 $album->setName($data['name']);
-            if ($data['artist'] !== null)
+            if ($data['artist'] !== "")
                 $album->setArtist($artistRepository->find($data['artist']));
-            if ($data['price'] !== null)
+            if ($data['price'] !== "")
                 $album->setPrice($data['price']);
-            if ($data['duration'] !== null)
+            if ($data['duration'] !== "")
                 $album->setDuration($data['duration']);
-            if ($data['imageFile'] !== null) {
+            if ($data['imageFile'] !== "") {
                 $album->setImageFile(new File($data['imageFile']));
                 $album->setImageName($data['imageName']);
                 $album->setImageSize($data['imageSize']);
             }
-            if ($data['released_at'] !== null)
+            if ($data['released_at'] !== "")
                 $album->setReleasedAt(new DateTime($data['released_at']));
             $album->setUpdatedAt(new DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores al album", $album);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -241,7 +215,7 @@ class AlbumController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar el album en la bbdd",null,$album);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Album editado!");
@@ -250,14 +224,6 @@ class AlbumController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_album_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Deletes a album",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="album", ref=@Model(type=Album::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Album $album
      * @param ApiUtils $apiUtils
@@ -268,11 +234,11 @@ class AlbumController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($album === null){
+            if ($album === ""){
                 $apiUtils->notFoundResponse("Album no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

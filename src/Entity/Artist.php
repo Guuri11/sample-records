@@ -84,7 +84,6 @@ class Artist implements \JsonSerializable
      * @Assert\File(uploadErrorMessage="Ha habido un error al subir la imagen",
      *     mimeTypesMessage="Tipo de archivo no válido, solo puede ser png, jpeg y jpg.",
      *     mimeTypes={"image/png","image/jpeg","image/jpg"})
-     * @Assert\NotNull(message="Inserte la imagen del artista")
      */
     private $imageFile;
 

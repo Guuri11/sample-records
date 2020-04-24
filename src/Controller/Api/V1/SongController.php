@@ -22,16 +22,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class SongController
  * @package App\Controller\V1
  * @Route("/api/v1.0/song")
- * @SWG\Tag(name="song")
  */
 class SongController extends AbstractController
 {
     /**
      * @Route("/", name="api_song_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all songs",
-     * )
      * @param Request $request
      * @param SongRepository $songRepository
      * @param ApiUtils $apiUtils
@@ -42,7 +37,7 @@ class SongController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -56,7 +51,7 @@ class SongController extends AbstractController
             $results = $songRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Canciones no encontradas");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -64,15 +59,8 @@ class SongController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_song_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one song",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="song", ref=@Model(type=Song::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Song $song
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
     public function show(Song $song, ApiUtils $apiUtils): JsonResponse
@@ -80,10 +68,10 @@ class SongController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($song === null){
+        if ($song === ""){
             $apiUtils->notFoundResponse("Canción no encontrada");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -93,14 +81,6 @@ class SongController extends AbstractController
 
     /**
      * @Route("/new", name="api_song_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Song object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="song", ref=@Model(type=Song::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ArtistRepository $artistRepository
      * @param AlbumRepository $albumRepository
@@ -115,7 +95,7 @@ class SongController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $song = new Song();
@@ -129,19 +109,25 @@ class SongController extends AbstractController
         try {
             $song->setName($data['name']);
             $song->setArtist($artistRepository->find($data['artist']));
-            if ($data['album'] !== null)
+            if ($data['album'] !== "")
                 $song->setAlbum($albumRepository->find($data['album']));
             $song->setDuration($data['duration']);
-            $song->setSongFileName($data['songFileName']);
+            $song->setSongFileName($data['song_file']);
             $song->setVideoSrc($data['video_src']);
             $song->setReleasedAt(new \DateTime($data['released_at']));
-            $song->setImageName($data['imageName']);
-            $song->setImageSize($data['imageSize']);
+            if ($data['imageFile'] !== ""){
+                $song->setImageFile($data['imageFile']);
+                $song->setImageName($data['imageName']);
+                $song->setImageSize($data['imageSize']);
+            } else {
+                $song->setImageName('song-default.png');
+                $song->setImageSize(1234);
+            }
             $song->setCreatedAt(new \DateTime());
             $song->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores a la canción", $song);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
         // Check errors, if there is any error return it
         try {
@@ -159,7 +145,7 @@ class SongController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear la canción en la bbdd", null, $song);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Canción creada!",$song);
@@ -169,14 +155,6 @@ class SongController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_song_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="updates a new Song object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="song", ref=@Model(type=Song::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Song $song
      * @param ArtistRepository $artistRepository
@@ -192,7 +170,7 @@ class SongController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -205,19 +183,22 @@ class SongController extends AbstractController
         try {
             $song->setName($data['name']);
             $song->setArtist($artistRepository->find($data['artist']));
-            if ($data['album'] !== null)
+            if ($data['album'] !== "")
                 $song->setAlbum($albumRepository->find($data['album']));
             $song->setDuration($data['duration']);
             $song->setSongFileName($data['song_file']);
             $song->setVideoSrc($data['video_src']);
             $song->setReleasedAt(new \DateTime($data['released_at']));
-            $song->setImageName($data['imageName']);
-            $song->setImageSize($data['imageSize']);
+            if ($data['imageFile'] !== ""){
+                $song->setImageFile($data['imageFile']);
+                $song->setImageName($data['imageName']);
+                $song->setImageSize($data['imageSize']);
+            }
             $song->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores a la canción", $song);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         // Check errors, if there is any errror return it
         try {
@@ -234,7 +215,7 @@ class SongController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar la canción en la bbdd",null,$song);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Canción editada!");
@@ -243,14 +224,6 @@ class SongController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_song_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Delete a song",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="song", ref=@Model(type=Song::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Song $song
      * @param ApiUtils $apiUtils
@@ -261,10 +234,10 @@ class SongController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
         try {
-            if ($song === null){
+            if ($song === ""){
                 $apiUtils->notFoundResponse("Canción no encontrada");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

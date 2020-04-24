@@ -20,20 +20,11 @@ use Exception;
  * Class CategoryController
  * @package App\Controller\V1
  * @Route("/api/v1.0/category")
- * @SWG\Tag(name="category")
  */
 class CategoryController extends AbstractController
 {
     /**
      * @Route("/", name="api_category_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all categories",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="category", ref=@Model(type=Category::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param CategoryRepository $categoryRepository
      * @param ApiUtils $apiUtils
@@ -44,7 +35,7 @@ class CategoryController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -58,7 +49,7 @@ class CategoryController extends AbstractController
             $results = $categoryRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Categorias no encontradas");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         return new JsonResponse($results,Response::HTTP_OK);
@@ -66,15 +57,8 @@ class CategoryController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_category_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one categories",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="category", ref=@Model(type=Category::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Category $category
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
     public function show(Category $category, ApiUtils $apiUtils): JsonResponse
@@ -82,10 +66,10 @@ class CategoryController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($category === null){
+        if ($category === ""){
             $apiUtils->notFoundResponse("Categoria no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -95,14 +79,6 @@ class CategoryController extends AbstractController
 
     /**
      * @Route("/new", name="api_category_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Category object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="category", ref=@Model(type=Category::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ValidatorInterface $validator
      * @param ApiUtils $apiUtils
@@ -114,7 +90,7 @@ class CategoryController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $category = new Category();
@@ -132,7 +108,7 @@ class CategoryController extends AbstractController
             $category->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores de la categoria", $category);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -151,7 +127,7 @@ class CategoryController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear la categoria en la bbdd", null, $category);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Categoria creada!",$category);
@@ -160,14 +136,6 @@ class CategoryController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_category_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Updates a new Category object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="category", ref=@Model(type=Category::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Category $category
      * @param ValidatorInterface $validator
@@ -180,7 +148,7 @@ class CategoryController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -197,7 +165,7 @@ class CategoryController extends AbstractController
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la categoria", $category);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -215,7 +183,7 @@ class CategoryController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar la categoria en la bbdd",null,$category);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Categoria editada!");
@@ -224,14 +192,6 @@ class CategoryController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_category_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Deletes a category",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="category", ref=@Model(type=Category::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Category $category
      * @param ApiUtils $apiUtils
@@ -242,11 +202,11 @@ class CategoryController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($category === null){
+            if ($category === ""){
                 $apiUtils->notFoundResponse("Categoria no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

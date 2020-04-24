@@ -24,19 +24,15 @@ use Exception;
  * @package App\Controller\V1
  * @Route("/api/v1.0/product")
  * @SWG\Tag(name="product")
+ * @SWG\ Response(
+ *      response=401,
+ *      description="Unauthorized"
+ * )
  */
 class ProductController extends AbstractController
 {
     /**
      * @Route("/", name="api_product_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all products",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="product", ref=@Model(type=Product::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ProductRepository $productRepository
      * @param ApiUtils $apiUtils
@@ -47,7 +43,7 @@ class ProductController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -61,7 +57,7 @@ class ProductController extends AbstractController
             $results = $productRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Productos no encontrados");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -69,14 +65,6 @@ class ProductController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_product_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one product",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="product", ref=@Model(type=Product::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Product $product
      * @param ApiUtils $apiUtils
      * @return JsonResponse
@@ -86,10 +74,10 @@ class ProductController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($product === null){
+        if ($product === ""){
             $apiUtils->notFoundResponse("Producto no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -100,14 +88,6 @@ class ProductController extends AbstractController
 
     /**
      * @Route("/new", name="api_product_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Product object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="product", ref=@Model(type=Product::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ArtistRepository $artistRepository
      * @param CategoryRepository $categoryRepository
@@ -122,7 +102,7 @@ class ProductController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $product = new Product();
@@ -136,22 +116,29 @@ class ProductController extends AbstractController
         try {
             $product->setName($data['name']);
             $product->setCategory($categoryRepository->find($data['category']));
-            if($data['artist'] !== null)
+            if($data['artist'] !== "")
                 $product->setArtist($artistRepository->find($data['artist']));
             $product->setPrice($data['price']);
-            $product->setDiscount($data['discount']);
-            if($data['artist'] !== null)
+            if($data['discount'] !== "")
+                $product->setDiscount($data['discount']);
+            if($data['size'] !== "")
                 $product->setSize($data['size']);
             $product->setStock($data['stock']);
             $product->setAvaiable($data['avaiable']);
             $product->setDescription($data['description']);
-            $product->setImageName($data['imageName']);
-            $product->setImageSize($data['imageSize']);
+            if ($data['imageFile'] !== "") {
+                $product->setImageFile($data['imageFile']);
+                $product->setImageName($data['imageName']);
+                $product->setImageSize($data['imageSize']);
+            } else {
+                $product->setImageName('product-default.png');
+                $product->setImageSize(1234);
+            }
             $product->setCreatedAt(new \DateTime());
             $product->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al producto",$product);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -170,7 +157,7 @@ class ProductController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el producto en la bbdd", null, $product);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Producto creado!",$product);
@@ -180,14 +167,6 @@ class ProductController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_product_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="updates a new Product object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="product", ref=@Model(type=Product::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Product $product
      * @param ArtistRepository $artistRepository
@@ -203,7 +182,7 @@ class ProductController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -218,18 +197,23 @@ class ProductController extends AbstractController
             $product->setCategory($categoryRepository->find($data['category']));
             $product->setArtist($artistRepository->find($data['artist']));
             $product->setPrice($data['price']);
-            $product->setDiscount($data['discount']);
-            $product->setSize($data['size']);
+            if($data['discount'] !== "")
+                $product->setDiscount($data['discount']);
+            if($data['size'] !== "")
+                $product->setSize($data['size']);
             $product->setStock($data['stock']);
             $product->setAvaiable($data['avaiable']);
             $product->setDescription($data['description']);
-            $product->setImageName($data['img']);
-            $product->setImageSize($data['img_size']);
+            if ($data['imageFile'] !== "") {
+                $product->setImageFile($data['imageFile']);
+                $product->setImageName($data['imageName']);
+                $product->setImageSize($data['imageSize']);
+            }
             $product->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores al producto",$product);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         // Check errors, if there is any errror return it
         try {
@@ -246,7 +230,7 @@ class ProductController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar el producto en la bbdd",null,$product);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Producto editado!");
@@ -255,14 +239,6 @@ class ProductController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_product_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Delete a product",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="product", ref=@Model(type=Product::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Product $product
      * @param ApiUtils $apiUtils
@@ -273,10 +249,10 @@ class ProductController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
         try {
-            if ($product === null){
+            if ($product === ""){
                 $apiUtils->notFoundResponse("Producto no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

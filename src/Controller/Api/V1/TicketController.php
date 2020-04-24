@@ -23,20 +23,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class TicketController
  * @package App\Controller\V1
  * @Route("/api/v1.0/ticket")
- * @SWG\Tag(name="ticket")
  */
 class TicketController extends AbstractController
 {
     /**
      * @Route("/", name="api_ticket_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all tickets",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="ticket", ref=@Model(type=Ticket::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param TicketRepository $ticketRepository
      * @param ApiUtils $apiUtils
@@ -47,7 +38,7 @@ class TicketController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -61,7 +52,7 @@ class TicketController extends AbstractController
             $results = $ticketRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Tickets no encontrados");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -70,14 +61,6 @@ class TicketController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_ticket_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one ticket",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="ticket", ref=@Model(type=Ticket::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Ticket $ticket
      * @param ApiUtils $apiUtils
      * @return JsonResponse
@@ -87,10 +70,10 @@ class TicketController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($ticket === null){
+        if ($ticket === ""){
             $apiUtils->notFoundResponse("Ticket no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -101,14 +84,6 @@ class TicketController extends AbstractController
 
     /**
      * @Route("/new", name="api_ticket_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Ticket object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="ticket", ref=@Model(type=Ticket::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param EventRepository $eventRepository
      * @param ValidatorInterface $validator
@@ -121,7 +96,7 @@ class TicketController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $ticket = new Ticket();
@@ -141,7 +116,7 @@ class TicketController extends AbstractController
             $ticket->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al ticket",$ticket);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
         // Check errors, if there is any error return it
         try {
@@ -159,7 +134,7 @@ class TicketController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el ticket en la bbdd", null, $ticket);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Ticket creado!",$ticket);
@@ -169,14 +144,6 @@ class TicketController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_ticket_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="updates a new Ticket object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="ticket", ref=@Model(type=Ticket::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Ticket $ticket
      * @param EventRepository $eventRepository
@@ -190,7 +157,7 @@ class TicketController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -208,7 +175,7 @@ class TicketController extends AbstractController
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores al ticket", $ticket);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -226,7 +193,7 @@ class TicketController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar el ticket en la bbdd",null,$ticket);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Ticket editado!");
@@ -235,14 +202,6 @@ class TicketController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_ticket_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Delete a ticket",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="ticket", ref=@Model(type=Ticket::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Ticket $ticket
      * @param ApiUtils $apiUtils
@@ -253,11 +212,11 @@ class TicketController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($ticket === null){
+            if ($ticket === ""){
                 $apiUtils->notFoundResponse("Ticket no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

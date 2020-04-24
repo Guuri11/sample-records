@@ -25,20 +25,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class CommentController
  * @package App\Controller\V1
  * @Route("/api/v1.0/comment")
- * @SWG\Tag(name="comment")
  */
 class CommentController extends AbstractController
 {
     /**
      * @Route("/", name="api_comment_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all comments",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param CommentRepository $commentRepository
      * @param ApiUtils $apiUtils
@@ -49,7 +40,7 @@ class CommentController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -64,7 +55,7 @@ class CommentController extends AbstractController
             $results = $commentRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Comentarios no encontrados");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -75,24 +66,16 @@ class CommentController extends AbstractController
      * @param Comment $comment
      * @param ApiUtils $apiUtils
      * @return JsonResponse
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one comment",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
-     *      )
-     * )
      */
     public function show(Comment $comment, ApiUtils $apiUtils): JsonResponse
     {
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($comment === null){
+        if ($comment === ""){
             $apiUtils->notFoundResponse("Comentario no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -103,14 +86,6 @@ class CommentController extends AbstractController
 
     /**
      * @Route("/new", name="api_comment_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Comment object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param UserRepository $userRepository
      * @param EventRepository $eventRepository
@@ -129,7 +104,7 @@ class CommentController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $comment = new Comment();
@@ -156,7 +131,7 @@ class CommentController extends AbstractController
             $comment->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al comentario", $comment);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -175,7 +150,7 @@ class CommentController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el comentario en la bbdd", null, $comment);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Comentario creado!",$comment);
@@ -185,14 +160,6 @@ class CommentController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_comment_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="updates a new Comment object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Comment $comment
      * @param UserRepository $userRepository
@@ -212,7 +179,7 @@ class CommentController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -236,7 +203,7 @@ class CommentController extends AbstractController
             $comment->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores del comentario", $comment);
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -253,7 +220,7 @@ class CommentController extends AbstractController
             $em->flush();
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar el comentario en la bbdd",null,$comment);
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Comentario editado!");
@@ -262,14 +229,6 @@ class CommentController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_comment_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Deletes a comment",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="comment", ref=@Model(type=Comment::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Comment $comment
      * @param ApiUtils $apiUtils
@@ -280,11 +239,11 @@ class CommentController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($comment === null){
+            if ($comment === ""){
                 $apiUtils->notFoundResponse("Comentario no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

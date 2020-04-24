@@ -24,20 +24,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class PostController
  * @package App\Controller\V1
  * @Route("/api/v1.0/post")
- * @SWG\Tag(name="post")
  */
 class PostController extends AbstractController
 {
     /**
      * @Route("/", name="api_post_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all posts",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="post", ref=@Model(type=Post::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param PostRepository $postRepository
      * @param ApiUtils $apiUtils
@@ -48,7 +39,7 @@ class PostController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -62,7 +53,7 @@ class PostController extends AbstractController
             $results = $postRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Noticias no encontradas");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -70,15 +61,8 @@ class PostController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_post_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one post",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="post", ref=@Model(type=Post::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Post $post
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
     public function show(Post $post, ApiUtils $apiUtils): JsonResponse
@@ -86,10 +70,10 @@ class PostController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($post === null){
+        if ($post === ""){
             $apiUtils->notFoundResponse("Noticia no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -100,14 +84,6 @@ class PostController extends AbstractController
 
     /**
      * @Route("/new", name="api_post_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Post object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="post", ref=@Model(type=Post::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ArtistRepository $artistRepository
      * @param ValidatorInterface $validator
@@ -121,7 +97,7 @@ class PostController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $post = new Post();
@@ -137,9 +113,15 @@ class PostController extends AbstractController
             $post->setTitle($data['title']);
             $post->setDescription($data['description']);
             $post->setArtist($artistRepository->find($data['artist']));
-            $post->setImageName($data['imageName']);
-            $post->setImageSize($data['imageSize']);
-            if($data['tag'] !== null){
+            if ($data['imageFile'] !== ""){
+                $post->setImageFile($data['imageFile']);
+                $post->setImageName($data['imageName']);
+                $post->setImageSize($data['imageSize']);
+            }else {
+                $post->setImageName('post-default.png');
+                $post->setImageSize(123);
+            }
+            if($data['tag'] !== ""){
                 $tag = $tagRepository->find($data['tag']);
                 $post->addTag($tag);
             }
@@ -148,7 +130,7 @@ class PostController extends AbstractController
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores de la noticia", $post);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         // Check errors, if there is any errror return it
         try {
@@ -166,7 +148,7 @@ class PostController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo crear el noticia en la bbdd",null,$post);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Noticia creada!",$post);
@@ -176,14 +158,6 @@ class PostController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_post_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="updates a new Post object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="post", ref=@Model(type=Post::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Post $post
      * @param ArtistRepository $artistRepository
@@ -198,7 +172,7 @@ class PostController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -213,9 +187,12 @@ class PostController extends AbstractController
             $post->setTitle($data['title']);
             $post->setDescription($data['description']);
             $post->setArtist($artistRepository->find($data['artist']));
-            $post->setImageName($data['imageName']);
-            $post->setImageSize($data['imageSize']);
-            if($data['tag'] !== null){
+            if ($data['imageFile'] !== ""){
+                $post->setImageFile($data['imageFile']);
+                $post->setImageName($data['imageName']);
+                $post->setImageSize($data['imageSize']);
+            }
+            if($data['tag'] !== ""){
                 $tag = $tagRepository->find($data['tag']);
                 $post->removeTag($post->getTag()->first());
                 $post->addTag($tag);
@@ -224,7 +201,7 @@ class PostController extends AbstractController
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la noticia",$post);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         // Check errors, if there is any errror return it
         try {
@@ -241,7 +218,7 @@ class PostController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar la noticia en la bbdd",null,$post);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Noticia editada!");
@@ -250,14 +227,6 @@ class PostController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_post_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Deletes a post",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="post", ref=@Model(type=Post::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Post $post
      * @param ApiUtils $apiUtils
@@ -268,11 +237,11 @@ class PostController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($post === null){
+            if ($post === ""){
                 $apiUtils->notFoundResponse("Noticia no encontrada");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

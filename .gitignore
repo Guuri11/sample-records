@@ -5,10 +5,9 @@
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
-/public/img/
-/public/songs/
 /var/
 /vendor/
+/templates/purchase
 ###< symfony/framework-bundle ###
 
 ###> symfony/phpunit-bridge ###

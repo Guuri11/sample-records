@@ -24,17 +24,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Class SearchController
  * @package App\Controller\V1
- * @SWG\Tag(name="search")
  * @Route("/api/v1.0/search")
  */
 class SearchController extends AbstractController
 {
     /**
      * @Route("/", name="api_search_retrieve", methods={"POST"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get search request"
-     * )
+     *
      * @param Request $request
      * @param ArtistRepository $artistRepository
      * @param EventRepository $eventRepository
@@ -42,6 +38,7 @@ class SearchController extends AbstractController
      * @param ProductRepository $productRepository
      * @param ApiUtils $apiUtils
      * @return JsonResponse
+     * @throws Exception
      */
     public function getSearchRequest(Request $request, ArtistRepository $artistRepository, EventRepository $eventRepository,
                                      PostRepository $postRepository, ProductRepository $productRepository, ApiUtils $apiUtils) : JsonResponse
@@ -49,7 +46,7 @@ class SearchController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -70,7 +67,7 @@ class SearchController extends AbstractController
                 "succes"=>false,
                 "message"=>"No se han encontrado resultados"];
             $apiUtils->setResponse($response);
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NO_CONTENT);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);

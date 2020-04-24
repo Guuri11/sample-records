@@ -55,6 +55,7 @@ class Comment implements \JsonSerializable
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Purchase", mappedBy="comment", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="id", referencedColumnName="id")
      */
     private $purchase;
 

@@ -175,9 +175,14 @@ class ApiUtils
      */
     public function isAuthorized(): bool
     {
+        // If the request is coming from the api doc avoid the checker authorization
+        if ($_SERVER['HTTP_REFERER'] === "http://localhost:8000/api/doc")
+            return true;
+
         if (! isset( $_SERVER['HTTP_AUTHORIZATION'])) {
             return false;
         }
+
 
         $authType = null;
         $authData = null;

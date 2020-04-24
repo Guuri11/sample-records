@@ -43,7 +43,6 @@ class Product implements \JsonSerializable
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Assert\NotBlank(message="Precio requerido")
      * @Assert\Type(
      *     type="float",
      *     message="El precio debe de ser un número"

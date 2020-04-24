@@ -24,20 +24,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class UserController
  * @package App\Controller\V1
  * @Route("/api/v1.0/user")
- * @SWG\Tag(name="user")
  */
 class UserController extends AbstractController
 {
     /**
      * @Route("/", name="api_user_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all users",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param UserRepository $userRepository
      * @param ApiUtils $apiUtils
@@ -48,7 +39,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -64,7 +55,7 @@ class UserController extends AbstractController
             $results = $userRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Usuarios no encontrados");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -73,14 +64,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_user_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one user",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param User $user
      * @param ApiUtils $apiUtils
      * @return JsonResponse
@@ -90,12 +73,12 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if ($user === null){
+        if ($user === ""){
             $apiUtils->notFoundResponse("Usuario no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -106,14 +89,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/new", name="api_user_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new User object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ValidatorInterface $validator
      * @param ApiUtils $apiUtils
@@ -124,7 +99,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -140,25 +115,46 @@ class UserController extends AbstractController
         
         try {
             $user->setName($data['name']);
-            $user->setSurname($data['surname']);
+            if ($data['surname'] !== "")
+                $user->setSurname($data['surname']);
             $user->setEmail($data['email']);
             $user->setPassword($data['password']);
-            $user->setRoles($data['roles']);
-            $user->setAddress($data['address']);
-            $user->setPostalCode($data['postal_code']);
-            $user->setTown($data['town']);
-            $user->setCity($data['city']);
-            $user->setPhone($data['phone']);
-            $user->setCreditCard($data['credit_card']);
-            $user->setProfileImage($data['profile_image']);
-            $user->setHeaderImage($data['header_image']);
-            $user->setProfileSize($data['profile_size']);
-            $user->setHeaderSize($data['header_size']);
+            $user->setRoles([$data['roles']]);
+            if ($data['address'] !== "")
+                $user->setAddress($data['address']);
+            if ($data['postal_code'] !== "")
+                $user->setPostalCode($data['postal_code']);
+            if ($data['town'] !== "")
+                $user->setTown($data['town']);
+            if ($data['city'] !== "")
+                $user->setCity($data['city']);
+            if ($data['phone'] !== "")
+                $user->setPhone($data['phone']);
+            if ($data['credit_card'] !== "")
+                $user->setCreditCard($data['credit_card']);
+            if ($data['profile_file'] !== ""){
+                $user->setProfileFile($data['profile_file']);
+                $user->setProfileImage($data['profile_image']);
+                $user->setProfileSize($data['profile_size']);
+            }
+            else {
+                $user->setProfileImage('user-default.png');
+                $user->setProfileSize(123);
+            }
+            if ($data['header_file'] !== ""){
+                $user->setHeaderFile($data['header_file']);
+                $user->setHeaderImage($data['header_image']);
+                $user->setHeaderSize($data['header_size']);
+            }
+            else {
+                $user->setHeaderImage('header-default.png');
+                $user->setHeaderSize(123);
+            }
             $user->setCreatedAt(new \DateTime());
             $user->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
+        }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al usuario", $user);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
         // Check errors, if there is any error return it
         try {
@@ -176,7 +172,7 @@ class UserController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el usuario en la bbdd", null, $user);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $log = new CustomLog("users_created","new_users");
@@ -188,14 +184,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_user_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="updates a new User object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param User $user
      * @param ApiUtils $apiUtils
@@ -207,7 +195,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -221,24 +209,45 @@ class UserController extends AbstractController
 
         try {
             $user->setName($data['name']);
-            $user->setSurname($data['surname']);
+            if ($data['surname'] !== "")
+                $user->setSurname($data['surname']);
             $user->setEmail($data['email']);
             $user->setPassword($data['password']);
-            $user->setRoles($data['roles']);
-            $user->setAddress($data['address']);
-            $user->setPostalCode($data['postal_code']);
-            $user->setTown($data['town']);
-            $user->setCity($data['city']);
-            $user->setPhone($data['phone']);
-            $user->setCreditCard($data['credit_card']);
-            $user->setProfileImage($data['profile_image']);
-            $user->setHeaderImage($data['header_image']);
-            $user->setProfileSize($data['profile_size']);
-            $user->setHeaderSize($data['header_size']);
+            $user->setRoles([$data['roles']]);
+            if ($data['address'] !== "")
+                $user->setAddress($data['address']);
+            if ($data['postal_code'] !== "")
+                $user->setPostalCode($data['postal_code']);
+            if ($data['town'] !== "")
+                $user->setTown($data['town']);
+            if ($data['city'] !== "")
+                $user->setCity($data['city']);
+            if ($data['phone'] !== "")
+                $user->setPhone($data['phone']);
+            if ($data['credit_card'] !== "")
+                $user->setCreditCard($data['credit_card']);
+            if ($data['profile_file'] !== ""){
+                $user->setProfileFile($data['profile_file']);
+                $user->setProfileImage($data['profile_image']);
+                $user->setProfileSize($data['profile_size']);
+            }
+            else {
+                $user->setProfileImage('user-default.png');
+                $user->setProfileSize(123);
+            }
+            if ($data['header_file'] !== ""){
+                $user->setHeaderFile($data['header_file']);
+                $user->setHeaderImage($data['header_image']);
+                $user->setHeaderSize($data['header_size']);
+            }
+            else {
+                $user->setHeaderImage('header-default.png');
+                $user->setHeaderSize(123);
+            }
             $user->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
+        }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores al usuario", $user);
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         // Check errors, if there is any errror return it
         try {
@@ -255,7 +264,7 @@ class UserController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar el usuario en la bbdd",null,$user);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Usuario editado!");
@@ -264,14 +273,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_user_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Delete a user",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param User $user
      * @param ApiUtils $apiUtils
@@ -282,13 +283,13 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         try {
-            if ($user === null){
+            if ($user === ""){
                 $apiUtils->notFoundResponse("Usuario no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }
@@ -309,14 +310,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/profile/info", name="api_user_info", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get personal info from the user logged",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param ApiUtils $apiUtils
      * @param UserRepository $userRepository
      * @return JsonResponse
@@ -326,7 +319,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -343,14 +336,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/profile/comments", name="api_user_comments", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all the comments from the user logged",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param ApiUtils $apiUtils
      * @param UserRepository $userRepository
      * @return JsonResponse
@@ -360,7 +345,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -377,14 +362,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/profile/purchases", name="api_user_purchases", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all the purchases from the user logged",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param ApiUtils $apiUtils
      * @param UserRepository $userRepository
      * @return JsonResponse
@@ -394,7 +371,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -411,14 +388,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/register", name="api_user_register", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Register a user",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param ApiUtils $apiUtils
@@ -431,7 +400,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $user = new User();
@@ -446,6 +415,10 @@ class UserController extends AbstractController
         try {
             $user->setName($data['name']);
             $user->setEmail($data['email']);
+            $user->setProfileImage('user-default.png');
+            $user->setProfileSize(123);
+            $user->setHeaderImage('header-default.jpg');
+            $user->setHeaderSize(123);
             $user->setRoles(['ROLE_USER']);
             $user->setPassword(
                 $passwordEncoder->encodePassword(
@@ -457,7 +430,7 @@ class UserController extends AbstractController
             $user->setUpdatedAt(new \DateTime('now'));
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudieron insertar los datos al usuario", $user);
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         // Check errors, if there is any error return it
@@ -476,7 +449,7 @@ class UserController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el usuario en la bbdd", null, $user);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $log = new CustomLog("new_users","new_users");
@@ -487,14 +460,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/login", name="api_user_login", methods={"POST"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Log the user",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param AuthenticationUtils $authenticationUtils
      * @param ApiUtils $apiUtils
      * @return Response
@@ -504,7 +469,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // get the login error if there is one
@@ -519,34 +484,18 @@ class UserController extends AbstractController
 
     /**
      * @Route("/logout", name="api_user_logout", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Logout the user",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
-     * @throws \Exception
+     * @throws Exception
      */
     public function logout()
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         // controller can be blank: it will never be executed!
-        throw new \Exception('Don\'t forget to activate logout in security.yaml');
+        throw new Exception('Don\'t forget to activate logout in security.yaml');
     }
 
     /**
      * @Route("/profile/change-password", name="api_user_change_password", methods={"POST"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Log the user",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ApiUtils $apiUtils
      * @param UserRepository $repository
@@ -560,7 +509,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -574,11 +523,11 @@ class UserController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        if ($data['password'] === null)
+        if ($data['password'] === "")
             $errors['required_old_password'] = "Por favor introduzca su contraseña actual";
-        if ($data['new_password'] === null)
+        if ($data['new_password'] === "")
             $errors['required_new_password'] = "Por favor introduzca su nueva contraseña";
-        if ($data['repeat_password'] === null)
+        if ($data['repeat_password'] === "")
             $errors['required_repeat_password'] = "Por favor introduzca de nuevo la nueva contraseña";
 
         if (count($errors) > 0){
@@ -616,7 +565,7 @@ class UserController extends AbstractController
             $user->setUpdatedAt(new \DateTime('now'));
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudieron insertar los datos al usuario", $user);
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         // Check errors, if there is any error return it
@@ -634,7 +583,7 @@ class UserController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo editar el usuario en la bbdd", null, $user);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Cambio de contraseña con existo!",$user);
@@ -644,14 +593,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/contact", name="api_user_contact", methods={"POST"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Send the user question to email account",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="user", ref=@Model(type=User::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ApiUtils $apiUtils
      * @param \Swift_Mailer $mailer
@@ -662,7 +603,7 @@ class UserController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -692,7 +633,7 @@ class UserController extends AbstractController
             $mailer->send($send_email);
         }catch (\Swift_SwiftException $e){
             $apiUtils->errorResponse($e, "No se pudo enviar el correo", null);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("Correo enviado");

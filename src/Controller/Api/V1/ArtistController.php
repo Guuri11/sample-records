@@ -21,20 +21,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class ArtistController
  * @package App\Controller\V1
  * @Route("/api/v1.0/artist")
- * @SWG\Tag(name="artist")
  */
 class ArtistController extends AbstractController
 {
     /**
      * @Route("/", name="api_artist_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all artists",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="artist", ref=@Model(type=Artist::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ArtistRepository $artistRepository
      * @param ApiUtils $apiUtils
@@ -45,7 +36,7 @@ class ArtistController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -59,7 +50,7 @@ class ArtistController extends AbstractController
             $results = $artistRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Artistas no encontrados");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("OK",$results);
@@ -68,14 +59,6 @@ class ArtistController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_artist_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one artist",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="artist", ref=@Model(type=Artist::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Artist $artist
      * @param ApiUtils $apiUtils
      * @return JsonResponse
@@ -85,10 +68,10 @@ class ArtistController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($artist === null){
+        if ($artist === ""){
             $apiUtils->notFoundResponse("Artista no encontrado");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -98,14 +81,6 @@ class ArtistController extends AbstractController
 
     /**
      * @Route("/new", name="api_artist_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Artist object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="artist", ref=@Model(type=Artist::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ValidatorInterface $validator
      * @param ApiUtils $apiUtils
@@ -116,7 +91,7 @@ class ArtistController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $artist = new Artist();
@@ -130,23 +105,29 @@ class ArtistController extends AbstractController
 
         // Process data
         try {
-            if ($data['name'] !== null)
+            if ($data['name'] !== "")
                 $artist->setName($data['name']);
             $artist->setAlias($data['alias']);
-            if ($data['surname'] !== null)
+            if ($data['surname'] !== "")
                 $artist->setSurname($data['surname']);
-            if ($data['is_from'] !== null)
+            if ($data['is_from'] !== "")
                 $artist->setIsFrom($data['is_from']);
             $artist->setBio($data['bio']);
-            if ($data['birth'] !== null)
+            if ($data['birth'] !== "")
                 $artist->setBirth(New DateTime($data['birth']));
-            $artist->setImageName($data['imageName']);
-            $artist->setImageSize($data['imageSize']);
+            if ($data['imageFile'] !== "") {
+                $artist->setImageFile($data['imageFile']);
+                $artist->setImageName($data['imageName']);
+                $artist->setImageSize($data['imageSize']);
+            } else {
+                $artist->setImageName('artist-default.jpg');
+                $artist->setImageSize(123);
+            }
             $artist->setCreatedAt(new DateTime());
             $artist->setUpdatedAt(new DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores al artista", $artist);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -165,7 +146,7 @@ class ArtistController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear el artista en la bbdd", null, $artist);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Artista creado!",$artist);
@@ -175,14 +156,6 @@ class ArtistController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_artist_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="updates a new Artist object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="artist", ref=@Model(type=Artist::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Artist $artist
      * @param ValidatorInterface $validator
@@ -195,7 +168,7 @@ class ArtistController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -207,25 +180,27 @@ class ArtistController extends AbstractController
 
         // Process data
         try {
-            if ($data['name'] !== null)
+            if ($data['name'] !== "")
                 $artist->setName($data['name']);
-            if ($data['name'] !== null)
+            if ($data['name'] !== "")
                 $artist->setAlias($data['alias']);
-            if ($data['surname'] !== null)
+            if ($data['surname'] !== "")
                 $artist->setSurname($data['surname']);
-            if ($data['is_from'] !== null)
+            if ($data['is_from'] !== "")
                 $artist->setIsFrom($data['is_from']);
             $artist->setBio($data['bio']);
-            if ($data['birth'] !== null)
+            if ($data['birth'] !== "")
                 $artist->setBirth(New DateTime($data['birth']));
-            $artist->setImageFile(new File($data['img']));
-            $artist->setImageName($data['img_file']);
-            $artist->setImageSize($data['img_size']);
+            if ($data['imageFile'] !== "") {
+                $artist->setImageFile($data['imageFile']);
+                $artist->setImageName($data['imageName']);
+                $artist->setImageSize($data['imageSize']);
+            }
             $artist->setUpdatedAt(new DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores del artista", $artist);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         // Check errors, if there is any errror return it
@@ -242,7 +217,7 @@ class ArtistController extends AbstractController
             $em->flush();
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar el artista en la bbdd",null,$artist);
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Artista editado!");
@@ -251,14 +226,6 @@ class ArtistController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_artist_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Delete a artist",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="artist", ref=@Model(type=Artist::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Artist $artist
      * @param ApiUtils $apiUtils
@@ -269,11 +236,11 @@ class ArtistController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($artist === null){
+            if ($artist === ""){
                 $apiUtils->notFoundResponse("Artista no encontrado");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }

@@ -28,20 +28,11 @@ use function Sodium\add;
  * Class PurchaseController
  * @package App\Controller\V1
  * @Route("/api/v1.0/purchase")
- * @SWG\Tag(name="purchase")
  */
 class PurchaseController extends AbstractController
 {
     /**
      * @Route("/", name="api_purchase_retrieve", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get all purchases",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="purchase", ref=@Model(type=Purchase::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param PurchaseRepository $purchaseRepository
      * @param ApiUtils $apiUtils
@@ -52,7 +43,7 @@ class PurchaseController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get params
@@ -66,7 +57,7 @@ class PurchaseController extends AbstractController
             $results = $purchaseRepository->getRequestResult($apiUtils->getParameters());
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "Compras no encontradas");
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
@@ -74,14 +65,6 @@ class PurchaseController extends AbstractController
 
     /**
      * @Route("/{id}", name="api_purchase_show", methods={"GET"})
-     * @SWG\ Response(
-     *      response=200,
-     *      description="Get one purchase",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="purchase", ref=@Model(type=Purchase::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Purchase $purchase
      * @param ApiUtils $apiUtils
      * @return JsonResponse
@@ -91,10 +74,10 @@ class PurchaseController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
-        if ($purchase === null){
+        if ($purchase === ""){
             $apiUtils->notFoundResponse("Compra no encontrada");
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
         }
@@ -104,14 +87,6 @@ class PurchaseController extends AbstractController
 
     /**
      * @Route("/new", name="api_purchase_new", methods={"POST"})
-     * @SWG\ Response(
-     *      response=201,
-     *      description="Creates a new Purchase object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="purchase", ref=@Model(type=Purchase::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param UserRepository $userRepository
      * @param TicketRepository $ticketRepository
@@ -126,7 +101,7 @@ class PurchaseController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $purchase = new Purchase();
@@ -138,18 +113,18 @@ class PurchaseController extends AbstractController
         try {
             $purchase->setSerialNumber($data['serial_number']);
             $purchase->setDate(new \DateTime($data['date']));
-            if($data['time'] !== null)
+            if($data['time'] !== "")
                 $purchase->setTime(new \DateTime($data['time']));
             $purchase->setReceived(false);
             $purchase->setAddress($data['address']);
-            if($data['town'] !== null)
+            if($data['town'] !== "")
                 $purchase->setTown($data['town']);
-            if($data['city'] !== null)
+            if($data['city'] !== "")
                 $purchase->setCity($data['city']);
             $purchase->setCountry($data['country']);
-            if($data['comment'] !== null)
+            if($data['comment'] !== "")
                 $purchase->setComment($data['comment']);
-            if ($data['product'] !== null) {
+            if ($data['product'] !== "") {
                 $purchase->addProduct($productRepository->find($data['product']));
             }
             if ($data['ticket'] !== null) {
@@ -161,7 +136,7 @@ class PurchaseController extends AbstractController
             $purchase->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores a la compra", $purchase);
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
         // Check errors, if there is any error return it
         try {
@@ -179,7 +154,7 @@ class PurchaseController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear la compra en la bbdd", null, $purchase);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
         $apiUtils->successResponse("¡Compra creada!",$purchase);
@@ -190,14 +165,6 @@ class PurchaseController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="api_purchase_update", methods={"PUT"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="updates a new Purchase object",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="purchase", ref=@Model(type=Purchase::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Purchase $purchase
      * @param UserRepository $userRepository
@@ -214,7 +181,7 @@ class PurchaseController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         // Get request data
@@ -229,21 +196,21 @@ class PurchaseController extends AbstractController
         try {
             $purchase->setSerialNumber($data['serial_number']);
             $purchase->setDate(new \DateTime($data['date']));
-            if($data['time'] !== null)
+            if($data['time'] !== "")
                 $purchase->setTime(new \DateTime($data['time']));
             $purchase->setReceived(false);
             $purchase->setAddress($data['address']);
-            if($data['town'] !== null)
+            if($data['town'] !== "")
                 $purchase->setTown($data['town']);
-            if($data['city'] !== null)
+            if($data['city'] !== "")
                 $purchase->setCity($data['city']);
             $purchase->setCountry($data['country']);
-            if($data['comment'] !== null)
+            if($data['comment'] !== "")
                 $purchase->setComment($data['comment']);
-            if ($data['product'] !== null) {
+            if ($data['product'] !== "") {
                 $purchase->addProduct($productRepository->find($data['product']));
             }
-            if ($data['ticket'] !== null) {
+            if ($data['ticket'] !== "") {
                 $purchase->addTicket($ticketRepository->find($data['ticket']));
             }
             $purchase->setFinalPrice($data['final_price']);
@@ -252,7 +219,7 @@ class PurchaseController extends AbstractController
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la compra", $purchase);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
         // Check errors, if there is any errror return it
         try {
@@ -269,7 +236,7 @@ class PurchaseController extends AbstractController
         }catch (Exception $e) {
             $apiUtils->errorResponse($e,"No se pudo actualizar la compra en la bbdd",null,$purchase);
 
-            return new JsonResponse($apiUtils->getResponse(),400,['Content-type'=>'application/json']);
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
         $apiUtils->successResponse("¡Compra editado!");
@@ -278,14 +245,6 @@ class PurchaseController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="api_purchase_delete", methods={"DELETE"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Delete a purchase",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="purchase", ref=@Model(type=Purchase::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param Purchase $purchase
      * @param ApiUtils $apiUtils
@@ -296,11 +255,11 @@ class PurchaseController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         try {
-            if ($purchase === null){
+            if ($purchase === ""){
                 $apiUtils->notFoundResponse("Compra no encontrada");
                 return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
             }
@@ -319,14 +278,6 @@ class PurchaseController extends AbstractController
 
     /**
      * @Route("/buy", name="api_purchase_buy", methods={"POST"})
-     * @SWG\ Response(
-     *      response=202,
-     *      description="Buy a product/event ticket",
-     * @SWG\ Schema(
-     *          type="object",
-     * @SWG\ Property(property="purchase", ref=@Model(type=Purchase::class, groups={"serialized"}))
-     *      )
-     * )
      * @param Request $request
      * @param ProductRepository $productRepository
      * @param TicketRepository $ticketRepository
@@ -343,7 +294,7 @@ class PurchaseController extends AbstractController
         // Check Oauth
         if (!$apiUtils->isAuthorized()){
             $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,400,['Content-type'=>'application/json']);
+            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
         }
 
         $response = [];
@@ -357,7 +308,7 @@ class PurchaseController extends AbstractController
         // Sanitize data
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
-        if ($data['email'] !== null)
+        if ($data['email'] !== "")
             $data['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
 
         // Validate data
@@ -387,13 +338,17 @@ class PurchaseController extends AbstractController
             return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
         }
 
+        // Set user if the buy is from one logged
+        if (!is_null($data['user']))
+            $purchase->setUser($userRepository->find($data['user']));
+
         // Retrieve the product / ticket
-        if (!empty($data["product"])){
+        if (!is_null($data["product"])){
             $item = $productRepository->find(intval($data["product"]));
-            if ($item !== null){
+            if ($item !== ""){
                 $check = true;
                 while ($check){
-                    $serialNumber->getSerialNumber();
+                    $serialNumber->GenerateSerialNumber();
                     $check = $serialNumber->checkSerialNumber($purchaseRepository);
                 }
                 try {
@@ -403,13 +358,13 @@ class PurchaseController extends AbstractController
                     $purchase->setDate($date);
                     $purchase->setReceived(false);
                     $purchase->setAddress($data['address']);
-                    if($data['town'] !== null)
+                    if($data['town'] !== "")
                         $purchase->setTown($data['town']);
-                    if($data['city'] !== null)
+                    if($data['city'] !== "")
                         $purchase->setCity($data['city']);
                     $purchase->setCountry($data['country']);
 
-                    if ($data['product'] !== null) {
+                    if ($data['product'] !== "") {
                         $purchase->addProduct($productRepository->find($data['product']));
                     }
                     $purchase->setFinalPrice($productRepository->find($data['product'])->getPrice());
@@ -418,16 +373,16 @@ class PurchaseController extends AbstractController
                     $purchase->setUpdatedAt(new \DateTime());
                 }catch (Exception $e){
                     $apiUtils->errorResponse($e, "No se pudo insertar los valores a la compra", $purchase);
-                    return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
                 }
             }
         }
         else{
             $item = $ticketRepository->find(intval($data["ticket"]));
-            if ($item !== null){
+            if ($item !== ""){
                 $check = true;
                 while ($check){
-                    $serialNumber->getSerialNumber();
+                    $serialNumber->GenerateSerialNumber();
                     $check = $serialNumber->checkSerialNumber($purchaseRepository);
                 }
                 try {
@@ -437,13 +392,13 @@ class PurchaseController extends AbstractController
                     $purchase->setDate($date);
                     $purchase->setReceived(false);
                     $purchase->setAddress($data['address']);
-                    if($data['town'] !== null)
+                    if($data['town'] !== "")
                         $purchase->setTown($data['town']);
-                    if($data['city'] !== null)
+                    if($data['city'] !== "")
                         $purchase->setCity($data['city']);
                     $purchase->setCountry($data['country']);
                     $purchase->setComment(null);
-                    if ($data['ticket'] !== null) {
+                    if ($data['ticket'] !== "") {
                         $purchase->addTicket($ticketRepository->find($data['ticket']));
                     }
                     $purchase->setFinalPrice($ticketRepository->find($data['ticket'])->getPrice());
@@ -452,7 +407,7 @@ class PurchaseController extends AbstractController
                     $purchase->setUpdatedAt(new \DateTime());
                 }catch (Exception $e){
                     $apiUtils->errorResponse($e, "No se pudo insertar los valores a la compra", $purchase);
-                    return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
                 }
             }
         }
@@ -465,7 +420,7 @@ class PurchaseController extends AbstractController
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No se pudo crear la compra en la bbdd", null, $purchase);
 
-            return new JsonResponse($apiUtils->getResponse(), 400, ['Content-type' => 'application/json']);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
 
