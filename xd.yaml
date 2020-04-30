@@ -1,0 +1,30 @@
+"/api/v1.0/category/new":
+  post:
+    parameters:
+      - name: Category
+        in: body
+        required: true
+        description: Object category
+        schema:
+          type: array
+          items:
+            properties:
+              name:
+                type: string
+            type: object
+          example:
+            name: NombreCategoria
+    responses:
+      '201':
+        description: Creates a new Category object
+        schema:
+          properties:
+            category:
+              "$ref": "#/definitions/Category"
+          type: object
+      '404':
+        description: Not found
+      '401':
+        description: Unauthorized
+    tags:
+      - category
