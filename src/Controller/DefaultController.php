@@ -10,24 +10,19 @@ use App\Service\CustomLog;
 class DefaultController extends AbstractController
 {
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="default")
+     */
+    public function default()
+    {
+        return $this->render('default/index.html.twig');
+    }
+
+    /**
+     * @Route("/{reactRouting}", name="homepage")
      */
     public function index()
     {
-        // get the Link repository (it is like our model)
-        $repository = $this->getDoctrine()->getRepository(Artist::class);
-
-        // retrieve all links
-        $artists = $repository->findAll();
-
-        $logger = new CustomLog('SR-INFO','test.log');
-        $logger->info('hola mundo');
-
-
-        // now pass the array of link object to the view
-        return $this->render('default/index.html.twig', [
-            'artists' => $artists,
-        ]);
+        return $this->render('default/index.html.twig');
     }
 
 }

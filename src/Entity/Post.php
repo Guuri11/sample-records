@@ -275,6 +275,7 @@ class Post implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
+            'entity'=>get_class($this),
             'id'=>$this->getId(),
             'title'=>$this->getTitle(),
             'artist'=>$this->getArtist(),

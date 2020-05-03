@@ -28,6 +28,9 @@ class SongController extends AbstractController
 
     /**
      * @Route("/new", name="song_new", methods={"GET","POST"})
+     * @param Request $request
+     * @param FileUploader $fileUploader
+     * @return Response
      */
     public function new(Request $request, FileUploader $fileUploader): Response
     {

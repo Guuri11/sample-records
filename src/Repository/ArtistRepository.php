@@ -67,5 +67,4 @@ class ArtistRepository extends ServiceEntityRepository
         else
             return null;
     }
-
 }

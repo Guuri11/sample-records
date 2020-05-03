@@ -169,6 +169,7 @@ class Ticket implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
+            'entity'=>get_class($this),
             'id'=>$this->getId(),
             'serial_number'=>$this->getSerialNumber(),
             'event'=>$this->getEvent(),

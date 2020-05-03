@@ -33,11 +33,7 @@ class EventController extends AbstractController
      */
     public function index(Request $request, EventRepository $eventRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get params
         $apiUtils->getRequestParams($request);
@@ -64,11 +60,7 @@ class EventController extends AbstractController
      */
     public function show(Event $event, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         if ($event === ""){
             $apiUtils->notFoundResponse("Evento no encontrado");
@@ -90,11 +82,7 @@ class EventController extends AbstractController
     public function new(Request $request, ArtistRepository $artistRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $event = new Event();
         // Get request data
@@ -164,11 +152,7 @@ class EventController extends AbstractController
     public function edit(Request $request, Event $event, ArtistRepository $artistRepository, ValidatorInterface $validato,
                         ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get request data
         $apiUtils->getContent($request);
@@ -213,11 +197,7 @@ class EventController extends AbstractController
      */
     public function delete(Request $request, Event $event, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         try {
             if ($event === ""){

@@ -155,6 +155,7 @@ class Comment implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
+            'entity'=>get_class($this),
             'id'=>$this->getId(),
             'comment'=>$this->getComment(),
             'user'=>$this->getUser(),

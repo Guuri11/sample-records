@@ -32,11 +32,7 @@ class CategoryController extends AbstractController
      */
     public function index(Request $request, CategoryRepository $categoryRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get params
         $apiUtils->getRequestParams($request);
@@ -63,11 +59,7 @@ class CategoryController extends AbstractController
      */
     public function show(Category $category, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         if ($category === ""){
             $apiUtils->notFoundResponse("Categoria no encontrado");
@@ -87,11 +79,7 @@ class CategoryController extends AbstractController
     public function new(Request $request, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $category = new Category();
 
@@ -145,11 +133,7 @@ class CategoryController extends AbstractController
     public function edit(Request $request, Category $category, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get request data
         $apiUtils->getContent($request);
@@ -199,11 +183,7 @@ class CategoryController extends AbstractController
      */
     public function delete(Request $request, Category $category, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         try {
             if ($category === ""){

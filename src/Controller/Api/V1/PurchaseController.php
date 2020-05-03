@@ -40,11 +40,7 @@ class PurchaseController extends AbstractController
      */
     public function index(Request $request, PurchaseRepository $purchaseRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get params
         $apiUtils->getRequestParams($request);
@@ -71,11 +67,7 @@ class PurchaseController extends AbstractController
      */
     public function show(Purchase $purchase, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         if ($purchase === ""){
             $apiUtils->notFoundResponse("Compra no encontrada");
@@ -98,11 +90,7 @@ class PurchaseController extends AbstractController
     public function new(Request $request, UserRepository $userRepository, TicketRepository $ticketRepository,
                         ProductRepository $productRepository, ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $purchase = new Purchase();
         $data = [];
@@ -178,11 +166,7 @@ class PurchaseController extends AbstractController
                         TicketRepository $ticketRepository, ProductRepository $productRepository,
                         ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get request data
         $apiUtils->getContent($request);
@@ -252,11 +236,7 @@ class PurchaseController extends AbstractController
      */
     public function delete(Request $request, Purchase $purchase, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         try {
             if ($purchase === ""){
@@ -291,11 +271,7 @@ class PurchaseController extends AbstractController
                         ApiUtils $apiUtils, SerialNumber $serialNumber, PurchaseRepository $purchaseRepository,
                         UserRepository $userRepository): JsonResponse {
 
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $response = [];
         $errors = [];

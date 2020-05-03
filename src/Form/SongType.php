@@ -25,7 +25,7 @@ class SongType extends AbstractType
                 'constraints' => [
                     new File([
                         'mimeTypes' => [
-                            'audio/mpeg',
+                            'audio/mp3',
                             'adio/vorbis',
                         ],
                         'mimeTypesMessage' => 'Please upload a valid audio file',

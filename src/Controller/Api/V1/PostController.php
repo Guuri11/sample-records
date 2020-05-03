@@ -36,11 +36,7 @@ class PostController extends AbstractController
      */
     public function index(Request $request ,PostRepository $postRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get params
         $apiUtils->getRequestParams($request);
@@ -67,11 +63,7 @@ class PostController extends AbstractController
      */
     public function show(Post $post, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         if ($post === ""){
             $apiUtils->notFoundResponse("Noticia no encontrado");
@@ -94,11 +86,7 @@ class PostController extends AbstractController
     public function new(Request $request, ArtistRepository $artistRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils, TagRepository $tagRepository): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $post = new Post();
         // Get request data
@@ -169,11 +157,7 @@ class PostController extends AbstractController
     public function edit(Request $request, Post $post, ArtistRepository $artistRepository, TagRepository $tagRepository,
                         ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get request data
         $apiUtils->getContent($request);
@@ -234,11 +218,7 @@ class PostController extends AbstractController
      */
     public function delete(Request $request, Post $post, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         try {
             if ($post === ""){

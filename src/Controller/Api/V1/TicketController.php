@@ -35,11 +35,7 @@ class TicketController extends AbstractController
      */
     public function index(Request $request, TicketRepository $ticketRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get params
         $apiUtils->getRequestParams($request);
@@ -67,11 +63,7 @@ class TicketController extends AbstractController
      */
     public function show(Ticket $ticket, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         if ($ticket === ""){
             $apiUtils->notFoundResponse("Ticket no encontrado");
@@ -93,11 +85,7 @@ class TicketController extends AbstractController
     public function new(Request $request, EventRepository $eventRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $ticket = new Ticket();
         // Get request data
@@ -154,11 +142,7 @@ class TicketController extends AbstractController
     public function edit(Request $request, Ticket $ticket, EventRepository $eventRepository, ValidatorInterface $validator,
                         ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get request data
         $apiUtils->getContent($request);
@@ -209,11 +193,7 @@ class TicketController extends AbstractController
      */
     public function delete(Request $request, Ticket $ticket, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         try {
             if ($ticket === ""){

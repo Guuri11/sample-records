@@ -37,11 +37,7 @@ class CommentController extends AbstractController
      */
     public function index(Request $request, CommentRepository $commentRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get params
         $apiUtils->getRequestParams($request);
@@ -69,11 +65,7 @@ class CommentController extends AbstractController
      */
     public function show(Comment $comment, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         if ($comment === ""){
             $apiUtils->notFoundResponse("Comentario no encontrado");
@@ -101,11 +93,7 @@ class CommentController extends AbstractController
                         PurchaseRepository $purchaseRepository, PostRepository $postRepository,
                         ApiUtils $apiUtils, ValidatorInterface $validator): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $comment = new Comment();
         // Get request data
@@ -176,11 +164,7 @@ class CommentController extends AbstractController
                         PurchaseRepository $purchaseRepository, ApiUtils $apiUtils,
                          PostRepository $postRepository, ValidatorInterface $validator): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get request data
         $apiUtils->getContent($request);
@@ -236,11 +220,7 @@ class CommentController extends AbstractController
      */
     public function delete(Request $request, Comment $comment, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         try {
             if ($comment === ""){

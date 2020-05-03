@@ -131,6 +131,7 @@ class Tag implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
+            'entity'=>get_class($this),
             'id'=>$this->getId(),
             'tag'=>$this->getTag(),
             'posts'=>$this->getPosts(),

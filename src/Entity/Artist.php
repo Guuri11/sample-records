@@ -448,6 +448,7 @@ class Artist implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
+            'entity'=>get_class($this),
             'id'=>$this->getId(),
             'name'=>$this->getName(),
             'alias'=>$this->getAlias(),

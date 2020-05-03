@@ -1749,6 +1749,23 @@ nelmio_api_doc:
                           description: Unauthorized
                   tags:
                       - search
+            "/api/v1.0/search/last":
+                get:
+                    parameters:
+                          - name: last
+                            in: query
+                            required: true
+                            description: Get the last actions by the artists (Songs, Albums, Events, Posts)
+                            type: integer
+                    responses:
+                        '200':
+                          description: Get search request
+                        '204':
+                          description: No content
+                        '401':
+                          description: Unauthorized
+                    tags:
+                        - search
             "/api/v1.0/song/":
                 get:
                     parameters:

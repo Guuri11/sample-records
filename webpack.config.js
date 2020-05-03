@@ -46,6 +46,7 @@ Encore
     .enableSourceMaps(!Encore.isProduction())
     // enables hashed filenames (e.g. app.abc123.css)
     .enableVersioning(Encore.isProduction())
+    .enableSassLoader()
     .enableReactPreset()
 
     // enables @babel/preset-env polyfills
@@ -55,6 +56,7 @@ Encore
             "@babel/plugin-transform-runtime"
         ]
     })
+
 
     // enables Sass/SCSS support
     //.enableSassLoader()
@@ -67,7 +69,6 @@ Encore
     //.enableIntegrityHashes(Encore.isProduction())
 
     // uncomment if you're having problems with a jQuery plugin
-    //.autoProvidejQuery() yarn encore dev
 
     // uncomment if you use API Platform Admin (composer req api-admin)
     //.enableReactPreset()

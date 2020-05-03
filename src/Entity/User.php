@@ -541,6 +541,7 @@ class User implements UserInterface, \Serializable, \JsonSerializable
     public function jsonSerialize()
     {
         return [
+            'entity'=>get_class($this),
             'id'=>$this->getId(),
             'name'=>$this->getName(),
             'surname'=>$this->getSurname(),

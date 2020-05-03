@@ -130,6 +130,7 @@ class Category implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
+            'entity'=>get_class($this),
             'id'=>$this->getId(),
             'name'=>$this->getName(),
             'created_at'=>$this->getCreatedAt(),

@@ -6,8 +6,10 @@ use App\Repository\ArtistRepository;
 use App\Repository\EventRepository;
 use App\Repository\PostRepository;
 use App\Repository\ProductRepository;
+use App\Repository\SongRepository;
 use App\Service\ApiUtils;
 use DateTime;
+use Doctrine\DBAL\DBALException;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
@@ -43,11 +45,6 @@ class SearchController extends AbstractController
     public function getSearchRequest(Request $request, ArtistRepository $artistRepository, EventRepository $eventRepository,
                                      PostRepository $postRepository, ProductRepository $productRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
 
         // Get request data
         $apiUtils->getContent($request);
@@ -69,6 +66,47 @@ class SearchController extends AbstractController
             $apiUtils->setResponse($response);
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NO_CONTENT);
         }
+        $apiUtils->successResponse("OK",$results);
+        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/last", name="api_search_last_retrieve", methods={"GET"})
+     * @param Request $request
+     * @param ApiUtils $apiUtils
+     * @param AlbumRepository $albumRepository
+     * @param SongRepository $songRepository
+     * @param EventRepository $eventRepository
+     * @param PostRepository $postRepository
+     * @return JsonResponse
+     */
+    public function getLastTwo(Request $request, ApiUtils $apiUtils, AlbumRepository $albumRepository, SongRepository $songRepository,
+                                EventRepository $eventRepository, PostRepository $postRepository) : JsonResponse
+    {
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setParameters($apiUtils->sanitizeData($apiUtils->getParameters()));
+
+        // Get result
+        try {
+            $albums = $albumRepository->getRequestResult($apiUtils->getParameters());
+            $events = $eventRepository->getRequestResult($apiUtils->getParameters());
+            $posts = $postRepository->getRequestResult($apiUtils->getParameters());
+            $songs = $songRepository->getRequestResult($apiUtils->getParameters());
+
+            $resultsQuery = [$albums[0],$albums[1],$events[0],$events[1],$posts[0],$posts[1],$songs[0],$songs[1]];
+
+            usort($resultsQuery, function ($obj1,$obj2){return $obj1->getCreatedAt() < $obj2->getCreatedAt();});
+
+            $results = [$resultsQuery[0],$resultsQuery[1]];
+
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, "Si resultados");
+            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+        }
+
         $apiUtils->successResponse("OK",$results);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
     }

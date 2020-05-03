@@ -168,54 +168,6 @@ class ApiUtils
             $this->response[self::RESULTS] = $results;
     }
 
-    /**
-     * Attempt authorization using jwt-verifier
-     *
-     * @return bool
-     */
-    public function isAuthorized(): bool
-    {
-        // If the request is coming from the api doc avoid the checker authorization
-        if ($_SERVER['HTTP_REFERER'] === "http://localhost:8000/api/doc")
-            return true;
-
-        if (! isset( $_SERVER['HTTP_AUTHORIZATION'])) {
-            return false;
-        }
-
-
-        $authType = null;
-        $authData = null;
-
-        // Extract the auth type and the data from the Authorization header.
-        @list($authType, $authData) = explode(" ", $_SERVER['HTTP_AUTHORIZATION'], 2);
-
-        // If the Authorization Header is not a bearer type, return a 401.
-        if ($authType != 'Bearer') {
-            return false;
-        }
-
-        // Attempt authorization with the provided token
-        try {
-
-            // Setup the JWT Verifier
-            $jwtVerifier = (new \Okta\JwtVerifier\JwtVerifierBuilder())
-                ->setAdaptor(new \Okta\JwtVerifier\Adaptors\SpomkyLabsJose())
-                ->setAudience('api://default')
-                ->setClientId('0oaa2rqjwqSSAxR8w4x6')
-                ->setIssuer('https://dev-837444.okta.com/oauth2/default')
-                ->build();
-
-            // Verify the JWT from the Authorization Header.
-            $jwt = $jwtVerifier->verify($authData);
-        } catch (\Exception $e) {
-
-            // We encountered an error, return a 401.
-            return false;
-        }
-
-        return true;
-    }
 
     /**
      * @return array

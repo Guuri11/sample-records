@@ -369,6 +369,7 @@ class Event implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
+            'entity'=>get_class($this),
             'id'=>$this->getId(),
             'name'=>$this->getName(),
             'artist'=>$this->getArtist(),

@@ -36,11 +36,7 @@ class UserController extends AbstractController
      */
     public function index(Request $request, UserRepository $userRepository, ApiUtils $apiUtils) : JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -70,11 +66,7 @@ class UserController extends AbstractController
      */
     public function show(User $user, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -96,11 +88,7 @@ class UserController extends AbstractController
      */
     public function new(Request $request, ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -192,11 +180,7 @@ class UserController extends AbstractController
      */
     public function edit(Request $request, User $user, ApiUtils $apiUtils, ValidatorInterface $validator): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -280,11 +264,7 @@ class UserController extends AbstractController
      */
     public function delete(Request $request, User $user, ApiUtils $apiUtils): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -316,11 +296,7 @@ class UserController extends AbstractController
      */
     public function personalInfo(ApiUtils $apiUtils, UserRepository $userRepository)
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         try {
@@ -342,11 +318,7 @@ class UserController extends AbstractController
      */
     public function getComments(ApiUtils $apiUtils, UserRepository $userRepository)
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         try {
@@ -368,11 +340,7 @@ class UserController extends AbstractController
      */
     public function purchases(ApiUtils $apiUtils, UserRepository $userRepository)
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         try {
@@ -397,11 +365,7 @@ class UserController extends AbstractController
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, ApiUtils $apiUtils,
                             ValidatorInterface $validator): Response
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $user = new User();
 
@@ -466,11 +430,7 @@ class UserController extends AbstractController
      */
     public function login(AuthenticationUtils $authenticationUtils, ApiUtils $apiUtils)
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -506,11 +466,7 @@ class UserController extends AbstractController
     public function changePassword(Request $request, ApiUtils $apiUtils, UserRepository $repository,
                                    UserPasswordEncoderInterface $passwordEncoder, ValidatorInterface $validator): JsonResponse
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -600,11 +556,7 @@ class UserController extends AbstractController
      */
     public function contact(Request $request,ApiUtils $apiUtils, \Swift_Mailer $mailer)
     {
-        // Check Oauth
-        if (!$apiUtils->isAuthorized()){
-            $response = ["success"=>false,"message"=>"Autentificación fallida"];
-            return new JsonResponse($response,Response::HTTP_UNAUTHORIZED,['Content-type'=>'application/json']);
-        }
+        
 
         // Get request data
         $apiUtils->getContent($request);
