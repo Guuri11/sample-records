@@ -556,7 +556,7 @@ class UserController extends AbstractController
      */
     public function contact(Request $request,ApiUtils $apiUtils, \Swift_Mailer $mailer)
     {
-        
+        $error = [];
 
         // Get request data
         $apiUtils->getContent($request);
@@ -565,10 +565,30 @@ class UserController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        $name = $data['name'];
-        $email = $data['email'];
+        $name = $data["name"];
+        if ($name === "")
+            $error["empty_name"] = "Por favor, indique su nombre";
+        $email = $data["email"];
+        if ($email === "")
+            $error["empty_email"] = "Por favor, indique su correo";
+        if ($email !== "" && filter_var($email,FILTER_VALIDATE_EMAIL) === false)
+            $error["not_email"] = "Correo no válido";
         $subject = $data['subject'];
+        if ($subject === "")
+            $error["empty_subject"] = "Por favor, indique el motivo de su duda";
         $message = $data['message'];
+        if ($message === "")
+            $error["empty_message"] = "Escriba su duda por favor";
+
+        if (count($error) > 0){
+            $apiUtils->setFormErrors([$error]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo enviar el correo",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
 
         try {
             $send_email = (new \Swift_Message('Mensaje de contacto'))
@@ -589,6 +609,6 @@ class UserController extends AbstractController
         }
 
         $apiUtils->successResponse("Correo enviado");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_OK);
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_OK,['Content-type' => 'application/json']);
     }
 }

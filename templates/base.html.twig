@@ -15,8 +15,11 @@
         <!-- Favicon -->
 
         <!-- Stylesheet -->
-        <link rel="stylesheet" href="./{{ asset('css/sample_records.css') }}">
-    {% else %}
+                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" charset="UTF-8" href="{{ asset('css/slick.min.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/slick-theme.min.css') }}" />
+        <link rel="stylesheet" href=".{{ asset('css/sample_records.css') }}">
+        {% else %}
 
     {% endif %}
 </head>

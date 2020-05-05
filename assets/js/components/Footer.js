@@ -4,37 +4,39 @@ import {Link} from "react-router-dom";
 class Footer extends Component {
     render() {
         return (
-            <div>
-                <footer className="footer-area">
+            <footer className="mainfooter" role="contentinfo">
+                <div className="footer-middle">
                     <div className="container">
-                        <div className="row d-flex flex-wrap align-items-center">
-                            <div className="col-12 col-md-6">
-                                <a className="text-dark one-day" id="footer-sr" href="#">SAMPLE RECORDS</a>
-                                <p className="copywrite-text"><a
-                                    href="#">
-                                    Copyright &copy;
-                                    <script>document.write(new Date().getFullYear());</script>
-                                    All rights reserved | This template is made with <i className="fa fa-heart-o"
-                                                                                        aria-hidden="true"/> by <a
-                                        href="https://colorlib.com" target="_blank"/>Colorlib</a>
-                                </p>
-                            </div>
-
-                            <div className="col-12 col-md-6">
-                                <div className="footer-nav">
-                                    <ul>
-                                        <li><Link to={'/'}>Inicio</Link></li>
-                                        <li><Link to={'/tienda'}>Tienda</Link></li>
-                                        <li><Link to={'/eventos'}>Eventos</Link></li>
-                                        <li><Link to={'/noticias'}>Noticias</Link></li>
-                                        <li><Link to={'/contacto'}>Contacto</Link></li>
-                                    </ul>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="footer-pad row justify-content-center">
+                                    <div className="col12 col-md-3 justify-content-center">
+                                        <Link to={'/'} className={"text-center"}>
+                                            <h4>SAMPLE RECORDS</h4>
+                                        </Link>
+                                    </div>
+                                    <div className="col-12 col-md-3 text-center">
+                                        <ul className="social-network social-circle">
+                                            <li><a href="#" className="icoTwitter" title="Twitter"><i
+                                                className="fa fa-twitter"/></a></li>
+                                            <li><a href="#" className="icoGmail" title="Gmail"><i
+                                                className="fa fa-google-plus"/></a></li>
+                                            <li><a href="#" className="icoGithub" title="Github"><i
+                                                className="fa fa-github"/></a></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div className="row">
+                            <div className="col-md-12 copy mt-3">
+                                <p className="text-center text-dark">&copy; Copyright 2020 - Sample Records. All rights
+                                    reserved.</p>
+                            </div>
+                        </div>
                     </div>
-                </footer>
-            </div>
+                </div>
+            </footer>
         );
     }
 }

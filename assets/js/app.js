@@ -39,6 +39,7 @@ ReactDOM.render(
             <Route path="/registrar" component={Register}/>
             <Route path="/tienda" component={Shop}/>
             <Route path="/sr-music" component={SRMusic}/>
+            <Route path="/error404" component={Error404} />
             <Route component={Error404} />
         </Switch>
     </Router>

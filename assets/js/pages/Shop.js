@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Title from "../components/Title";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 class Shop extends Component {
     render() {
@@ -8,6 +9,7 @@ class Shop extends Component {
             <div>
                 <Title title={"SR - TIENDA"}/>
                 <Header active={"shop"}/>
+                <Footer/>
             </div>
         );
     }

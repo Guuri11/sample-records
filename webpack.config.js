@@ -57,6 +57,11 @@ Encore
         ]
     })
 
+    .autoProvideVariables({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+    })
 
     // enables Sass/SCSS support
     //.enableSassLoader()
