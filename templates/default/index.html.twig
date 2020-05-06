@@ -4,5 +4,7 @@
 
  {% block body %}
 
+     <!--- Don't worry about this line, you won't hack the page changing the value ;) --->
+     <div class="js-user-rating" data-is-authenticated="{{ app.user ? 'true' : 'false' }}"></div>
      <div id="root"></div>
  {% endblock %}

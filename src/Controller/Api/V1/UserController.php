@@ -384,12 +384,7 @@ class UserController extends AbstractController
             $user->setHeaderImage('header-default.jpg');
             $user->setHeaderSize(123);
             $user->setRoles(['ROLE_USER']);
-            $user->setPassword(
-                $passwordEncoder->encodePassword(
-                    $user,
-                    $data['password']
-                )
-            );
+            $user->setPassword($data['password']);
             $user->setCreatedAt(new \DateTime('now'));
             $user->setUpdatedAt(new \DateTime('now'));
         }catch (Exception $e){
@@ -401,10 +396,17 @@ class UserController extends AbstractController
         try {
             $apiUtils->validateData($validator, $user);
         } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+            $apiUtils->errorResponse($e, "No se pudo validar los datos", $apiUtils->getFormErrors());
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
         }
 
+        // hash of the password we do it here because of validateData
+        $user->setPassword(
+            $passwordEncoder->encodePassword(
+                $user,
+                $data['password']
+            )
+        );
         // Upload obj to the database
         try {
             $em = $this->getDoctrine()->getManager();

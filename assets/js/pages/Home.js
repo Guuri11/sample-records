@@ -8,6 +8,11 @@ import Slider from 'react-slick';
 
 class Home extends Component{
 
+    constructor(props) {
+        super(props);
+        this._isMounted = false;
+    }
+
     state = {
         last_two: [],
         last_posts: [],
@@ -18,10 +23,11 @@ class Home extends Component{
     };
 
     componentDidMount() {
-        this.getLastTwo();
-        this.getLastSong();
-        this.getLastProducts();
-        this.getLastPosts();
+        this._isMounted = true;
+        this._isMounted && this.getLastTwo();
+        this._isMounted && this.getLastSong();
+        this._isMounted && this.getLastProducts();
+        this._isMounted && this.getLastPosts();
     }
     componentWillUnmount() {
         this._isMounted = false;
@@ -32,7 +38,7 @@ class Home extends Component{
     getLastTwo() {
         axios.get(`/api/v1.0/search/last?last=2`).then(res => {
             if (res.data.success === true){
-                this.setState( { last_two: res.data.results } );
+                this._isMounted && this.setState( { last_two: res.data.results } );
             } else {
                 <Redirect to={'error404'}/>
             }
@@ -44,7 +50,7 @@ class Home extends Component{
     getLastSong () {
         axios.get(`/api/v1.0/song?last=1`).then(res => {
             if (res.data.success === true){
-                this.setState( { last_song: res.data.results } );
+                this._isMounted && this.setState( { last_song: res.data.results } );
             } else {
                 <Redirect to='/error404' />
             }
@@ -66,7 +72,7 @@ class Home extends Component{
     getLastPosts () {
         axios.get(`/api/v1.0/post?last=6`).then(res => {
             if (res.data.success === true){
-                this.setState( { last_posts: res.data.results, loading: false } );
+                this._isMounted && this.setState( { last_posts: res.data.results, loading: false } );
             } else {
                 <Redirect to='/error404' />
 
@@ -135,7 +141,6 @@ class Home extends Component{
         };
 
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-        console.log(this.state.last_song);
         return(
             <div className={"bg-sr"}>
                 <Title title={"SR - INICIO"}/>
@@ -312,7 +317,7 @@ class Home extends Component{
                         </section>
                 }
 
-                <Footer/>
+                <Footer additionalStyles={{marginTop: 0}}/>
             </div>
         )
     }

@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 class Footer extends Component {
     render() {
         return (
-            <footer className="mainfooter" role="contentinfo">
+            <footer className="mainfooter" role="contentinfo" style={this.props.additionalStyles}>
                 <div className="footer-middle">
                     <div className="container">
                         <div className="row">

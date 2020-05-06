@@ -165,6 +165,7 @@ class ApiUtils
         $this->response[self::SUCCESS] = true;
         $this->response[self::MESSAGE] = $message;
         $this->response[self::ERRORS] = [];
+        $this->response[self::ERROR] = [];
         if ($results !== null)
             $this->response[self::RESULTS] = $results;
     }

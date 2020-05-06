@@ -15,6 +15,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            provider: app_user_provider
             anonymous: lazy
             json_login:
                 check_path: /api/v1.0/user/login
