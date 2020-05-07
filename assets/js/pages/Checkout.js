@@ -9,6 +9,7 @@ class Checkout extends Component {
             <div>
                 <Title title={"SR - CHECKOUT"}/>
                 <Header/>
+                <h1>hola</h1>
                 <Footer/>
             </div>
         );
