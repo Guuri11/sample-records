@@ -1,0 +1,2897 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Sample Records API
+            description: Informacion de los endpoints de la API
+            version: 1.0.0
+            contact:
+                name: API Support
+                url: https://github.com/Guuri11
+                email: sample.records11@gmail.com
+        paths:
+            "/api/v1.0/album/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: artist
+                          in: query
+                          required: false
+                          description: Filter where the album is released by this artist ID
+                          type: integer
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this album ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all albums
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - album
+            "/api/v1.0/album/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one album
+                            schema:
+                                properties:
+                                    album:
+                                        "$ref": "#/definitions/Album"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - album
+            "/api/v1.0/album/new":
+                post:
+                    parameters:
+                      - name: Album
+                        in: body
+                        required: true
+                        description: Album object
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              artist:
+                                type: integer
+                              price:
+                                type: float
+                              duration:
+                                type: integer
+                              imageFile:
+                                type: string
+                                format: binary
+                                required: false
+                                nullable: true
+                              imageName:
+                                type: string
+                                required: false
+                                nullable: true
+                              imageSize:
+                                type: integer
+                                required: false
+                                nullable: true
+                              released_at:
+                                type: string
+                                format: date
+                            type: object
+                          example:
+                            name: Nombre album
+                            artist: 4
+                            price: 10.99
+                            duration: 185
+                            imageFile: null
+                            imageName: null
+                            imageSize: null
+                            released_at: "2020-04-15"
+                    responses:
+                        '201':
+                            description: Creates a new Album object
+                            schema:
+                                properties:
+                                    album:
+                                        "$ref": "#/definitions/Album"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - album
+            "/api/v1.0/album/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Album
+                          in: body
+                          required: true
+                          description: Album object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                artist:
+                                  type: integer
+                                price:
+                                  type: float
+                                duration:
+                                  type: integer
+                                imageFile:
+                                  type: string
+                                  format: binary
+                                  required: false
+                                  nullable: true
+                                imageName:
+                                  type: string
+                                  required: false
+                                  nullable: true
+                                imageSize:
+                                  type: integer
+                                  required: false
+                                  nullable: true
+                                released_at:
+                                  type: string
+                                  format: date
+                              type: object
+                            example:
+                              name: Nombre album
+                              artist: 4
+                              price: 10.99
+                              duration: 185
+                              imageFile: null
+                              imageName: null
+                              imageSize: null
+                              released_at: "2020-04-15"
+                    responses:
+                        '202':
+                            description: Updates a new Album object
+                            schema:
+                                properties:
+                                    album:
+                                        "$ref": "#/definitions/Album"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - album
+            "/api/v1.0/album/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '202':
+                            description: Deletes a album
+                            schema:
+                                properties:
+                                    album:
+                                        "$ref": "#/definitions/Album"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - album
+            "/api/v1.0/artist/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this category ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all artists
+                            schema:
+                                properties:
+                                    artist:
+                                        "$ref": "#/definitions/Artist"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - artist
+            "/api/v1.0/artist/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: integer
+                    responses:
+                        '200':
+                            description: Get one artist
+                            schema:
+                                properties:
+                                    artist:
+                                        "$ref": "#/definitions/Artist"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - artist
+            "/api/v1.0/artist/{alias}":
+                get:
+                    parameters:
+                        - name: alias
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one artist by alias
+                            schema:
+                                properties:
+                                    artist:
+                                        "$ref": "#/definitions/Artist"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - artist
+            "/api/v1.0/artist/new":
+                post:
+                    parameters:
+                      - name: Artist
+                        in: body
+                        required: true
+                        description: Artist object
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              surname:
+                                type: string
+                              alias:
+                                type: string
+                              is_from:
+                                type: string
+                              bio:
+                                type: string
+                              imageFile:
+                                type: string
+                                format: binary
+                                required: false
+                                nullable: true
+                              imageName:
+                                type: string
+                                required: false
+                                nullable: true
+                              imageSize:
+                                type: integer
+                                required: false
+                                nullable: true
+                              birth:
+                                type: string
+                                format: date
+                            type: object
+                          example:
+                            name: Nombre artista
+                            surname: Apellidos artista
+                            alias: Sample Rapper
+                            is_from: Ondara
+                            bio: Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum
+                            imageFile: null
+                            imageName: null
+                            imageSize: null
+                            birth: "1990-04-15"
+                    responses:
+                        '201':
+                            description: Creates a new Artist object
+                            schema:
+                                properties:
+                                    artist:
+                                        "$ref": "#/definitions/Artist"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - artist
+            "/api/v1.0/artist/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Artist
+                          in: body
+                          required: true
+                          description: Artist object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                surname:
+                                  type: string
+                                alias:
+                                  type: string
+                                is_from:
+                                  type: string
+                                bio:
+                                  type: string
+                                imageFile:
+                                  type: string
+                                  format: binary
+                                  required: false
+                                  nullable: true
+                                imageName:
+                                  type: string
+                                  required: false
+                                  nullable: true
+                                imageSize:
+                                  type: integer
+                                  required: false
+                                  nullable: true
+                                birth:
+                                  type: string
+                                  format: date
+                              type: object
+                            example:
+                              name: Nombre artista
+                              surname: Apellidos artista
+                              alias: Sample Rapper
+                              is_from: Ondara
+                              bio: Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum
+                              imageFile: null
+                              imageName: null
+                              imageSize: null
+                              birth: "1990-04-15"
+
+                    responses:
+                        '202':
+                            description: updates a new Artist object
+                            schema:
+                                properties:
+                                    artist:
+                                        "$ref": "#/definitions/Artist"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - artist
+            "/api/v1.0/artist/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '202':
+                            description: Delete a artist
+                            schema:
+                                properties:
+                                    artist:
+                                        "$ref": "#/definitions/Artist"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - artist
+            "/api/v1.0/category/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this category ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all categories
+                            schema:
+                                properties:
+                                    category:
+                                        "$ref": "#/definitions/Category"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - category
+            "/api/v1.0/category/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one categories
+                            schema:
+                                properties:
+                                    category:
+                                        "$ref": "#/definitions/Category"
+                                type: object
+                        '400':
+                            description: Not found
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - category
+            "/api/v1.0/category/new":
+              post:
+                parameters:
+                  - name: name
+                    in: body
+                    required: true
+                    description: Name of the Category
+                    schema:
+                      type: array
+                      items:
+                        properties:
+                          name:
+                            type: string
+                        type: object
+                      example:
+                        name: NombreCategoria
+                responses:
+                  '201':
+                    description: Creates a new Category object
+                    schema:
+                      properties:
+                        category:
+                          "$ref": "#/definitions/Category"
+                      type: object
+                  '404':
+                    description: Not found
+                  '401':
+                    description: Unauthorized
+                tags:
+                  - category
+            "/api/v1.0/category/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Category
+                          in: body
+                          required: true
+                          description: Object category
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                              type: object
+                            example:
+                              name: NombreCategoria
+                    responses:
+                        '202':
+                            description: Updates a new Category object
+                            schema:
+                                properties:
+                                    category:
+                                        "$ref": "#/definitions/Category"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - category
+            "/api/v1.0/category/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Deletes a category
+                            schema:
+                                properties:
+                                    category:
+                                        "$ref": "#/definitions/Category"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - category
+            "/api/v1.0/comment/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: post
+                          in: query
+                          required: false
+                          description: Filter where the comment is from this post ID
+                          type: integer
+                        - name: product
+                          in: query
+                          required: false
+                          description: Filter where the comment is from this product ID
+                          type: integer
+                        - name: user
+                          in: query
+                          required: false
+                          description: Get purchases by a client
+                        - name: purchase
+                          in: query
+                          required: false
+                          description: Filter where the comment is from this purchase ID
+                          type: integer
+                        - name: event
+                          in: query
+                          required: false
+                          description: Filter where the comment is from this event ID
+                          type: integer
+                        - name: entity
+                          in: query
+                          required: false
+                          description: Filter to get all the commets of a entity (Ex-> post)
+                          type: string
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this comment ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all comments
+                            schema:
+                                properties:
+                                    comment:
+                                        "$ref": "#/definitions/Comment"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - comment
+            "/api/v1.0/comment/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one comment
+                            schema:
+                                properties:
+                                    comment:
+                                        "$ref": "#/definitions/Comment"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - comment
+            "/api/v1.0/comment/new":
+                post:
+                    parameters:
+                      - name: Comment
+                        in: body
+                        required: true
+                        description: Object comment, change post into product/purchase/event to set the comment to one of these entitites
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              comment:
+                                type: string
+                              user:
+                                type: integer
+                              post:
+                                type: integer
+                                nullable: true
+                              product:
+                                type: integer
+                                nullable: true
+                              event:
+                                type: integer
+                                nullable: true
+                            type: object
+                          example:
+                            comment: Esto es un comentario para una noticia
+                            user: 2
+                            post: 3
+                    responses:
+                        '201':
+                            description: Creates a new Comment object
+                            schema:
+                                properties:
+                                    comment:
+                                        "$ref": "#/definitions/Comment"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - comment
+            "/api/v1.0/comment/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Comment
+                          in: body
+                          required: true
+                          description: Object comment
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                comment:
+                                  type: string
+                                user:
+                                  type: integer
+                                post:
+                                  type: integer
+                                  nullable: true
+                                product:
+                                  type: integer
+                                  nullable: true
+                                event:
+                                  type: integer
+                                  nullable: true
+                              type: object
+                            example:
+                              comment: Esto es un comentario para un producto
+                              user: 2
+                              product: 3
+                              post: null
+                    responses:
+                        '202':
+                            description: updates a new Comment object
+                            schema:
+                                properties:
+                                    comment:
+                                        "$ref": "#/definitions/Comment"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - comment
+            "/api/v1.0/comment/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '202':
+                            description: Deletes a comment
+                            schema:
+                                properties:
+                                    comment:
+                                        "$ref": "#/definitions/Comment"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - comment
+            "/api/v1.0/event/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: artist
+                          in: query
+                          required: false
+                          description: Filter where the event is released by this artist ID
+                          type: integer
+                        - name: until
+                          in: query
+                          required: false
+                          description: Filter where the event will start at this date
+                          type: string
+                          default: '2020-04-15'
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this event ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all events
+                            schema:
+                                properties:
+                                    event:
+                                        "$ref": "#/definitions/Event"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - event
+            "/api/v1.0/event/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one event
+                            schema:
+                                properties:
+                                    event:
+                                        "$ref": "#/definitions/Event"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - event
+            "/api/v1.0/event/new":
+                post:
+                  parameters:
+                    - name: Event
+                      in: body
+                      required: true
+                      description: Event object
+                      schema:
+                        type: array
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            artist:
+                              type: integer
+                            place:
+                              type: string
+                            city:
+                              type: string
+                            country:
+                              type: string
+                            date:
+                              type: string
+                              format: date
+                            prefix_serial_number:
+                              type: string
+                            imageFile:
+                              type: string
+                              format: binary
+                              required: false
+                              nullable: true
+                            imageName:
+                              type: string
+                              required: false
+                              nullable: true
+                            imageSize:
+                              type: integer
+                              required: false
+                              nullable: true
+                          type: object
+                        example:
+                          name: Nombre event
+                          artist: 4
+                          place: Calle false 123 Pabellon Municipal Ondara
+                          city: Ondara
+                          country: España
+                          date: "2020-06-30"
+                          prefix_serial_number: NEO1
+                          ticket_quantity: 50
+                          imageFile: null
+                          imageName: null
+                          imageSize: null
+                  responses:
+                        '201':
+                            description: Creates a new Event object
+                            schema:
+                                properties:
+                                    event:
+                                        "$ref": "#/definitions/Event"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                  tags:
+                      - event
+            "/api/v1.0/event/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Event
+                          in: body
+                          required: true
+                          description: Event object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                artist:
+                                  type: integer
+                                place:
+                                  type: string
+                                city:
+                                  type: string
+                                country:
+                                  type: string
+                                date:
+                                  type: string
+                                  format: date
+                                prefix_serial_number:
+                                  type: string
+                                imageFile:
+                                  type: string
+                                  format: binary
+                                  required: false
+                                  nullable: true
+                                imageName:
+                                  type: string
+                                  required: false
+                                  nullable: true
+                                imageSize:
+                                  type: integer
+                                  required: false
+                                  nullable: true
+                              type: object
+                            example:
+                              name: Nombre event editado
+                              artist: 5
+                              place: Calle false 456 Pabellon Municipal Ondara
+                              city: Ondara
+                              country: España
+                              date: "2020-07-30"
+                              prefix_serial_number: NEO2
+                              ticket_quantity: 50
+                              imageFile: null
+                              imageName: null
+                              imageSize: null
+
+                    responses:
+                        '202':
+                            description: updates a new Event object
+                            schema:
+                                properties:
+                                    event:
+                                        "$ref": "#/definitions/Event"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - event
+            "/api/v1.0/event/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Delete a event
+                            schema:
+                                properties:
+                                    event:
+                                        "$ref": "#/definitions/Event"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - event
+            "/api/v1.0/post/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: artist
+                          in: query
+                          required: false
+                          description: Filter where the post is about this artist ID
+                          type: integer
+                        - name: tag
+                          in: query
+                          required: false
+                          description: Filter where the post has this tag ID
+                          type: integer
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this post ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all posts
+                            schema:
+                                properties:
+                                    post:
+                                        "$ref": "#/definitions/Post"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - post
+            "/api/v1.0/post/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one post
+                            schema:
+                                properties:
+                                    post:
+                                        "$ref": "#/definitions/Post"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - post
+            "/api/v1.0/post/new":
+                post:
+                  parameters:
+                    - name: Album
+                      in: body
+                      required: true
+                      description: Album object
+                      schema:
+                        type: array
+                        items:
+                          properties:
+                            title:
+                              type: string
+                            description:
+                              type: string
+                            artist:
+                              type: integer
+                            tag:
+                              type: integer
+                              nullable: true
+                            imageFile:
+                              type: string
+                              format: binary
+                              required: false
+                              nullable: true
+                            imageName:
+                              type: string
+                              required: false
+                              nullable: true
+                            imageSize:
+                              type: integer
+                              required: false
+                              nullable: true
+                          type: object
+                        example:
+                          title: Nombre noticia
+                          description: Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum
+                          artist: 4
+                          tag: null
+                          imageFile: null
+                          imageName: null
+                          imageSize: null
+                  responses:
+                        '201':
+                            description: Creates a new Post object
+                            schema:
+                                properties:
+                                    post:
+                                        "$ref": "#/definitions/Post"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                  tags:
+                      - post
+            "/api/v1.0/post/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Album
+                          in: body
+                          required: true
+                          description: Album object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                title:
+                                  type: string
+                                description:
+                                  type: string
+                                artist:
+                                  type: integer
+                                tag:
+                                  type: integer
+                                  nullable: true
+                                imageFile:
+                                  type: string
+                                  format: binary
+                                  required: false
+                                  nullable: true
+                                imageName:
+                                  type: string
+                                  required: false
+                                  nullable: true
+                                imageSize:
+                                  type: integer
+                                  required: false
+                                  nullable: true
+                              type: object
+                            example:
+                              title: Nombre noticia
+                              description: Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum
+                              artist: 4
+                              tag: null
+                              imageFile: null
+                              imageName: null
+                              imageSize: null
+
+                    responses:
+                        '202':
+                            description: updates a new Post object
+                            schema:
+                                properties:
+                                    post:
+                                        "$ref": "#/definitions/Post"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - post
+            "/api/v1.0/post/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Deletes a post
+                            schema:
+                                properties:
+                                    post:
+                                        "$ref": "#/definitions/Post"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - post
+            "/api/v1.0/product/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: artist
+                          in: query
+                          required: false
+                          description: Filter where the product is about this artist ID
+                          type: integer
+                        - name: category
+                          in: query
+                          required: false
+                          description: Filter where the product is from this category ID
+                          type: integer
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this product ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all products
+                            schema:
+                                properties:
+                                    product:
+                                        "$ref": "#/definitions/Product"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - product
+            "/api/v1.0/product/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one product
+                            schema:
+                                properties:
+                                    product:
+                                        "$ref": "#/definitions/Product"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - product
+            "/api/v1.0/product/new":
+                post:
+                  parameters:
+                    - name: Product
+                      in: body
+                      required: true
+                      description: Product object
+                      schema:
+                        type: array
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            category:
+                              type: integer
+                            artist:
+                              type: integer
+                            price:
+                              type: float
+                            discount:
+                              type: float
+                            size:
+                              type: string
+                            stock:
+                              type: integer
+                            avaiable:
+                              type: boolean
+                            description:
+                              type: string
+                            imageFile:
+                              type: string
+                              format: binary
+                              required: false
+                              nullable: true
+                            imageName:
+                              type: string
+                              required: false
+                              nullable: true
+                            imageSize:
+                              type: integer
+                              required: false
+                              nullable: true
+                          type: object
+                        example:
+                          name: Nombre product
+                          category: 2
+                          artist: 4
+                          price: 10.99
+                          discount: null
+                          size: unique
+                          stock: 56
+                          avaiable: true
+                          description: Lorem ipsumLorem ipsumLorem ipsumLorem ipsum
+                          imageFile: null
+                          imageName: null
+                          imageSize: null
+
+                  responses:
+                        '201':
+                            description: Creates a new Product object
+                            schema:
+                                properties:
+                                    product:
+                                        "$ref": "#/definitions/Product"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                  tags:
+                      - product
+            "/api/v1.0/product/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Product
+                          in: body
+                          required: true
+                          description: Product object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                artist:
+                                  type: integer
+                                price:
+                                  type: float
+                                discount:
+                                  type: float
+                                size:
+                                  type: string
+                                stock:
+                                  type: integer
+                                avaiable:
+                                  type: boolean
+                                description:
+                                  type: string
+                                imageFile:
+                                  type: string
+                                  format: binary
+                                  required: false
+                                  nullable: true
+                                imageName:
+                                  type: string
+                                  required: false
+                                  nullable: true
+                                imageSize:
+                                  type: integer
+                                  required: false
+                                  nullable: true
+                              type: object
+                            example:
+                              name: Nombre product editado
+                              category: 2
+                              artist: 4
+                              price: 12.99
+                              discount: null
+                              size: unique
+                              stock: 56
+                              avaiable: true
+                              description: Lorem ipsumLorem ipsumLorem ipsumLorem ipsum
+                              imageFile: null
+                              imageName: null
+                              imageSize: null
+
+                    responses:
+                        '200':
+                            description: updates a new Product object
+                            schema:
+                                properties:
+                                    product:
+                                        "$ref": "#/definitions/Product"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - product
+            "/api/v1.0/product/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Delete a product
+                            schema:
+                                properties:
+                                    product:
+                                        "$ref": "#/definitions/Product"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - product
+            "/api/v1.0/purchase/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this purchase ID
+                          type: integer
+                        - name: user
+                          in: query
+                          required: false
+                          description: Get purchases by a client
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all purchases
+                            schema:
+                                properties:
+                                    purchase:
+                                        "$ref": "#/definitions/Purchase"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - purchase
+            "/api/v1.0/purchase/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one purchase
+                            schema:
+                                properties:
+                                    purchase:
+                                        "$ref": "#/definitions/Purchase"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - purchase
+            "/api/v1.0/purchase/new":
+                post:
+                  parameters:
+                    - name: Purchase
+                      in: body
+                      required: true
+                      description: Purchase object
+                      schema:
+                        type: array
+                        items:
+                          properties:
+                            serial_number:
+                              type: string
+                            date:
+                              type: integer
+                              format: date
+                            time:
+                              type: string
+                              format: date
+                            received:
+                              type: boolean
+                              default: false
+                            address:
+                              type: string
+                            town:
+                              type: string
+                            city:
+                              type: string
+                            country:
+                              type: string
+                            comment:
+                              type: integer
+                              nullable: true
+                            product:
+                              type: integer
+                              nullable: true
+                            ticket:
+                              type: integer
+                              nullable: true
+                            final_price:
+                              type: float
+                            user:
+                              type: integer
+                          type: object
+                        example:
+                          serial_number: ADSF123412341234
+                          artist: 3
+                          date: "2020-06-07"
+                          time: null
+                          received: false
+                          address: Calle falsa 123
+                          town: Ondara
+                          city: Alicante
+                          country: España
+                          comment: null
+                          product: 5
+                          ticket: null
+                          final_price: 10.99
+                          user: 2
+                  responses:
+                        '201':
+                            description: Creates a new Purchase object
+                            schema:
+                                properties:
+                                    purchase:
+                                        "$ref": "#/definitions/Purchase"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                  tags:
+                      - purchase
+            "/api/v1.0/purchase/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Purchase
+                          in: body
+                          required: true
+                          description: Purchase object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                serial_number:
+                                  type: string
+                                date:
+                                  type: integer
+                                  format: date
+                                time:
+                                  type: string
+                                  format: date
+                                received:
+                                  type: boolean
+                                  default: false
+                                address:
+                                  type: string
+                                town:
+                                  type: string
+                                city:
+                                  type: string
+                                country:
+                                  type: string
+                                comment:
+                                  type: integer
+                                  nullable: true
+                                product:
+                                  type: integer
+                                  nullable: true
+                                ticket:
+                                  type: integer
+                                  nullable: true
+                                final_price:
+                                  type: float
+                                user:
+                                  type: integer
+                              type: object
+                            example:
+                              serial_number: ADSF123412341234
+                              artist: 4
+                              date: "2020-06-07"
+                              time: null
+                              received: false
+                              address: Calle falsa 123 editada
+                              town: Pego
+                              city: Alicante
+                              country: España
+                              comment: null
+                              product: 5
+                              ticket: null
+                              final_price: 10.99
+                              user: 2
+
+                    responses:
+                        '202':
+                            description: updates a new Purchase object
+                            schema:
+                                properties:
+                                    purchase:
+                                        "$ref": "#/definitions/Purchase"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - purchase
+            "/api/v1.0/purchase/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '202':
+                            description: Delete a purchase
+                            schema:
+                                properties:
+                                    purchase:
+                                        "$ref": "#/definitions/Purchase"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - purchase
+            "/api/v1.0/purchase/buy":
+                post:
+                    parameters:
+                      - name: Buy
+                        in: body
+                        required: true
+                        description: Create a purchase with the user data
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              email:
+                                type: string
+                                format: email
+                              credit_card:
+                                type: string
+                              address:
+                                type: string
+                              town:
+                                type: string
+                              city:
+                                type: string
+                              country:
+                                type: string
+                              comment:
+                                type: integer
+                                nullable: true
+                              product:
+                                type: integer
+                                nullable: true
+                              ticket:
+                                type: integer
+                                nullable: true
+                              user:
+                                type: integer
+                                nullable: true
+                            type: object
+                          example:
+                            name: Sergio
+                            email: ejemplo@ejemplo.com
+                            credit_card: 123123456456123
+                            address: Calle falsa 123 editada
+                            town: Pego
+                            city: Alicante
+                            country: España
+                            comment: null
+                            product: 5
+                            ticket: null
+                            user: 2
+                    responses:
+                        '202':
+                            description: Buy a product/event ticket
+                            schema:
+                                properties:
+                                    purchase:
+                                        "$ref": "#/definitions/Purchase"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - purchase
+            "/api/v1.0/search/":
+              get:
+                  parameters:
+                      - name: search
+                        in: query
+                        required: true
+                        description: ind data about artists, events, posts and products
+                        type: string
+                  responses:
+                      '200':
+                          description: Get search request
+                      '204':
+                          description: No content
+                      '401':
+                          description: Unauthorized
+                  tags:
+                      - search
+            "/api/v1.0/search/last":
+                get:
+                    parameters:
+                          - name: last
+                            in: query
+                            required: true
+                            description: Get the last actions by the artists (Songs, Albums, Events, Posts)
+                            type: integer
+                    responses:
+                        '200':
+                          description: Get search request
+                        '204':
+                          description: No content
+                        '401':
+                          description: Unauthorized
+                    tags:
+                        - search
+            "/api/v1.0/song/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: artist
+                          in: query
+                          required: false
+                          description: Filter where the song is released by this artist ID
+                          type: integer
+                        - name: album
+                          in: query
+                          required: false
+                          description: Filter where the song is from this album ID
+                          type: integer
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this song ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all songs
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - song
+            "/api/v1.0/song/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one song
+                            schema:
+                                properties:
+                                    song:
+                                        "$ref": "#/definitions/Song"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - song
+            "/api/v1.0/song/new":
+                post:
+                  parameters:
+                    - name: Song
+                      in: body
+                      required: true
+                      description: Song object
+                      schema:
+                        type: array
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            artist:
+                              type: integer
+                            album:
+                              type: integer
+                              nullable: true
+                            duration:
+                              type: integer
+                            video_src:
+                              type: string
+                            song_file:
+                              type: string
+                              format: binary
+                            imageFile:
+                              type: string
+                              format: binary
+                              required: false
+                              nullable: true
+                            imageName:
+                              type: string
+                              required: false
+                              nullable: true
+                            imageSize:
+                              type: integer
+                              required: false
+                              nullable: true
+                            released_at:
+                              type: string
+                              format: date
+                          type: object
+                        example:
+                          name: Nombre cancion
+                          artist: 4
+                          album: 2
+                          duration: 185
+                          video_src: http://videofalso.prueba/video.mpcasi
+                          song_file: babi-colegas-5e903022d45dd.mpga
+                          imageFile: null
+                          imageName: null
+                          imageSize: null
+                          released_at: "2020-04-15"
+
+                  responses:
+                        '201':
+                            description: Creates a new Song object
+                            schema:
+                                properties:
+                                    song:
+                                        "$ref": "#/definitions/Song"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                  tags:
+                      - song
+            "/api/v1.0/song/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Song
+                          in: body
+                          required: true
+                          description: Song object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                artist:
+                                  type: integer
+                                album:
+                                  type: integer
+                                  nullable: true
+                                duration:
+                                  type: integer
+                                video_src:
+                                  type: string
+                                song_file:
+                                  type: string
+                                  format: binary
+                                imageFile:
+                                  type: string
+                                  format: binary
+                                  required: false
+                                  nullable: true
+                                imageName:
+                                  type: string
+                                  required: false
+                                  nullable: true
+                                imageSize:
+                                  type: integer
+                                  required: false
+                                  nullable: true
+                                released_at:
+                                  type: string
+                                  format: date
+                              type: object
+                            example:
+                              name: Nombre cancion editada
+                              artist: 5
+                              album: null
+                              duration: 185
+                              video_src: http://videofalso.prueba/video.mpcasi
+                              song_file: babi-colegas-5e903022d45dd.mpga
+                              imageFile: null
+                              imageName: null
+                              imageSize: null
+                              released_at: "2020-04-15"
+                    responses:
+                        '202':
+                            description: updates a new Song object
+                            schema:
+                                properties:
+                                    song:
+                                        "$ref": "#/definitions/Song"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - song
+            "/api/v1.0/song/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '202':
+                            description: Delete a song
+                            schema:
+                                properties:
+                                    song:
+                                        "$ref": "#/definitions/Song"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - song
+            "/api/v1.0/tag/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this tag ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all tags
+                            schema:
+                                properties:
+                                    tag:
+                                        "$ref": "#/definitions/Tag"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - tag
+            "/api/v1.0/tag/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one tag
+                            schema:
+                                properties:
+                                    tag:
+                                        "$ref": "#/definitions/Tag"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - tag
+            "/api/v1.0/tag/new":
+                post:
+                    parameters:
+                      - name: Tag
+                        in: body
+                        required: true
+                        description: Tag object
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              tag:
+                                type: string
+                            type: object
+                          example:
+                            tag: NombreTag
+                    responses:
+                        '202':
+                            description: Creates a new Tag object
+                            schema:
+                                properties:
+                                    tag:
+                                        "$ref": "#/definitions/Tag"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - tag
+            "/api/v1.0/tag/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Tag
+                          in: body
+                          required: true
+                          description: Tag object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                tag:
+                                  type: string
+                              type: object
+                            example:
+                              tag: NombreTagEditado
+                    responses:
+                        '201':
+                            description: updates a new Tag object
+                            schema:
+                                properties:
+                                    tag:
+                                        "$ref": "#/definitions/Tag"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - tag
+            "/api/v1.0/tag/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '201':
+                            description: Delete a tag
+                            schema:
+                                properties:
+                                    tag:
+                                        "$ref": "#/definitions/Tag"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - tag
+            "/api/v1.0/ticket/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: event
+                          in: query
+                          required: false
+                          description: Filter where the ticket is from this event ID
+                          type: integer
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this album ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all tickets
+                            schema:
+                                properties:
+                                    ticket:
+                                        "$ref": "#/definitions/Ticket"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - ticket
+            "/api/v1.0/ticket/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one ticket
+                            schema:
+                                properties:
+                                    ticket:
+                                        "$ref": "#/definitions/Ticket"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - ticket
+            "/api/v1.0/ticket/new":
+                post:
+                    parameters:
+                      - name: Ticket
+                        in: body
+                        required: true
+                        description: Ticket object
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              event:
+                                type: integer
+                              serial_number:
+                                type: string
+                              price:
+                                type: float
+                            type: object
+                          example:
+                            event: 3
+                            serial_number: ASDF1234
+                            price: 12.5
+                    responses:
+                        '201':
+                            description: Creates a new Ticket object
+                            schema:
+                                properties:
+                                    ticket:
+                                        "$ref": "#/definitions/Ticket"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - ticket
+            "/api/v1.0/ticket/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: Ticket
+                          in: body
+                          required: true
+                          description: Ticket object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                event:
+                                  type: integer
+                                serial_number:
+                                  type: string
+                                price:
+                                  type: float
+                              type: object
+                            example:
+                              event: 3
+                              serial_number: ASDF1234
+                              price: 12.5
+                    responses:
+                        '202':
+                            description: updates a new Ticket object
+                            schema:
+                                properties:
+                                    ticket:
+                                        "$ref": "#/definitions/Ticket"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - ticket
+            "/api/v1.0/ticket/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '202':
+                            description: Delete a ticket
+                            schema:
+                                properties:
+                                    ticket:
+                                        "$ref": "#/definitions/Ticket"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - ticket
+            "/api/v1.0/user/":
+                get:
+                    parameters:
+                        - name: search
+                          in: query
+                          required: false
+                          description: Filter where the items contains this string en the name
+                          type: string
+                        - name: first
+                          in: query
+                          required: false
+                          description: Start searching from this user ID
+                          type: integer
+                        - name: last
+                          in: query
+                          required: false
+                          description: Number of items to extract
+                          type: integer
+                        - name: ord
+                          in: query
+                          required: false
+                          description: Order the results
+                          type: string
+                          default: DESC
+                    responses:
+                        '200':
+                            description: Get all users
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/{id}":
+                get:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: Get one user
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - user
+            "/api/v1.0/user/new":
+                post:
+                    parameters:
+                      - name: User
+                        in: body
+                        required: true
+                        description: User object
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              surname:
+                                type: string
+                                nullable: true
+                              email:
+                                type: string
+                                format: email
+                              roles:
+                                type: string
+                              password:
+                                type: string
+                                format: password
+                              town:
+                                type: string
+                                nullable: true
+                              city:
+                                type: string
+                                nullable: true
+                              phone:
+                                type: string
+                                nullable: true
+                              credit_card:
+                                type: string
+                                nullable: true
+                              profile_file:
+                                type: string
+                                format: binary
+                                nullable: true
+                              profile_image:
+                                type: string
+                                nullable: true
+                              profile_size:
+                                type: integer
+                                nullable: true
+                              header_file:
+                                type: string
+                                format: binary
+                                nullable: true
+                              header_image:
+                                  type: string
+                                  nullable: true
+                              header_size:
+                                  type: integer
+                                  nullable: true
+                            type: object
+                          example:
+                            name: Pepe
+                            surname: Luis Francisco
+                            email: pepe@luis.francisco
+                            password: pepeluisfrancisco
+                            roles: ROLE_USER
+                            address: null
+                            postal_code: null
+                            town: null
+                            city: Madrid
+                            phone: null
+                            credit_card: null
+                            profile_image: null
+                            profile_file: null
+                            profile_size: null
+                            header_image: null
+                            header_file: null
+                            header_size: null
+                    responses:
+                        '201':
+                            description: Creates a new User object
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/edit/{id}":
+                put:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                        - name: User
+                          in: body
+                          required: true
+                          description: User object
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                surname:
+                                  type: string
+                                  nullable: true
+                                email:
+                                  type: string
+                                  format: email
+                                roles:
+                                  type: string
+                                password:
+                                  type: string
+                                  format: password
+                                town:
+                                  type: string
+                                  nullable: true
+                                city:
+                                  type: string
+                                  nullable: true
+                                phone:
+                                  type: string
+                                  nullable: true
+                                credit_card:
+                                  type: string
+                                  nullable: true
+                                profile_file:
+                                  type: string
+                                  format: binary
+                                  nullable: true
+                                profile_image:
+                                  type: string
+                                  nullable: true
+                                profile_size:
+                                  type: integer
+                                  nullable: true
+                                header_file:
+                                  type: string
+                                  format: binary
+                                  nullable: true
+                                header_image:
+                                  type: string
+                                  nullable: true
+                                header_size:
+                                  type: integer
+                                  nullable: true
+                              type: object
+                            example:
+                              name: Luis
+                              surname: Pepe Francisco
+                              email: luis@pepe.francisco
+                              password: luispepefrancisco
+                              roles: ROLE_USER
+                              address: null
+                              postal_code: null
+                              town: null
+                              city: Madrid
+                              phone: null
+                              credit_card: null
+                              profile_image: null
+                              profile_file: null
+                              profile_size: null
+                              header_image: null
+                              header_file: null
+                              header_size: null
+
+                    responses:
+                        '202':
+                            description: updates a new User object
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/delete/{id}":
+                delete:
+                    parameters:
+                        - name: id
+                          in: path
+                          required: true
+                          type: string
+                    responses:
+                        '202':
+                            description: Delete a user
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                        '404':
+                            description: Not found
+                    tags:
+                        - user
+            "/api/v1.0/user/profile/info":
+                get:
+                    responses:
+                        '200':
+                            description: Get personal info from the user logged
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/profile/edit/info":
+              put:
+                  parameters:
+                    - name: User
+                      in: body
+                      required: true
+                      description: User object
+                      schema:
+                        type: array
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            surname:
+                              type: string
+                              nullable: true
+                            town:
+                              type: string
+                              nullable: true
+                            city:
+                              type: string
+                              nullable: true
+                            phone:
+                              type: string
+                              nullable: true
+                            credit_card:
+                              type: string
+                              nullable: true
+                          type: object
+                        example:
+                          name: Luis
+                          surname: Pepe Francisco
+                          address: Calle pepe
+                          postal_code: 12345
+                          town: Pedreguer
+                          city: Alicante
+                          phone: 658947765
+                          credit_card: ASD123456789657
+                  responses:
+                      '202':
+                        description: updates personal user data
+                        schema:
+                          properties:
+                            user:
+                              "$ref": "#/definitions/User"
+                          type: object
+                      '400':
+                        description: Bad request
+                      '401':
+                        description: Unauthorized
+                  tags:
+                    - user
+
+            "/api/v1.0/user/profile/comments":
+                get:
+                    responses:
+                        '200':
+                            description: Get all the comments from the user logged
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/profile/purchases":
+                get:
+                    responses:
+                        '200':
+                            description: Get all the purchases from the user logged
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/register":
+                post:
+                    parameters:
+                      - name: Register
+                        in: body
+                        required: true
+                        description: Register a user
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              email:
+                                type: string
+                                format: email
+                              password:
+                                type: string
+                                format: password
+                            type: object
+                          example:
+                            name: Luis
+                            email: ejemplo@ejemplo.com
+                            password: 123qwe
+                    responses:
+                        '201':
+                            description: Register a user
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/login":
+                post:
+                  parameters:
+                    - name: Login
+                      in: body
+                      required: true
+                      description: Login a user, once you send the request, REFRESH THE PAGE
+                      schema:
+                        type: array
+                        items:
+                          properties:
+                            username:
+                              type: string
+                              format: email
+                            password:
+                              type: string
+                              format: password
+                          type: object
+                        example:
+                          username: usuario@usuario.com
+                          password: usuario
+                  responses:
+                      '200':
+                          description: Log the user
+                          schema:
+                              properties:
+                                  user:
+                                      "$ref": "#/definitions/User"
+                              type: object
+                      '401':
+                          description: Unauthorized
+                  tags:
+                      - user
+            "/api/v1.0/user/logout":
+                get:
+                    responses:
+                        '200':
+                            description: Logout the user
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/authenticated":
+                get:
+                  responses:
+                      '200':
+                          description: User is logged in
+                      '204':
+                          description: Unauthorized
+                  tags:
+                    - user
+            "/api/v1.0/user/profile/change-password":
+                post:
+                    parameters:
+                      - name: Change password
+                        in: body
+                        required: true
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              password:
+                                type: string
+                                format: password
+                              new_password:
+                                type: string
+                                format: password
+                              repeat_password:
+                                type: string password
+                            type: object
+                          example:
+                            password: contraseña_de_usuario_logueado
+                            new_password: nuevapass
+                            repeat_password: nuevapass
+                    responses:
+                        '200':
+                            description: Log the user
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/contact":
+                post:
+                    parameters:
+                      - name: Contact
+                        in: body
+                        required: true
+                        description: send a question to the sample record email account
+                        schema:
+                          type: array
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              email:
+                                type: string
+                                format: email
+                              subject:
+                                type: string
+                              message:
+                                type: string
+                            type: object
+                          example:
+                            name: Pepe Luis
+                            email: pepe@luis.com
+                            subject: Prueba contacto
+                            message: Hola mundo, esto es un mensaje desde la API de Sample Records
+                    responses:
+                        '200':
+                            description: Send the user question to email account
+                            schema:
+                                properties:
+                                    user:
+                                        "$ref": "#/definitions/User"
+                                type: object
+                        '400':
+                            description: Bad request
+                        '401':
+                            description: Unauthorized
+                    tags:
+                        - user
+            "/api/v1.0/user/datatocomment":
+                get:
+                  responses:
+                      '200':
+                          description: User can comment
+                          schema:
+                            properties:
+                              user:
+                                "$ref": "#/definitions/User"
+                            type: object
+                      '401':
+                        description: Unauthorized
+                  tags:
+                    - user
+
+        definitions:
+            Album:
+                type: object
+            Artist:
+                type: object
+            Category:
+                type: object
+            Comment:
+                type: object
+            Event:
+                type: object
+            Post:
+                type: object
+            Product:
+                type: object
+            Purchase:
+                type: object
+            Song:
+                type: object
+            Tag:
+                type: object
+            Ticket:
+                type: object
+            User:
+                type: object
+
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc

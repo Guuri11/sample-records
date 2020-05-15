@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Song index{% endblock %}
+
+{% block body %}
+    <h1>Song index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Video_src</th>
+                <th>SongFileName</th>
+                <th>ImageName</th>
+                <th>ImageSize</th>
+                <th>Released_at</th>
+                <th>Created_at</th>
+                <th>Updated_at</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for song in songs %}
+            <tr>
+                <td>{{ song.id }}</td>
+                <td>{{ song.name }}</td>
+                <td>{{ song.duration }}</td>
+                <td>{{ song.videoSrc }}</td>
+                <td>{{ song.songFileName }}</td>
+                <td>{{ song.imageName }}</td>
+                <td>{{ song.imageSize }}</td>
+                <td>{{ song.releasedAt ? song.releasedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ song.createdAt ? song.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ song.updatedAt ? song.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('song_show', {'id': song.id}) }}">show</a>
+                    <a href="{{ path('song_edit', {'id': song.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="12">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('song_new') }}">Create new</a>
+{% endblock %}
