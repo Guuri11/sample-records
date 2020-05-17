@@ -156,7 +156,7 @@ $tertiary-color: $dark-color;
 }
 
 .card-post {
-  top: 2rem;
+  top: 1rem;
   width: 350px;
   color: black;
   margin: auto;
@@ -582,6 +582,12 @@ $tertiary-color: $dark-color;
 
 .event-back {
   font-size: 14px;
+}
+
+/* CATEGORIA CHART */
+.img-cart-item {
+  width: 100%;
+  height: auto;
 }
 
 /* CATEGORIA ERROR 404 */
@@ -1234,6 +1240,7 @@ tbody tr:hover{
     width: 15%;
     left: 0;
     height: 100%;
+    background-color: #474747;
     @media #{$breakpoint-md} {
         width: 100%;
         max-height: 10%;
@@ -1256,7 +1263,7 @@ tbody tr:hover{
             ul li {
                 display: inline;
             }
-            ul li a{
+            ul li{
                 margin-left: 1.9rem;
                 float: left;
                 h4 {
@@ -1287,7 +1294,7 @@ tbody tr:hover{
             ul li {
                 display: inline;
             }
-            ul li a{
+            ul li {
                 margin-left: 1.9rem;
                 float: left;
                 h4 {
@@ -1303,7 +1310,7 @@ tbody tr:hover{
     z-index: 1;
     @include flex(0 0 calc(100% - 385px));
     max-width: 100%;
-    background-color: $secundary-color;
+    background-color: #474747;
     padding: 15px 30px 20px;
     @media #{$breakpoint-xs} {
         @include flex(0 0 100%);
@@ -1385,14 +1392,14 @@ tbody tr:hover{
   width: 110%;
 }
 .current-song {
-    background-color: $secundary-color;
+    background-color: #474747;
     z-index: 999;
     position: fixed;
     bottom: 0;
     width: 100%;
     #current-img {
         position: absolute;
-        top: -212%;
+        top: -211%;
         left: 0;
         height: 14.8rem;
         width: 90%;
@@ -1414,7 +1421,6 @@ tbody tr:hover{
         }
         .current-title, .current-artist {
             display: inline;
-
         }
     }
     @media #{$breakpoint-xs} {
@@ -1435,6 +1441,7 @@ tbody tr:hover{
         label {
             font-size: 12px;
             font-weight: bold;
+            color: $primary-color;
         }
     }
 }
@@ -1443,6 +1450,7 @@ tbody tr:hover{
   font-weight: bolder;
   left: 25%;
   position: relative;
+  color: $primary-color;
   @media #{$breakpoint-sm} {
     left: 0;
     margin-right: 10px;
@@ -1455,6 +1463,10 @@ tbody tr:hover{
     left: 0;
     margin-right: 10px;
   }
+}
+
+.pb-sr-music {
+  padding-bottom: 4rem;
 }
 
 /* FONT CLASES*/
@@ -1822,6 +1834,10 @@ ul.social-network {
 .caption {
   font-weight: 900;
   font-size: 2.5rem;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .text-brand {

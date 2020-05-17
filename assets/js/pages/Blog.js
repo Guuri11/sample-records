@@ -243,7 +243,7 @@ class Blog extends Component {
     render() {
 
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - NOTICIAS"}/>
                 <Header active={"news"}/>
                 <Breadcumb title={"Noticias"} upgradeable={false} />

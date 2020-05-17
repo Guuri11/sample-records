@@ -37,7 +37,7 @@ class AlbumRepository extends ServiceEntityRepository
                 ->setParameter('id',$params['first']);
         }
         if (key_exists("artist",$params)) {
-            $result->andWhere('a.artist >= :id_artist')
+            $result->andWhere('a.artist = :id_artist')
                 ->setParameter('id_artist',$params['artist']);
         }
         if (key_exists("last",$params)) {

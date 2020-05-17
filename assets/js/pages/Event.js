@@ -178,7 +178,7 @@ class Event extends Component {
         const { event,day,month,year, loading, comments, can_comment, user_data, comment_submited, comment_success, saved_at_cart } = this.state;
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - "+event.name === undefined ? "EVENTO":event.name}/>
                 <Header/>
 

@@ -20,7 +20,7 @@ class Error404 extends Component {
 
     render() {
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"No se encontró la página"}/>
                 <Header/>
                 <div className={"container mt-5"}>

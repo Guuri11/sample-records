@@ -157,7 +157,7 @@ class Post extends Component {
         const { post,day,month,year, loading, comments, can_comment, user_data, comment_submited, comment_success } = this.state;
 
         return (
-                <div className={"bg-sr"}>
+                <div>
                 <Title title={"SR - "+post.title === undefined ? "NOTICIAS":post.title}/>
                 <Header/>
 

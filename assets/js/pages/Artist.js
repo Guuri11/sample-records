@@ -114,7 +114,7 @@ class Artist extends Component {
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - "+artist.alias === undefined ? "ARTISTAS":artist.alias}/>
                 <Header/>
                 {
@@ -183,7 +183,7 @@ class Artist extends Component {
                                     null
                             }
                             {
-                                /* POSTS SECTION */
+                                /* SONGS SECTION */
                                 songs.length > 0 ?
                                     <div className="box-rounded">
                                         <div className="container caption">

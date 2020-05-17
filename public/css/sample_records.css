@@ -166,7 +166,7 @@
 }
 
 .card-post {
-  top: 2rem;
+  top: 1rem;
   width: 350px;
   color: black;
   margin: auto;
@@ -607,6 +607,12 @@
 
 .event-back {
   font-size: 14px;
+}
+
+/* CATEGORIA CHART */
+.img-cart-item {
+  width: 100%;
+  height: auto;
 }
 
 /* CATEGORIA ERROR 404 */
@@ -1202,6 +1208,7 @@ tbody tr:hover {
   width: 15%;
   left: 0;
   height: 100%;
+  background-color: #474747;
 }
 @media only screen and (min-width:768px) and (max-width:991px) {
   .menu-sr-music {
@@ -1228,11 +1235,11 @@ tbody tr:hover {
   .menu-sr-music .widget-content ul li {
     display: inline;
   }
-  .menu-sr-music .widget-content ul li a {
+  .menu-sr-music .widget-content ul li {
     margin-left: 1.9rem;
     float: left;
   }
-  .menu-sr-music .widget-content ul li a h4 {
+  .menu-sr-music .widget-content ul li h4 {
     font-size: 12px;
   }
 }
@@ -1261,11 +1268,11 @@ tbody tr:hover {
   .menu-sr-music .widget-content ul li {
     display: inline;
   }
-  .menu-sr-music .widget-content ul li a {
+  .menu-sr-music .widget-content ul li {
     margin-left: 1.9rem;
     float: left;
   }
-  .menu-sr-music .widget-content ul li a h4 {
+  .menu-sr-music .widget-content ul li h4 {
     font-size: 10px;
   }
 }
@@ -1277,7 +1284,7 @@ tbody tr:hover {
   -ms-flex: 0 0 calc(100% - 385px);
   flex: 0 0 calc(100% - 385px);
   max-width: 100%;
-  background-color: #ffffff;
+  background-color: #474747;
   padding: 15px 30px 20px;
 }
 @media only screen and (max-width:767px) {
@@ -1371,7 +1378,7 @@ tbody tr:hover {
 }
 
 .current-song {
-  background-color: #ffffff;
+  background-color: #474747;
   z-index: 999;
   position: fixed;
   bottom: 0;
@@ -1379,7 +1386,7 @@ tbody tr:hover {
 }
 .current-song #current-img {
   position: absolute;
-  top: -212%;
+  top: -211%;
   left: 0;
   height: 14.8rem;
   width: 90%;
@@ -1427,6 +1434,7 @@ tbody tr:hover {
   .current-song label {
     font-size: 12px;
     font-weight: bold;
+    color: #ffcc22;
   }
 }
 
@@ -1435,6 +1443,7 @@ tbody tr:hover {
   font-weight: bolder;
   left: 25%;
   position: relative;
+  color: #ffcc22;
 }
 @media only screen and (min-width:576px) and (max-width:767px) {
   .title-song, .artist-song {
@@ -1453,6 +1462,10 @@ tbody tr:hover {
     left: 0;
     margin-right: 10px;
   }
+}
+
+.pb-sr-music {
+  padding-bottom: 4rem;
 }
 
 /* FONT CLASES*/
@@ -1826,6 +1839,10 @@ ul.social-network li {
 .caption {
   font-weight: 900;
   font-size: 2.5rem;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .text-brand {

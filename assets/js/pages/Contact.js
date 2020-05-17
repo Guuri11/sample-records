@@ -65,7 +65,7 @@ class Contact extends Component{
 
     render () {
         return(
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - CONTACTO"}/>
                 <Header active={"contact"}/>
                 <Breadcrumb title={"¡Contáctanos!"} p_text={"¿Alguna duda?"}/>

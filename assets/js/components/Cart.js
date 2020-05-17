@@ -84,7 +84,7 @@ class Cart extends Component {
                                                                     <td className="w-25">
                                                                         <img
                                                                             src={item.img}
-                                                                            className="img-fluid img-thumbnail" alt="Sheep"/>
+                                                                            className="img-fluid img-thumbnail img-cart-item" alt="Sheep"/>
                                                                     </td>
                                                                     <td>{item.name}</td>
                                                                     <td>{item.price}</td>

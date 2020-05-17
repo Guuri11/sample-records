@@ -65,7 +65,7 @@ class Register extends Component {
 
     render() {
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - INICIO"}/>
                 <Header/>
                 <Breadcrumb title={"REGISTRARSE"}/>

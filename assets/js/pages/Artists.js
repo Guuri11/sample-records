@@ -48,7 +48,7 @@ class Artists extends Component {
         const { artists, loading } = this.state;
 
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - ARTISTAS"}/>
                 <Header active={"artists"}/>
                 <Breadcumb title={"ARTISTAS"} p_text={"¡Conoce a nuestras promesas!"}/>

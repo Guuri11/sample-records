@@ -126,7 +126,7 @@ class Home extends Component{
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         console.log(this.state.last_posts);
         return(
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - INICIO"}/>
                 <Header active={"home"}/>
 

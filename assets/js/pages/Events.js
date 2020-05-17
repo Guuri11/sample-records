@@ -108,7 +108,7 @@ class Events extends Component {
         const { events, active_page, events_per_page, loading } = this.state;
 
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - EVENTOS"}/>
                 <Header active={"events"}/>
                 <Breadcrumb title={"EVENTOS"} p_text={"¿Están en tu ciudad? ¡Entonces no te los pierdas!"}/>

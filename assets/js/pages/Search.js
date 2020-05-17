@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from "prop-types";
 import Title from "../components/Title";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -140,7 +139,7 @@ class Search extends Component {
 
         console.log(results);
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - BUSQUEDA"}/>
                 <Header/>
                 { loading ? null : <Breadcumb title={search} p_text={"Esto es lo que hemos encontrado!"}/> }

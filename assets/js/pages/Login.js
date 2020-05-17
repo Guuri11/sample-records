@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Breadcrumb from "../components/Breadcumb";
 import BoxArea from "../components/BoxArea";
-import {Link, Redirect} from "react-router-dom";
+import {Link, Redirect, withRouter} from "react-router-dom";
 import Loading from "../components/Loading";
 
 class Login extends Component {
@@ -46,7 +46,7 @@ class Login extends Component {
 
     render() {
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - LOGIN"}/>
                 <Header/>
                 <Breadcrumb title={"INICIAR SESIÓN"}/>
@@ -54,6 +54,13 @@ class Login extends Component {
                 <div className="container section-padding-100">
                     <BoxArea>
                         <h3>¡Bienvenido!</h3>
+                        {
+                            // Redirect message if comes from a unauthorized page
+                            this.props.location.state !== undefined ?
+                                <h4 className={"text-info"}>{this.props.location.state.redirect_message}</h4>
+                                :
+                                null
+                        }
                         {
                             this.state.sending ?
                                 <div>
@@ -99,4 +106,4 @@ class Login extends Component {
         );
     }
 }
-export default Login;
+export default withRouter(Login);

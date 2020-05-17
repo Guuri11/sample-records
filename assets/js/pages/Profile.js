@@ -51,7 +51,10 @@ class Profile extends Component {
                     loading: false })
 
             } else {
-                this.props.history.push('/login');
+                this.props.history.push({
+                    pathname: '/login',
+                    state: { redirect_message: "Para entrar a tu perfil necesitas iniciar sesión" }
+                });
             }
         }
     }
@@ -503,7 +506,7 @@ class Profile extends Component {
         const dropdown_active = "dropdown-item active";
         const dropdown_inactive = "dropdown-item";
         return (
-            <div className={"bg-sr"}>
+            <div>
                 <Title title={"SR - INICIO"}/>
                 <Header/>
                 { loading ? null : <Breadcumb profile={true} header_user={header_img}/> }
