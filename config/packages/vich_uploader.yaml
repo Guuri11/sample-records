@@ -1,0 +1,59 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        artists:
+            uri_prefix: /img/artists
+            upload_destination: '%kernel.project_dir%/public/img/artists'
+            inject_on_load: false
+            delete_on_update: false
+            delete_on_remove: false
+
+        albums:
+            uri_prefix: /img/albums
+            upload_destination: '%kernel.project_dir%/public/img/albums'
+            inject_on_load: false
+            delete_on_update: false
+            delete_on_remove: false
+
+        events:
+            uri_prefix: /img/events
+            upload_destination: '%kernel.project_dir%/public/img/events'
+            inject_on_load: false
+            delete_on_update: false
+            delete_on_remove: false
+
+        posts:
+            uri_prefix: /img/posts
+            upload_destination: '%kernel.project_dir%/public/img/posts'
+            inject_on_load: false
+            delete_on_update: false
+            delete_on_remove: false
+
+        products:
+            uri_prefix: /img/products
+            upload_destination: '%kernel.project_dir%/public/img/products'
+            inject_on_load: false
+            delete_on_update: false
+            delete_on_remove: true
+
+        songs_img:
+            uri_prefix: /img/songs
+            upload_destination: '%kernel.project_dir%/public/img/songs'
+            inject_on_load: false
+            delete_on_update: false
+            delete_on_remove: false
+
+        users_header:
+            uri_prefix: /img/users/headers
+            upload_destination: '%kernel.project_dir%/public/img/users/headers'
+            inject_on_load: false
+            delete_on_update: false
+            delete_on_remove: false
+
+        users_profile:
+            uri_prefix: /img/users/profiles
+            upload_destination: '%kernel.project_dir%/public/img/users/profiles'
+            inject_on_load: false
+            delete_on_update: false
+            delete_on_remove: false
