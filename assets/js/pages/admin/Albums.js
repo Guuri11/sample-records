@@ -19,6 +19,7 @@ class Albums extends Component {
         total_albums: [],
         active_page : 1,
         albums_per_page: 5,
+        message: '',
     }
 
     componentDidMount() {
@@ -98,10 +99,31 @@ class Albums extends Component {
         this.setState({active_page: pageNumber});
     }
 
+    /* DELETE CALL */
+    handleDelete = (id) => {
+        const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+
+        if (ans) {
+
+            let {total_albums} = this.state;
+
+            axios.delete(`/api/v1.0/album/delete/${id}`).then(res => {
+                if (res.data.success === true) {
+                    total_albums = total_albums.filter(function( item ) {
+                        return item.id !== parseInt(id);
+                    });
+                    this.setState({ total_albums: total_albums, albums: total_albums ,message: 'Álbum eliminado' });
+                }
+            }).catch(error => {
+                this.setState( { message: "No se pudo borrar el album" } )
+            });
+        }
+    }
+
 
     render() {
 
-        const { active_page, albums_per_page, albums, loading} = this.state;
+        const { active_page, albums_per_page, albums, loading, message} = this.state;
 
         // Logic for pagination
         const indexLastEvent = active_page * albums_per_page;
@@ -126,6 +148,12 @@ class Albums extends Component {
                                         <div className="card shadow mb-4 w-100">
                                             <div className="card-header py-3">
                                                 <h6 className="m-0 font-weight-bold text-sr">Todos los albums</h6>
+                                                {
+                                                    message !== '' ?
+                                                        <h5 className={"text-info"}>{message}</h5>
+                                                        :
+                                                        null
+                                                }
                                             </div>
                                             <div className="card-body">
                                                 <div className="table-responsive">
@@ -203,7 +231,7 @@ class Albums extends Component {
                                                                     <tr key={idx} className={"row-sr"}>
                                                                         <td>
                                                                             <Link to={`/admin/albums/${album.id}`} className={"font-weight-bolder"}>
-                                                                                {idx+1}
+                                                                                {idx+1+albums_per_page*(active_page-1)}
                                                                             </Link>
                                                                         </td>
                                                                         <td>{album.name}</td>
@@ -218,7 +246,8 @@ class Albums extends Component {
 
                                                                         <td>
                                                                             <button className="btn btn-primary d-block mb-2">Editar</button>
-                                                                            <button className={"btn btn-danger"}>Borrar</button>
+                                                                            <button className={"btn btn-danger"}
+                                                                                onClick={this.handleDelete.bind(this,album.id)}>Borrar</button>
                                                                         </td>
                                                                     </tr>
                                                                 )

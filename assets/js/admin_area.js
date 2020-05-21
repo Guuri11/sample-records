@@ -7,7 +7,6 @@ import Blog from "./pages/admin/Blog";
 import Events from "./pages/admin/Events";
 import Event from "./pages/admin/Event";
 import Error404 from "./pages/admin/Error404";
-import Logout from "./pages/admin/Logout";
 import Albums from "./pages/admin/Albums";
 import Album from "./pages/admin/Album";
 import Artist from "./pages/admin/Artist";
@@ -48,7 +47,6 @@ ReactDOM.render(
             <Route path="/admin/eventos/entradas" component={Tickets}/>
             <Route exact path="/admin/eventos/:event" component={Event}/>
             <Route path="/admin/eventos" component={Events}/>
-            <Route path="/admin/logout" component={Logout}/>
             <Route exact path="/admin/noticias/tags/:tag" component={Tag}/>
             <Route path="/admin/noticias/tags" component={Tags}/>
             <Route exact path="/admin/noticias/:noticias" component={Post}/>

@@ -19,6 +19,7 @@ class Artists extends Component {
         total_artists: [],
         active_page : 1,
         artists_per_page: 10,
+        message: ''
     }
 
     componentDidMount() {
@@ -98,9 +99,31 @@ class Artists extends Component {
         this.setState({active_page: pageNumber});
     }
 
+    /* DELETE CALL */
+    handleDelete = (id) => {
+        const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+
+        if (ans) {
+
+            let {total_artists} = this.state;
+
+            axios.delete(`/api/v1.0/artist/delete/${id}`).then(res => {
+                if (res.data.success === true) {
+                    total_artists = total_artists.filter(function( item ) {
+                        return item.id !== parseInt(id);
+                    });
+                    this.setState({ total_artists: total_artists, artists: total_artists ,message: 'Artista eliminado' });
+                }
+            }).catch(error => {
+                this.setState( { message: "No se pudo borrar al artista" } )
+            });
+        }
+    }
+
+
 
     render() {
-        const { active_page, artists_per_page, artists, loading} = this.state;
+        const { active_page, artists_per_page, artists, loading, message} = this.state;
 
         // Logic for pagination
         const indexLastEvent = active_page * artists_per_page;
@@ -124,7 +147,13 @@ class Artists extends Component {
                                     <div className={"row"}>
                                         <div className="card shadow mb-4 w-100">
                                             <div className="card-header py-3">
-                                                <h6 className="m-0 font-weight-bold text-sr">Todos los artistas</h6>
+                                                <h5 className="m-0 font-weight-bold text-sr">Todos los artistas</h5>
+                                                {
+                                                    message !== '' ?
+                                                        <h6 className={"text-info"}>{message}</h6>
+                                                        :
+                                                        null
+                                                }
                                             </div>
                                             <div className="card-body">
                                                 <div className="table-responsive">
@@ -215,7 +244,7 @@ class Artists extends Component {
                                                                     <tr key={idx} className={"row-sr"}>
                                                                         <td>
                                                                             <Link to={`/admin/artistas/${artist.id}`} className={"font-weight-bolder"}>
-                                                                                {idx+1}
+                                                                                {idx+1+artists_per_page*(active_page-1)}
                                                                             </Link>
                                                                         </td>
                                                                         <td>{artist.name}</td>
@@ -233,7 +262,8 @@ class Artists extends Component {
 
                                                                         <td>
                                                                             <button className="btn btn-primary d-block mb-2">Editar</button>
-                                                                            <button className={"btn btn-danger"}>Borrar</button>
+                                                                            <button className={"btn btn-danger"}
+                                                                                onClick={this.handleDelete.bind(this,artist.id)}>Borrar</button>
                                                                         </td>
                                                                     </tr>
                                                                 )

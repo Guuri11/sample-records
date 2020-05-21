@@ -1,6 +1,20 @@
 import React, { Component } from 'react';
+import axios from "axios";
 
 class Header extends Component{
+
+    constructor(props) {
+        super(props);
+    }
+
+    handleLogout = () => {
+        axios.get(`/api/v1.0/user/logout`).then(()=>{
+            sessionStorage.setItem('auth',false);
+            sessionStorage.setItem('is_admin',false);
+            window.location.assign('/');
+        })
+    }
+
 
     render() {
         return (
@@ -44,10 +58,14 @@ class Header extends Component{
                         </a>
                         <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-                            <a className="dropdown-item" href="#" >
+                            <p className="dropdown-item pointer" onClick={ () => window.location.assign('/perfil') }>
+                                <i className="fa fa-home fa-sm fa-fw mr-2"/>
+                                Perfil
+                            </p>
+                            <p className="dropdown-item pointer" onClick={this.handleLogout.bind(this)}>
                                 <i className="fa fa-sign-out fa-sm fa-fw mr-2"/>
                                 Logout
-                            </a>
+                            </p>
                         </div>
                     </li>
                 </ul>

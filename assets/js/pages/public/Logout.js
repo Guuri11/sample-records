@@ -16,6 +16,7 @@ class Logout extends Component {
     handleLogout = () => {
         axios.get(`/api/v1.0/user/logout`).then(()=>{
             sessionStorage.setItem('auth',false);
+            sessionStorage.getItem('is_admin') !== null ? sessionStorage.setItem('is_admin',false): '';
             this.props.history.push('/');
         })
     }

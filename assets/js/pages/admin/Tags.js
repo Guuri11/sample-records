@@ -19,6 +19,7 @@ class Tags extends Component {
         total_items: [],
         active_page : 1,
         items_per_page: 10,
+        message: ''
     }
 
     componentDidMount() {
@@ -99,8 +100,30 @@ class Tags extends Component {
         this.setState({active_page: pageNumber});
     }
 
+    /* DELETE CALL */
+    handleDelete = (id) => {
+        const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+
+        if (ans) {
+
+            let {total_items} = this.state;
+
+            axios.delete(`/api/v1.0/tag/delete/${id}`).then(res => {
+                if (res.data.success === true) {
+                    total_items = total_items.filter(function( item ) {
+                        return item.id !== parseInt(id);
+                    });
+                    this.setState({ total_item: total_items, items: total_items ,message: 'Tag eliminado' });
+                }
+            }).catch(error => {
+                this.setState( { message: "No se pudo borrar el tag" } )
+            });
+        }
+    }
+
+
     render() {
-        const { active_page, items_per_page, items, loading} = this.state;
+        const { active_page, items_per_page, items, loading, message} = this.state;
 
         // Logic for pagination
         const indexLastEvent = active_page * items_per_page;
@@ -124,7 +147,13 @@ class Tags extends Component {
                                     <div className={"row"}>
                                         <div className="card shadow mb-4 w-100">
                                             <div className="card-header py-3">
-                                                <h6 className="m-0 font-weight-bold text-sr">Todos los tags</h6>
+                                                <h5 className="m-0 font-weight-bold text-sr">Todos los tags</h5>
+                                                {
+                                                    message !== '' ?
+                                                        <h6 className={"text-info"}>{message}</h6>
+                                                        :
+                                                        null
+                                                }
                                             </div>
                                             <div className="card-body">
                                                 <div className="table-responsive">
@@ -199,7 +228,7 @@ class Tags extends Component {
                                                                     <tr key={idx} className={"row-sr"}>
                                                                         <td>
                                                                             <Link to={`/admin/productos/${item.id}`} className={"font-weight-bolder"}>
-                                                                                {idx+1}
+                                                                                {idx+1+items_per_page*(active_page-1)}
                                                                             </Link>
                                                                         </td>
                                                                         <td>{item.tag}</td>
@@ -208,7 +237,8 @@ class Tags extends Component {
 
                                                                         <td>
                                                                             <button className="btn btn-primary d-block mb-2">Editar</button>
-                                                                            <button className={"btn btn-danger"}>Borrar</button>
+                                                                            <button className={"btn btn-danger"}
+                                                                                onClick={this.handleDelete.bind(this,item.id)}>Borrar</button>
                                                                         </td>
                                                                     </tr>
                                                                 )
