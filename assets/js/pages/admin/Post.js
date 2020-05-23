@@ -99,37 +99,37 @@ class Post extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Título
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {post.title}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="description" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="description" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Cuerpo
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {post.description}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Artista
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {post.artist !== null ? post.artist.alias:'No tiene'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Tags
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {
                                 post.tags.map(tag => {
                                 return tag.tag+" ";
@@ -138,10 +138,10 @@ class Post extends Component {
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Imágen
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             <img src={post.img_name} alt={"Imagen no disponible"} width={75} className={"img img-fluid"}/>
                         </div>
                     </div>
@@ -192,14 +192,14 @@ class Post extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="title" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="title" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Título
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('title') ?
                                     <p className={"text-danger"}>{this.state.errors.title}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="title" name="title" defaultValue={post.title}
                                        className="form-control here"
                                        type="text"/>
@@ -207,27 +207,27 @@ class Post extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="description" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="description" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Cuerpo
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('description') ?
                                     <p className={"text-danger"}>{this.state.errors.description}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <textarea defaultValue={post.description} cols={80} rows={10} name={"description"} id={"description"}/>
                             </div>
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Artista
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('artist') ?
                                     <p className={"text-danger"}>{this.state.errors.artist}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"artist"} id={"artist"}>
                                     {
                                         artists.map( (artist, idx) => {
@@ -241,14 +241,14 @@ class Post extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="tag" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="tag" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Tags
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('tag') ?
                                     <p className={"text-danger"}>{this.state.errors.tag}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"tag"} id={"tag"} multiple={true}>
                                     {
                                         tags.map( (tag, idx) => {
@@ -262,14 +262,14 @@ class Post extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Imagen
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_img') ?
                                     <p className={"text-danger"}>{this.state.errors.cant_upload_img}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="img" name="img"
                                        className="form-control here"
                                        type="file"/>
@@ -278,7 +278,7 @@ class Post extends Component {
 
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>

@@ -75,64 +75,64 @@ class Artist extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Nombre
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {artist.name}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="surname" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="surname" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Apellidos
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {artist.surname ? artist.surname : ''}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="alias" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="alias" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Alias
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {artist.alias}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="birth" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="birth" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Fecha de nacimiento
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {birth_day+"-"+birth_month+"-"+birth_year}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="is_from" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="is_from" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Providencia
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {artist.is_from}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="bio" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="bio" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Biografía
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {artist.bio !== null ? artist.bio:'No tiene biografía'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Imágen
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             <img src={artist.img_name} alt={"Imagen no disponible"} width={75} className={"img img-fluid"}/>
                         </div>
                     </div>
@@ -183,14 +183,14 @@ class Artist extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Nombre
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('name') ?
                                     <p className={"text-danger"}>{this.state.errors.tag}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="name" name="name" defaultValue={artist.name}
                                        className="form-control here"
                                        type="text"/>
@@ -198,14 +198,14 @@ class Artist extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="surname" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="surname" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Apellidos
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('surname') ?
                                     <p className={"text-danger"}>{this.state.errors.surname}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="surname" name="surname" defaultValue={artist.surname}
                                        className="form-control here"
                                        type="text"/>
@@ -213,14 +213,14 @@ class Artist extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="alias" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="alias" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Alias
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('alias') ?
                                     <p className={"text-danger"}>{this.state.errors.alias}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="alias" name="alias" defaultValue={artist.alias}
                                        className="form-control here"
                                        type="text"/>
@@ -228,14 +228,14 @@ class Artist extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="birth" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="birth" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Fecha de nacimiento
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('birth') ?
                                     <p className={"text-danger"}>{this.state.errors.birth}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="birth" name="birth"
                                        className="form-control here"
                                        type="date"/>
@@ -243,14 +243,14 @@ class Artist extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="is_from" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="is_from" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Providencia
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('is_from') ?
                                     <p className={"text-danger"}>{this.state.errors.surname}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="is_from" name="is_from" defaultValue={artist.is_from}
                                        className="form-control here"
                                        type="text"/>
@@ -258,28 +258,28 @@ class Artist extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="bio" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="bio" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Biografía
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('bio') ?
                                     <p className={"text-danger"}>{this.state.errors.bio}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <textarea id={"bio"} name={"bio"} defaultValue={artist.bio !== null ? artist.bio:''} cols={80} rows={10}/>
                             </div>
                         </div>
 
 
                         <div className="form-group row">
-                            <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 image
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_img') ?
                                     <p className={"text-danger"}>{this.state.errors.cant_upload_img}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="img" name="img"
                                        className="form-control here"
                                        type="file"/>
@@ -288,7 +288,7 @@ class Artist extends Component {
 
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>

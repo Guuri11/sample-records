@@ -70,10 +70,10 @@ class Tag extends Component {
                         null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Nombre
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {tag.tag}
                         </div>
                     </div>
@@ -122,21 +122,21 @@ class Tag extends Component {
                             <div className="col-md-12">
                                 <form onSubmit={this.handleUpdate}>
                                     <div className="form-group row">
-                                        <label htmlFor="tag" className="col-3 col-form-label font-weight-bolder">
+                                        <label htmlFor="tag" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                             Nombre
                                         </label>
                                         {
                                             this.state.errors.hasOwnProperty('tag') ?
                                                 <p className={"text-danger"}>{this.state.errors.tag}</p> : null
                                         }
-                                        <div className="col-3">
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                             <input id="tag" name="tag" defaultValue={tag.tag}
                                                    className="form-control here"
                                                    type="text"/>
                                         </div>
                                     </div>
                                     <div className="form-group row">
-                                        <div className="col-3">
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                             <button name="submit" type="submit"
                                                     className="btn btn-success">Actualizar
                                             </button>

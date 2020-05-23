@@ -103,65 +103,65 @@ class Song extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Nombre
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {song.name}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Artista
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {song.artist.alias}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="album" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="album" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Album
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {song.album !== null ? song.album.name:'No tiene'}
                         </div>
                     </div>
 
 
                     <div className="form-group row">
-                        <label htmlFor="duration" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="duration" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Duración
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {song.duration !== null ? song.duration:'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="album" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="album" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Enlace videoclip
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {song.video_src !== null ? song.video_src:'No tiene'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="released_at" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="released_at" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Fecha de lanzamiento
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {released_at_day+"-"+released_at_month+"-"+released_at_year}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="album" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="album" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Fichero canción
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             <audio preload="auto" controls>
                                 <source src={"/songs/"+song.song_file}/>
                             </audio>
@@ -169,10 +169,10 @@ class Song extends Component {
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Imágen
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             <img src={song.img_name} alt={"Imagen no disponible"} width={75} className={"img img-fluid"}/>
                         </div>
                     </div>
@@ -223,14 +223,14 @@ class Song extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Nombre
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('name') ?
                                     <p className={"text-danger"}>{this.state.errors.name}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="name" name="name" defaultValue={song.name}
                                        className="form-control here"
                                        type="text"/>
@@ -238,14 +238,14 @@ class Song extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Artista
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('artist') ?
                                     <p className={"text-danger"}>{this.state.errors.artist}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"artist"} id={"artist"} defaultValue={''}>
                                     <option value={''}/>
                                     {
@@ -260,14 +260,14 @@ class Song extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="album" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="album" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Album
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('album') ?
                                     <p className={"text-danger"}>{this.state.errors.album}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"album"} id={"album"} defaultValue={''}>
                                     <option value={''}/>
                                     {
@@ -282,14 +282,14 @@ class Song extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="duration" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="duration" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Duración
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('duration') ?
                                     <p className={"text-danger"}>{this.state.errors.duration}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="duration" name="duration" defaultValue={song.duration}
                                        className="form-control here"
                                        type="number"/>
@@ -297,14 +297,14 @@ class Song extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="video_src" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="video_src" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Enlace videoclip
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('video_src') ?
                                     <p className={"text-danger"}>{this.state.errors.video_src}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="video_src" name="video_src" defaultValue={song.video_src !== null ? song.video_src:''}
                                        className="form-control here"
                                        type="text"/>
@@ -312,14 +312,14 @@ class Song extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="released_at" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="released_at" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Fecha lanzamiento
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('released_at') ?
                                     <p className={"text-danger"}>{this.state.errors.released_at}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="released_at" name="released_at"
                                        className="form-control here"
                                        type="date"/>
@@ -327,14 +327,14 @@ class Song extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="song" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="song" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Fichero canción
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_song') ?
                                     <p className={"text-danger"}>{this.state.errors.cant_upload_song}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="song" name="song"
                                        className="form-control here"
                                        type="file"/>
@@ -342,14 +342,14 @@ class Song extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Imagen
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_img') ?
                                     <p className={"text-danger"}>{this.state.errors.cant_upload_img}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="img" name="img"
                                        className="form-control here"
                                        type="file"/>
@@ -358,7 +358,7 @@ class Song extends Component {
 
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>

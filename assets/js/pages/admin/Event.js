@@ -89,83 +89,83 @@ class Event extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Nombre
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {event.name}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Artista
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {event.artist.alias}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="place" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="place" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Lugar
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {event.place}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="city" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="city" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Ciudad
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {event.city !== null ? event.city:'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="country" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="country" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             País
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {event.country}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="date" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="date" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Fecha de evento
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {date_at_day+"-"+date_at_month+"-"+date_at_year}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="prefix_serial_number" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="prefix_serial_number" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Prefijo de nº serie
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {event.prefix_serial_number}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="ticket_quantity" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="ticket_quantity" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Cantidad de tickets
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {event.ticket_quantity}
                         </div>
                     </div>
 
 
                     <div className="form-group row">
-                        <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Imágen
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             <img src={event.img_name} alt={"Imagen no disponible"} width={75} className={"img img-fluid"}/>
                         </div>
                     </div>
@@ -216,14 +216,14 @@ class Event extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Nombre
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('name') ?
                                     <p className={"text-danger"}>{this.state.errors.name}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="name" name="name" defaultValue={event.name}
                                        className="form-control here"
                                        type="text"/>
@@ -231,14 +231,14 @@ class Event extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Artista
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('artist') ?
                                     <p className={"text-danger"}>{this.state.errors.artist}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"artist"} id={"artist"}>
                                     {
                                         artists.map( (artist, idx) => {
@@ -252,14 +252,14 @@ class Event extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="place" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="place" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Lugar
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('place') ?
                                     <p className={"text-danger"}>{this.state.errors.place}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="place" name="place" defaultValue={event.place}
                                        className="form-control here"
                                        type="text"/>
@@ -267,14 +267,14 @@ class Event extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="city" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="city" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Ciudad
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('city') ?
                                     <p className={"text-danger"}>{this.state.errors.city}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="city" name="city" defaultValue={event.city !== null ? event.city:''}
                                        className="form-control here"
                                        type="text"/>
@@ -282,14 +282,14 @@ class Event extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="country" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="country" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 País
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('countr') ?
                                     <p className={"text-danger"}>{this.state.errors.country}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="country" name="country" defaultValue={event.country}
                                        className="form-control here"
                                        type="text"/>
@@ -297,14 +297,14 @@ class Event extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="date" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="date" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Fecha
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('date') ?
                                     <p className={"text-danger"}>{this.state.errors.date}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="date" name="date"
                                        className="form-control here"
                                        type="date"/>
@@ -312,14 +312,14 @@ class Event extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="prefix_serial_number" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="prefix_serial_number" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Prefijo de nº serie
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('prefix_serial_number') ?
                                     <p className={"text-danger"}>{this.state.errors.prefix_serial_number}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="prefix_serial_number" name="prefix_serial_number" defaultValue={event.prefix_serial_number}
                                        className="form-control here"
                                        type="text"/>
@@ -328,14 +328,14 @@ class Event extends Component {
 
 
                         <div className="form-group row">
-                            <label htmlFor="ticket_quantity" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="ticket_quantity" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Nº entradas
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('ticket_quantity') ?
                                     <p className={"text-danger"}>{this.state.errors.ticket_quantity}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="ticket_quantity" name="ticket_quantity" defaultValue={event.ticket_quantity}
                                        className="form-control here"
                                        type="number"/>
@@ -343,14 +343,14 @@ class Event extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Imagen
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_img') ?
                                     <p className={"text-danger"}>{this.state.errors.cant_upload_img}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="img" name="img"
                                        className="form-control here"
                                        type="file"/>
@@ -359,7 +359,7 @@ class Event extends Component {
 
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>

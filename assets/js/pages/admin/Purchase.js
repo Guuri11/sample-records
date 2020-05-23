@@ -88,100 +88,100 @@ class Purchase extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Nº de serie
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.serial_number}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="date" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="date" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Fecha de entrega
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {day+"-"+month+"-"+year}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="time" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="time" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Tiempo entre la compra y entrega
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.time !== null ? purchase.time.d+" dia/s y "+purchase.time.h+" hora/s aprox": 'Aún no especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="received" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="received" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Recibido
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.received ? "Sí": "No"}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="address" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="address" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Dirección
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.address}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="town" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="town" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Población
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.town !== null ? purchase.town: 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="city" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="city" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Ciudad
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.city !== null ? purchase.city: 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="country" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="country" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             País
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.country}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="final_price" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="final_price" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Precio final
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.final_price.toFixed(2)}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Usuario
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {purchase.user ? purchase.user.name: 'Anónimo'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="Comment" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="Comment" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Comentario
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {
                                 purchase.comment !== null ? purchase.comment : 'No tiene'
                             }
@@ -233,14 +233,14 @@ class Purchase extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="serial_number" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="serial_number" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Nº de serie
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('serial_number') ?
                                     <p className={"text-danger"}>{this.state.errors.serial_number}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="serial_number" name="serial_number" defaultValue={purchase.serial_number}
                                        className="form-control here"
                                        type="text"/>
@@ -248,14 +248,14 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="date" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="date" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Fecha de compra
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('date') ?
                                     <p className={"text-danger"}>{this.state.errors.date}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="date" name="date"
                                        className="form-control here"
                                        type="date"/>
@@ -263,14 +263,14 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="received" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="received" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Recibido
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('received') ?
                                     <p className={"text-danger"}>{this.state.errors.received}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select id={"received"} name={"received"} defaultValue={purchase.received ? "1":"0"}>
                                     <option value={"1"}>Sí</option>
                                     <option value={"0"}>No</option>
@@ -279,14 +279,14 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="address" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="address" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Dirección
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('address') ?
                                     <p className={"text-danger"}>{this.state.errors.address}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="address" name="address" defaultValue={purchase.address}
                                        className="form-control here"
                                        type="text"/>
@@ -294,14 +294,14 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="town" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="town" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Población
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('town') ?
                                     <p className={"text-danger"}>{this.state.errors.town}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="town" name="town" defaultValue={purchase.town !== null ? purchase.town:''}
                                        className="form-control here"
                                        type="text"/>
@@ -309,14 +309,14 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="city" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="city" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Ciudad
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('city') ?
                                     <p className={"text-danger"}>{this.state.errors.city}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="city" name="city" defaultValue={purchase.city !== null ? purchase.city:''}
                                        className="form-control here"
                                        type="text"/>
@@ -324,14 +324,14 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="country" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="country" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 País
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('country') ?
                                     <p className={"text-danger"}>{this.state.errors.country}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="country" name="country" defaultValue={purchase.country}
                                        className="form-control here"
                                        type="text"/>
@@ -339,14 +339,14 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="final_price" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="final_price" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Precio final
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('final_price') ?
                                     <p className={"text-danger"}>{this.state.errors.final_price}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="final_price" name="final_price" defaultValue={purchase.final_price.toFixed(2)}
                                        className="form-control here"
                                        type="number"/>
@@ -355,14 +355,14 @@ class Purchase extends Component {
 
 
                         <div className="form-group row">
-                            <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Usuario
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('user') ?
                                     <p className={"text-danger"}>{this.state.errors.user}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"user"} id={"user"}>
                                     <option value={""}>Anónimo</option>
                                     {
@@ -377,14 +377,14 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="comment" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="comment" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Comentario
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('comment') ?
                                     <p className={"text-danger"}>{this.state.errors.comment}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="comment" name="comment" defaultValue={purchase.comment !== null ? purchase.comment:''}
                                        className="form-control here"
                                        type="text"/>
@@ -392,7 +392,7 @@ class Purchase extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>

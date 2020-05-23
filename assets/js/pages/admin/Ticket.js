@@ -85,37 +85,37 @@ class Ticket extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="serial_number" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="serial_number" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Nº de serie
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {ticket.serial_number}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="price" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="price" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Precio
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {ticket.price}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="event" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="event" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Event
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {ticket.event.name}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="sold" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="sold" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Vendido
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {ticket.sold ? "Sí":"No"}
                         </div>
                     </div>
@@ -166,14 +166,14 @@ class Ticket extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="serial_number" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="serial_number" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Nº de serie
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('serial_number') ?
                                     <p className={"text-danger"}>{this.state.errors.serial_number}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="serial_number" name="serial_number" defaultValue={ticket.serial_number}
                                        className="form-control here"
                                        type="text"/>
@@ -181,14 +181,14 @@ class Ticket extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="price" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="price" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Precio
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('price') ?
                                     <p className={"text-danger"}>{this.state.errors.price}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="price" name="price" defaultValue={ticket.price}
                                        className="form-control here"
                                        type="number"/>
@@ -196,14 +196,14 @@ class Ticket extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Evento
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('event') ?
                                     <p className={"text-danger"}>{this.state.errors.event}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"event"} id={"event"} defaultValue={''}>
                                     <option value={''}/>
                                     {
@@ -218,14 +218,14 @@ class Ticket extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="sold" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="sold" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Vendido
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('sold') ?
                                     <p className={"text-danger"}>{this.state.errors.sold}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select id={"sold"} name={"sold"} defaultValue={ticket.sold ? "1":"0"}>
                                     <option value={"1"}>Sí</option>
                                     <option value={"0"}>No</option>
@@ -234,7 +234,7 @@ class Ticket extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>

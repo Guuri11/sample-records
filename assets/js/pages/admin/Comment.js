@@ -103,25 +103,25 @@ class Comment extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Comentario
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {comment.comment}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Usuario
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {comment.user ? comment.user.name: 'Anónimo'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             {
                                 comment.product !== null ?
                                     "Producto"
@@ -135,7 +135,7 @@ class Comment extends Component {
                                             "Compra"
                             }
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {
                                 comment.product !== null ?
                                     comment.product.name
@@ -195,14 +195,14 @@ class Comment extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="comment" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="comment" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Comentario
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('comment') ?
                                     <p className={"text-danger"}>{this.state.errors.comment}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="comment" name="comment" defaultValue={comment.comment}
                                        className="form-control here"
                                        type="text"/>
@@ -210,14 +210,14 @@ class Comment extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Usuario
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('user') ?
                                     <p className={"text-danger"}>{this.state.errors.user}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"user"} id={"user"}>
                                     <option value={''}>Anónimo</option>
                                     {
@@ -232,7 +232,7 @@ class Comment extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 {
                                     comment.product !== null ?
                                         "Producto"
@@ -246,7 +246,7 @@ class Comment extends Component {
                                                 "Compra"
                                 }
                             </label>
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"item"} id={"item"}>
                                     {
                                         relation === "product" ?
@@ -281,7 +281,7 @@ class Comment extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>

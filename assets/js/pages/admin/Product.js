@@ -98,92 +98,92 @@ class Product extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Nombre
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.name}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="price" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="price" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Precio
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.price}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="discount" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="discount" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Descuento
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.discount !== null ? product.discount : 'No tiene'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="size" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="size" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Talla
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.size !== null ? product.size : 'No tiene'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="discount" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="discount" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Descuento
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.discount !== null ? product.discount : 'No tiene'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="stock" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="stock" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Stock
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.stock}
                         </div>
                     </div>
 
 
                     <div className="form-group row">
-                        <label htmlFor="description" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="description" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Descripción
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.description}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Artista
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.artist !== null ? product.artist.alias : 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="category" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="category" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Categoria
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {product.category !== null ? product.category.name : 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Imágen
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             <img src={product.img_name} alt={"Imagen no disponible"} width={75} className={"img img-fluid"}/>
                         </div>
                     </div>
@@ -234,14 +234,14 @@ class Product extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Nombre
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('name') ?
                                     <p className={"text-danger"}>{this.state.errors.name}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="name" name="name" defaultValue={product.name}
                                        className="form-control here"
                                        type="text"/>
@@ -249,14 +249,14 @@ class Product extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="price" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="price" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Precio
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('price') ?
                                     <p className={"text-danger"}>{this.state.errors.price}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="price" name="price" defaultValue={product.price}
                                        className="form-control here"
                                        type="number"/>
@@ -264,14 +264,14 @@ class Product extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="discount" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="discount" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Descuento
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('discount') ?
                                     <p className={"text-danger"}>{this.state.errors.discount}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="discount" name="discount" defaultValue={product.discount !== null ? product.discount : 0}
                                        className="form-control here"
                                        type="number"/>
@@ -279,14 +279,14 @@ class Product extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="size" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="size" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Talla
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('sizze') ?
                                     <p className={"text-danger"}>{this.state.errors.size}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="size" name="size" defaultValue={product.size !== null ? price.size : ''}
                                        className="form-control here"
                                        type="text"/>
@@ -294,14 +294,14 @@ class Product extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="stock" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="stock" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Stock
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('stock') ?
                                     <p className={"text-danger"}>{this.state.errors.stock}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="stock" name="stock" defaultValue={product.stock}
                                        className="form-control here"
                                        type="number"/>
@@ -309,14 +309,14 @@ class Product extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="available" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="available" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Disponible
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('avaiable') ?
                                     <p className={"text-danger"}>{this.state.errors.avaiable}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select id={"available"} name={"available"} defaultValue={product.avaiable ? "1":"0"}>
                                     <option value={"1"}>Sí</option>
                                     <option value={"0"}>No</option>
@@ -325,27 +325,27 @@ class Product extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="description" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="description" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Descripción
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('description') ?
                                     <p className={"text-danger"}>{this.state.errors.description}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <textarea cols={80} rows={10} name={"description"} id={"description"} defaultValue={product.description}/>
                             </div>
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="artist" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Artista
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('artist') ?
                                     <p className={"text-danger"}>{this.state.errors.artist}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"artist"} id={"artist"} defaultValue={''}>
                                     <option value={''}/>
                                     {
@@ -360,14 +360,14 @@ class Product extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="category" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="category" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Categoria
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('category') ?
                                     <p className={"text-danger"}>{this.state.errors.category}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"category"} id={"category"}>
                                     {
                                         categories.map( (category, idx) => {
@@ -381,14 +381,14 @@ class Product extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Imagen
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_img') ?
                                     <p className={"text-danger"}>{this.state.errors.cant_upload_img}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="img" name="img"
                                        className="form-control here"
                                        type="file"/>
@@ -397,7 +397,7 @@ class Product extends Component {
 
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>

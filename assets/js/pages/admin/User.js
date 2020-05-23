@@ -71,37 +71,37 @@ class User extends Component {
                             null
                     }
                     <div className="form-group row">
-                        <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Nombre
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.name}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="surname" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="surname" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Apellidos
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.surname ? user.surname : ''}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="alias" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="alias" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Email
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.email}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="role" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="role" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Roles
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.role.map(role => {
                                 return role+" "
                             })}
@@ -109,55 +109,55 @@ class User extends Component {
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="address" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="address" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Dirección
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.address ? user.address : 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="postal_code" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="postal_code" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Código postal
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.postal_code ? user.postal_code : 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="town" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="town" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Población
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.town ? user.town : 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="city" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="city" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Ciudad
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.city ? user.city : 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="town" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="town" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Teléfono
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             {user.phone ? user.phone : 'No especificado'}
                         </div>
                     </div>
 
                     <div className="form-group row">
-                        <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                        <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                             Imágen de perfil
                         </label>
-                        <div className="col-3">
+                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                             <img src={user.profile_image} alt={"Imagen no disponible"} width={75} className={"img img-fluid"}/>
                         </div>
                     </div>
@@ -208,14 +208,14 @@ class User extends Component {
                 <div className="col-md-12">
                     <form onSubmit={this.handleUpdate}>
                         <div className="form-group row">
-                            <label htmlFor="name" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Nombre
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('name') ?
                                     <p className={"text-danger"}>{this.state.errors.tag}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="name" name="name" defaultValue={user.name}
                                        className="form-control here"
                                        type="text"/>
@@ -223,14 +223,14 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="surname" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="surname" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Apellidos
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('surname') ?
                                     <p className={"text-danger"}>{this.state.errors.surname}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="surname" name="surname" defaultValue={user.surname}
                                        className="form-control here"
                                        type="text"/>
@@ -238,14 +238,14 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="email" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="email" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Email
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('email') ?
                                     <p className={"text-danger"}>{this.state.errors.email}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="email" name="email" defaultValue={user.email}
                                        className="form-control here"
                                        type="email"/>
@@ -253,14 +253,14 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="role" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="role" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Roles
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('role') ?
                                     <p className={"text-danger"}>{this.state.errors.role}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <select name={"role"} id={"role"} defaultValue={['ROLE_USER']} multiple={true}>
                                     <option value={'ROLE_USER'}>Usuario normal</option>
                                     <option value={'ROLE_ADMIN'}>Admin</option>
@@ -270,14 +270,14 @@ class User extends Component {
 
 
                         <div className="form-group row">
-                            <label htmlFor="address" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="address" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Dirección
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('address') ?
                                     <p className={"text-danger"}>{this.state.errors.address}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="address" name="address" defaultValue={user.address !== null ? user.address:''}
                                        className="form-control here"
                                        type="text"/>
@@ -285,14 +285,14 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="postal_code" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="postal_code" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Código postal
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('postal_code') ?
                                     <p className={"text-danger"}>{this.state.errors.postal_code}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="postal_code" name="postal_code" defaultValue={user.postal_code !== null ? user.postal_code:''}
                                        className="form-control here"
                                        type="text"/>
@@ -300,14 +300,14 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="town" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="town" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Población
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('town') ?
                                     <p className={"text-danger"}>{this.state.errors.town}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="town" name="town" defaultValue={user.town !== null ? user.town:''}
                                        className="form-control here"
                                        type="text"/>
@@ -315,14 +315,14 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="city" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="city" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Ciudad
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('city') ?
                                     <p className={"text-danger"}>{this.state.errors.city}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="city" name="city" defaultValue={user.city !== null ? user.city:''}
                                        className="form-control here"
                                        type="text"/>
@@ -330,14 +330,14 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="phone" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="phone" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 Teléfono
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('phone') ?
                                     <p className={"text-danger"}>{this.state.errors.phone}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="phone" name="phone" defaultValue={user.phone !== null ? user.phone:''}
                                        className="form-control here"
                                        type="text"/>
@@ -345,14 +345,14 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <label htmlFor="img" className="col-3 col-form-label font-weight-bolder">
+                            <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
                                 image
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_img') ?
                                     <p className={"text-danger"}>{this.state.errors.cant_upload_img}</p> : null
                             }
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="img" name="img"
                                        className="form-control here"
                                        type="file"/>
@@ -360,7 +360,7 @@ class User extends Component {
                         </div>
 
                         <div className="form-group row">
-                            <div className="col-3">
+                            <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <button name="submit" type="submit"
                                         className="btn btn-success">Actualizar
                                 </button>
