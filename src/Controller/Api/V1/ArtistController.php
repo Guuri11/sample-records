@@ -5,6 +5,7 @@ namespace App\Controller\Api\V1;
 use App\Entity\Artist;
 use App\Repository\ArtistRepository;
 use App\Service\ApiUtils;
+use App\Service\CustomFileUploader;
 use DateTime;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -121,14 +122,8 @@ class ArtistController extends AbstractController
             $artist->setBio($data['bio']);
             if ($data['birth'] !== "")
                 $artist->setBirth(New DateTime($data['birth']));
-            if ($data['imageFile'] !== "") {
-                $artist->setImageFile($data['imageFile']);
-                $artist->setImageName($data['imageName']);
-                $artist->setImageSize($data['imageSize']);
-            } else {
-                $artist->setImageName('artist-default.png');
-                $artist->setImageSize(123);
-            }
+            $artist->setImageName('artist-default.png');
+            $artist->setImageSize(123);
             $artist->setCreatedAt(new DateTime());
             $artist->setUpdatedAt(new DateTime());
         }catch (Exception $e){
@@ -195,11 +190,6 @@ class ArtistController extends AbstractController
             $artist->setBio($data['bio']);
             if ($data['birth'] !== "")
                 $artist->setBirth(New DateTime($data['birth']));
-            if ($data['imageFile'] !== "") {
-                $artist->setImageFile($data['imageFile']);
-                $artist->setImageName($data['imageName']);
-                $artist->setImageSize($data['imageSize']);
-            }
             $artist->setUpdatedAt(new DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores del artista", $artist);
@@ -224,7 +214,7 @@ class ArtistController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Artista editado!");
+        $apiUtils->successResponse("¡Artista editado!",$artist);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
@@ -256,5 +246,81 @@ class ArtistController extends AbstractController
 
         $apiUtils->successResponse("¡Artista borrado!");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+    }
+
+    /**
+     * @Route("/upload-img/{id}", name="api_artist_upload_image", methods={"POST"})
+     * @param Request $request
+     * @param Artist $artist
+     * @param ApiUtils $apiUtils
+     * @param CustomFileUploader $fileUploader
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function uploadFile(Request $request, Artist $artist, ApiUtils $apiUtils, CustomFileUploader $fileUploader,
+                               ValidatorInterface $validator): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Get image
+        $img = $_FILES['img'];
+
+        // check if not empty
+        if (!array_key_exists('img',$_FILES)) {
+            $apiUtils->setFormErrors(["not_found"=>"No se ha enviado ninguna foto"]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se ha enviado ninguna imagen",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse([$_FILES,$img], Response::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
+        }
+
+        // Upload image
+        $errors = $fileUploader->uploadImage($img,CustomFileUploader::ARTIST, $artist->getImageName());
+
+        // if could upload image
+
+        // send response
+        if (count($errors) === 0){
+            try {
+                $artist->setImageName($fileUploader->getFileName());
+                $artist->setUpdatedAt(new \DateTime('now'));
+            }catch (Exception $e){
+                $apiUtils->errorResponse($e, "No se pudieron insertar los datos al artista");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+            }
+
+            // Check errors, if there is any error return it
+            try {
+                $apiUtils->validateData($validator, $artist);
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+            }
+
+            // Upload obj to the database
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, "No se pudo editar el artista en la bbdd");
+
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+
+            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$artist);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+        } else {
+            $apiUtils->setFormErrors($errors);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo subir la imagen",
+                "errors" => $apiUtils->getFormErrors(),
+                "results" => $artist
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
+
     }
 }

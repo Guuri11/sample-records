@@ -104,6 +104,7 @@ class Artists extends Component {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
 
         if (ans) {
+            console.log('jaj')
 
             let {total_artists} = this.state;
 
@@ -114,6 +115,7 @@ class Artists extends Component {
                     });
                     this.setState({ total_artists: total_artists, artists: total_artists ,message: 'Artista eliminado' });
                 }
+                console.log(res.data)
             }).catch(error => {
                 this.setState( { message: "No se pudo borrar al artista" } )
             });
@@ -151,6 +153,13 @@ class Artists extends Component {
                                                 {
                                                     message !== '' ?
                                                         <h6 className={"text-info"}>{message}</h6>
+                                                        :
+                                                        null
+                                                }
+                                                {
+                                                    // Delete message
+                                                    this.props.location.state !== undefined ?
+                                                        <h6 className={"text-info"}>{this.props.location.state.delete_success}</h6>
                                                         :
                                                         null
                                                 }

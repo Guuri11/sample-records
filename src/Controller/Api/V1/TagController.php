@@ -149,6 +149,14 @@ class TagController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
 
+        // Check errors, if there is any error return it
+        try {
+            $apiUtils->validateData($validator, $tag);
+        } catch (Exception $e) {
+            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+        }
+
         // Update obj to the database
         try {
             $entityManager = $this->getDoctrine()->getManager();
@@ -159,7 +167,7 @@ class TagController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Tag editado!");
+        $apiUtils->successResponse("¡Tag editado!", $tag);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 

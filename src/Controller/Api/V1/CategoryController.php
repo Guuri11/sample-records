@@ -173,7 +173,7 @@ class CategoryController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Categoria editada!");
+        $apiUtils->successResponse("¡Categoria editada!",$category);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 

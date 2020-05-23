@@ -8,6 +8,7 @@ use App\Repository\ArtistRepository;
 use App\Repository\TicketRepository;
 use App\Service\ApiUtils;
 use App\Repository\EventRepository;
+use App\Service\CustomFileUploader;
 use App\Utils\SerialNumber;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -111,8 +112,8 @@ class EventController extends AbstractController
             $event->setDate(new \DateTime($data['date']));
             $event->setPrefixSerialNumber($data['prefix_serial_number']);
             $event->setTicketQuantity($data['ticket_quantity']);
-            $event->setImageName($data['imageName']);
-            $event->setImageSize($data['imageSize']);
+            $event->setImageName('default-event.png');
+            $event->setImageSize(123);
             $event->setCreatedAt(new \DateTime());
             $event->setUpdatedAt(new \DateTime());
 
@@ -172,10 +173,11 @@ class EventController extends AbstractController
      * @param ArtistRepository $artistRepository
      * @param ValidatorInterface $validato
      * @param ApiUtils $apiUtils
+     * @param ValidatorInterface $validator
      * @return JsonResponse
      */
     public function edit(Request $request, Event $event, ArtistRepository $artistRepository, ValidatorInterface $validato,
-                        ApiUtils $apiUtils): JsonResponse
+                        ApiUtils $apiUtils, ValidatorInterface $validator): JsonResponse
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -198,27 +200,40 @@ class EventController extends AbstractController
             $event->setPrefixSerialNumber($data['prefix_serial_number']);
             $event->setTicketQuantity($data['ticket_quantity']);
             $event->setArtist($artistRepository->find($data['artist']));
-            if ($data['imageFile'] !== "") {
-                $event->setImageFile($data['imageFile']);
-                $event->setImageName($data['imageName']);
-                $event->setImageSize($data['imageSize']);
-            }
             $event->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $error['code'] = $e->getCode();
             $error['message'] = $e->getMessage();
             return new JsonResponse($error,Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
-        $em = $this->getDoctrine()->getManager();
-        $em->flush();
 
-        return new JsonResponse($event, Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        // Check errors, if there is any errror return it
+        try {
+            $apiUtils->validateData($validator, $event);
+        } catch (\Exception $e) {
+            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Upload obj to the database
+        try {
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+        } catch (\Exception $e) {
+            $apiUtils->errorResponse($e, "No se pudo editar el evento en la bbdd", null, $event);
+
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
+
+        $apiUtils->successResponse("¡Evento editado!",$event);
+        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED, ['Content-type' => 'application/json']);
     }
 
     /**
      * @Route("/delete/{id}", name="api_event_delete", methods={"DELETE"})
      * @param Request $request
      * @param Event $event
+     * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
     public function delete(Request $request, Event $event, ApiUtils $apiUtils): JsonResponse
@@ -242,5 +257,81 @@ class EventController extends AbstractController
 
         $apiUtils->successResponse("¡Evento borrado!");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+    }
+
+    /**
+     * @Route("/upload-img/{id}", name="api_event_upload_image", methods={"POST"})
+     * @param Request $request
+     * @param Event $event
+     * @param ApiUtils $apiUtils
+     * @param CustomFileUploader $fileUploader
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function uploadFile(Request $request, Event $event, ApiUtils $apiUtils, CustomFileUploader $fileUploader,
+                               ValidatorInterface $validator): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Get image
+        $img = $_FILES['img'];
+
+        // check if not empty
+        if (!array_key_exists('img',$_FILES)) {
+            $apiUtils->setFormErrors(["not_found"=>"No se ha enviado ninguna foto"]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se ha enviado ninguna imagen",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse([$_FILES,$img], Response::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
+        }
+
+        // Upload image
+        $errors = $fileUploader->uploadImage($img,CustomFileUploader::EVENT, $event->getImageName());
+
+        // if could upload image
+
+        // send response
+        if (count($errors) === 0){
+            try {
+                $event->setImageName($fileUploader->getFileName());
+                $event->setUpdatedAt(new \DateTime('now'));
+            }catch (Exception $e){
+                $apiUtils->errorResponse($e, "No se pudieron insertar los datos al artista");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+            }
+
+            // Check errors, if there is any error return it
+            try {
+                $apiUtils->validateData($validator, $event);
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+            }
+
+            // Upload obj to the database
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, "No se pudo editar el evento en la bbdd");
+
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+
+            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$event);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+        } else {
+            $apiUtils->setFormErrors($errors);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo subir la imagen",
+                "errors" => $apiUtils->getFormErrors(),
+                "results" => $event
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
+
     }
 }

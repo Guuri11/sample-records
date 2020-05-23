@@ -96,10 +96,13 @@ class PurchaseController extends AbstractController
      * @param ProductRepository $productRepository
      * @param ValidatorInterface $validator
      * @param ApiUtils $apiUtils
+     * @param SerialNumber $serialNumber
+     * @param PurchaseRepository $purchaseRepository
      * @return JsonResponse
      */
     public function new(Request $request, UserRepository $userRepository, TicketRepository $ticketRepository,
-                        ProductRepository $productRepository, ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
+                        ProductRepository $productRepository, ValidatorInterface $validator, ApiUtils $apiUtils,
+                        SerialNumber $serialNumber, PurchaseRepository $purchaseRepository): JsonResponse
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -110,10 +113,16 @@ class PurchaseController extends AbstractController
         }
 
         try {
-            $purchase->setSerialNumber($data['serial_number']);
+            $check = true;
+            // Generate a serial number for the purchase
+            while ($check){
+                $serialNumber->setSerialNumber('');
+                $serialNumber->GenerateSerialNumber();
+                $check = $serialNumber->checkSerialNumberPurchase($purchaseRepository);
+            }
+            $purchase->setSerialNumber($serialNumber->getSerialNumber());
+
             $purchase->setDate(new \DateTime($data['date']));
-            if($data['time'] !== "")
-                $purchase->setTime(new \DateInterval($data['time']));
             $purchase->setReceived(false);
             $purchase->setAddress($data['address']);
             if($data['town'] !== "")
@@ -121,9 +130,15 @@ class PurchaseController extends AbstractController
             if($data['city'] !== "")
                 $purchase->setCity($data['city']);
             $purchase->setCountry($data['country']);
-            if($data['comment'] !== "")
-                $purchase->setComment($data['comment']);
-            else
+            // Set comment
+            if ($data['comment'] !== "") {
+                $comment = new Comment();
+                $comment->setComment($data['comment']);
+                $comment->setCreatedAt(new \DateTime());
+                $comment->setUpdatedAt(new \DateTime());
+                $comment->setPurchase($purchase);
+                $purchase->setComment($comment);
+            } else
                 $purchase->setComment(null);
             if ($data['product'] !== "") {
                 $purchase->addProduct($productRepository->find($data['product']));
@@ -134,6 +149,7 @@ class PurchaseController extends AbstractController
             $purchase->setFinalPrice($data['final_price']);
             $purchase->setUser($userRepository->find($data['user']));
             $purchase->setCreatedAt(new \DateTime());
+            $purchase->setTime( $purchase->getCreatedAt()->diff($purchase->getDate()) );
             $purchase->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo insertar los valores a la compra", $purchase);
@@ -169,14 +185,11 @@ class PurchaseController extends AbstractController
      * @param Request $request
      * @param Purchase $purchase
      * @param UserRepository $userRepository
-     * @param TicketRepository $ticketRepository
-     * @param ProductRepository $productRepository
      * @param ValidatorInterface $validator
      * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
     public function edit(Request $request, Purchase $purchase, UserRepository $userRepository,
-                        TicketRepository $ticketRepository, ProductRepository $productRepository,
                         ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -192,31 +205,32 @@ class PurchaseController extends AbstractController
         // Process data
         try {
             $purchase->setSerialNumber($data['serial_number']);
-            $purchase->setDate(new \DateTime($data['date']));
-            $purchase->setReceived($data['received']);
-            if($data['time'] !== "")
-                $purchase->setTime(new \DateInterval($data['time']));
-            elseif ($purchase->getReceived()){
+            if($data['date'] !== "")
+                $purchase->setDate(new \DateTime($data['date']));
+            if($data['received'] !== "")
+                $purchase->setReceived($data['received']);
+            if ($purchase->getReceived())
                 $purchase->setTime( $purchase->getCreatedAt()->diff($purchase->getDate()) );
-            }
-            $purchase->setAddress($data['address']);
+            if($data['address'] !== "")
+                $purchase->setAddress($data['address']);
             if($data['town'] !== "")
                 $purchase->setTown($data['town']);
             if($data['city'] !== "")
                 $purchase->setCity($data['city']);
             $purchase->setCountry($data['country']);
-            if($data['comment'] !== "")
-                $purchase->setComment($data['comment']);
-            else
-                $purchase->setComment(null);
-            if ($data['product'] !== "") {
-                $purchase->addProduct($productRepository->find($data['product']));
+            // Set comment
+            if ($data['comment'] !== "") {
+                $comment = new Comment();
+                $comment->setComment($data['comment']);
+                $comment->setCreatedAt(new \DateTime());
+                $comment->setUpdatedAt(new \DateTime());
+                $comment->setPurchase($purchase);
+                $purchase->setComment($comment);
             }
-            if ($data['ticket'] !== "") {
-                $purchase->addTicket($ticketRepository->find($data['ticket']));
-            }
-            $purchase->setFinalPrice($data['final_price']);
-            $purchase->setUser($userRepository->find($data['user']));
+            if($data['final_price'] !== "")
+                $purchase->setFinalPrice($data['final_price']);
+            if($data['user'] !== "")
+                $purchase->setUser($userRepository->find($data['user']));
             $purchase->setUpdatedAt(new \DateTime('now'));
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la compra", $purchase);
@@ -241,7 +255,7 @@ class PurchaseController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Compra editado!");
+        $apiUtils->successResponse("¡Compra editada!", $purchase);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 

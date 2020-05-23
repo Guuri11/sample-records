@@ -24,8 +24,8 @@ class Category implements \JsonSerializable
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="El nombre de la categoria es necesario")
      * @Assert\Regex(
-     *     pattern="/^[a-zA-Z ]*$/",
-     *     message="El nombre de la categoría solo deberia contener letras"
+     *     pattern="/^[a-zA-ZÀ-ú\s]*$/",
+     *     message="El nombre de la categoría solo deberia contener letras y espacios"
      * )
      */
     private $name;

@@ -25,7 +25,7 @@ class Song implements \JsonSerializable
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Nombre requerido")
      * @Assert\Regex(
-     *     pattern="/^[a-zA-Z0-9 ]*$/",
+     *     pattern="/^[a-zA-ZÀ-ú0-9 ]*$/",
      *     message="El nombre de la canción solo debería contener letras"
      * )
      */

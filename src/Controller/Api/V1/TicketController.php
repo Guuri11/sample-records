@@ -166,10 +166,15 @@ class TicketController extends AbstractController
         $data = $apiUtils->getData();
 
         try {
-            $ticket->setEvent($eventRepository->find($data['event']));
-            $ticket->setSerialNumber($ticket->getEvent()->getPrefixSerialNumber().$data['serial_number']);
-            $ticket->setPrice($data['price']);
-            $ticket->setSold($data['sold']);
+            if ($data["event"] !== "")
+                $ticket->setEvent($eventRepository->find($data['event']));
+
+            if ($data["serial_number"] !== "")
+                $ticket->setSerialNumber($data['serial_number']);
+            if ($data["price"] !== "")
+                $ticket->setPrice($data['price']);
+            if ($data["sold"] !== "")
+                $ticket->setSold($data['sold']);
             $ticket->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores al ticket", $ticket);
@@ -195,7 +200,7 @@ class TicketController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Ticket editado!");
+        $apiUtils->successResponse("¡Ticket editado!", $ticket);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 

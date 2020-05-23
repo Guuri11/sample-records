@@ -7,6 +7,7 @@ use App\Repository\ArtistRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Service\ApiUtils;
+use App\Service\CustomFileUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -115,14 +116,8 @@ class ProductController extends AbstractController
             $product->setStock($data['stock']);
             $product->setAvaiable($data['avaiable']);
             $product->setDescription($data['description']);
-            if ($data['imageFile'] !== "") {
-                $product->setImageFile($data['imageFile']);
-                $product->setImageName($data['imageName']);
-                $product->setImageSize($data['imageSize']);
-            } else {
-                $product->setImageName('product-default.png');
-                $product->setImageSize(1234);
-            }
+            $product->setImageName('product-default.png');
+            $product->setImageSize(1234);
             $product->setCreatedAt(new \DateTime());
             $product->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
@@ -190,11 +185,6 @@ class ProductController extends AbstractController
             $product->setStock($data['stock']);
             $product->setAvaiable($data['avaiable']);
             $product->setDescription($data['description']);
-            if ($data['imageFile'] !== "") {
-                $product->setImageFile($data['imageFile']);
-                $product->setImageName($data['imageName']);
-                $product->setImageSize($data['imageSize']);
-            }
             $product->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores al producto",$product);
@@ -219,7 +209,7 @@ class ProductController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Producto editado!");
+        $apiUtils->successResponse("¡Producto editado!",$product);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
@@ -251,5 +241,81 @@ class ProductController extends AbstractController
 
         $apiUtils->successResponse("¡Producto borrado!");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+    }
+
+    /**
+     * @Route("/upload-img/{id}", name="api_product_upload_image", methods={"POST"})
+     * @param Request $request
+     * @param Product $product
+     * @param ApiUtils $apiUtils
+     * @param CustomFileUploader $fileUploader
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function uploadFile(Request $request, Product $product, ApiUtils $apiUtils, CustomFileUploader $fileUploader,
+                               ValidatorInterface $validator): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Get image
+        $img = $_FILES['img'];
+
+        // check if not empty
+        if (!array_key_exists('img',$_FILES)) {
+            $apiUtils->setFormErrors(["not_found"=>"No se ha enviado ninguna foto"]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se ha enviado ninguna imagen",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse([$_FILES,$img], Response::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
+        }
+
+        // Upload image
+        $errors = $fileUploader->uploadImage($img,CustomFileUploader::PRODUCT, $product->getImageName());
+
+        // if could upload image
+
+        // send response
+        if (count($errors) === 0){
+            try {
+                $product->setImageName($fileUploader->getFileName());
+                $product->setUpdatedAt(new \DateTime('now'));
+            }catch (Exception $e){
+                $apiUtils->errorResponse($e, "No se pudieron insertar los datos al product");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+            }
+
+            // Check errors, if there is any error return it
+            try {
+                $apiUtils->validateData($validator, $product);
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+            }
+
+            // Upload obj to the database
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, "No se pudo editar el producto en la bbdd");
+
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+
+            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$product);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+        } else {
+            $apiUtils->setFormErrors($errors);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo subir la imagen",
+                "errors" => $apiUtils->getFormErrors(),
+                "results" => $product
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
+
     }
 }

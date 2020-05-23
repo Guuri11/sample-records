@@ -170,12 +170,14 @@ class Comment implements \JsonSerializable
      */
     public function jsonSerialize()
     {
+        // Maybe the comment is from an anonymous user who buy something
         if ($this->user !== null)
             return [
             'entity'=>'Comment',
             'id'=>$this->getId(),
             'comment'=>$this->getComment(),
             'user'=>[
+                "id"=>$this->getUser()->getId(),
                 "name"=>$this->getUser()->getName(),
                 "surname"=>$this->getUser()->getSurname(),
                 "img_profile"=>$this->getUser()->getProfileImage()

@@ -118,7 +118,14 @@ class ApiUtils
     public function sanitizeData ($data)
     {
         foreach ($data as $key => $item) {
-            $data[$key] = trim(strip_tags($item));
+            if (!is_array($item)){
+                $data[$key] = trim(strip_tags($item));
+            } else{
+                // Sanitize array value (ex: array tags)
+                foreach ($item as $item_key => $value){
+                    $item[$item_key] = trim(strip_tags($value));
+                }
+            }
         }
         return $data;
     }
@@ -213,9 +220,9 @@ class ApiUtils
     /**
      * @return array
      */
-    public function getData(): array
+    public function getData(): ?array
     {
-        return $this->data;
+        return $this->data ? $this->data : [];
     }
 
     /**

@@ -156,6 +156,13 @@ class Purchases extends Component {
                                                         :
                                                         null
                                                 }
+                                                {
+                                                    // Delete message
+                                                    this.props.location.state !== undefined ?
+                                                        <h6 className={"text-info"}>{this.props.location.state.delete_success}</h6>
+                                                        :
+                                                        null
+                                                }
                                             </div>
                                             <div className="card-body">
                                                 <div className="table-responsive">

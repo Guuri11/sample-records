@@ -21,10 +21,10 @@ class Ticket implements \JsonSerializable
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank(message="Nombre requerido")
      * @Assert\Regex(
-     *     pattern="/^[a-zA-Z0-9]*$/",
+     *     pattern="/^[a-zA-Z0-9_-]*$/",
      *     message="El numero de serie solo pueden tener letras y números"
      * )
      */

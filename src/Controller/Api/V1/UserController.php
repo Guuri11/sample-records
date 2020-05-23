@@ -87,9 +87,10 @@ class UserController extends AbstractController
      * @param Request $request
      * @param ValidatorInterface $validator
      * @param ApiUtils $apiUtils
+     * @param UserPasswordEncoderInterface $passwordEncoder
      * @return JsonResponse
      */
-    public function new(Request $request, ValidatorInterface $validator, ApiUtils $apiUtils): JsonResponse
+    public function new(Request $request, ValidatorInterface $validator, ApiUtils $apiUtils, UserPasswordEncoderInterface $passwordEncoder): JsonResponse
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -108,7 +109,12 @@ class UserController extends AbstractController
             if ($data['surname'] !== "")
                 $user->setSurname($data['surname']);
             $user->setEmail($data['email']);
-            $user->setPassword($data['password']);
+            $user->setPassword(
+                $passwordEncoder->encodePassword(
+                    $user,
+                    $data['new_password']
+                )
+            );
             $user->setRoles([$data['roles']]);
             if ($data['address'] !== "")
                 $user->setAddress($data['address']);
@@ -120,26 +126,10 @@ class UserController extends AbstractController
                 $user->setCity($data['city']);
             if ($data['phone'] !== "")
                 $user->setPhone($data['phone']);
-            if ($data['credit_card'] !== "")
-                $user->setCreditCard($data['credit_card']);
-            if ($data['profile_file'] !== ""){
-                $user->setProfileFile($data['profile_file']);
-                $user->setProfileImage($data['profile_image']);
-                $user->setProfileSize($data['profile_size']);
-            }
-            else {
-                $user->setProfileImage('user-default.png');
-                $user->setProfileSize(123);
-            }
-            if ($data['header_file'] !== ""){
-                $user->setHeaderFile($data['header_file']);
-                $user->setHeaderImage($data['header_image']);
-                $user->setHeaderSize($data['header_size']);
-            }
-            else {
-                $user->setHeaderImage('header-default.png');
-                $user->setHeaderSize(123);
-            }
+            $user->setProfileImage('user-default.png');
+            $user->setProfileSize(123);
+            $user->setHeaderImage('header-default.png');
+            $user->setHeaderSize(123);
             $user->setCreatedAt(new \DateTime());
             $user->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
@@ -197,9 +187,11 @@ class UserController extends AbstractController
             $user->setName($data['name']);
             if ($data['surname'] !== "")
                 $user->setSurname($data['surname']);
+            $user->setSurname($data['surname']);
+            if ($data['email'] !== "")
             $user->setEmail($data['email']);
-            $user->setPassword($data['password']);
-            $user->setRoles([$data['roles']]);
+            if ($data['roles'] !== "")
+                $user->setRoles($data['roles']);
             if ($data['address'] !== "")
                 $user->setAddress($data['address']);
             if ($data['postal_code'] !== "")
@@ -210,26 +202,6 @@ class UserController extends AbstractController
                 $user->setCity($data['city']);
             if ($data['phone'] !== "")
                 $user->setPhone($data['phone']);
-            if ($data['credit_card'] !== "")
-                $user->setCreditCard($data['credit_card']);
-            if ($data['profile_file'] !== ""){
-                $user->setProfileFile($data['profile_file']);
-                $user->setProfileImage($data['profile_image']);
-                $user->setProfileSize($data['profile_size']);
-            }
-            else {
-                $user->setProfileImage('user-default.png');
-                $user->setProfileSize(123);
-            }
-            if ($data['header_file'] !== ""){
-                $user->setHeaderFile($data['header_file']);
-                $user->setHeaderImage($data['header_image']);
-                $user->setHeaderSize($data['header_size']);
-            }
-            else {
-                $user->setHeaderImage('header-default.png');
-                $user->setHeaderSize(123);
-            }
             $user->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores al usuario", $user);
@@ -253,7 +225,7 @@ class UserController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Usuario editado!");
+        $apiUtils->successResponse("¡Usuario editado!",$user);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
@@ -287,6 +259,82 @@ class UserController extends AbstractController
         $log->info($user->getEmail()." ha sido eliminado!");
         $apiUtils->successResponse("¡Usuario borrado!");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+    }
+
+    /**
+     * @Route("/upload-img/{id}", name="api_user_upload_image", methods={"POST"})
+     * @param Request $request
+     * @param User $user
+     * @param ApiUtils $apiUtils
+     * @param CustomFileUploader $fileUploader
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function uploadFile(Request $request, User $user, ApiUtils $apiUtils, CustomFileUploader $fileUploader,
+                               ValidatorInterface $validator): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Get image
+        $img = $_FILES['img'];
+
+        // check if not empty
+        if (!array_key_exists('img',$_FILES)) {
+            $apiUtils->setFormErrors(["not_found"=>"No se ha enviado ninguna foto"]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se ha enviado ninguna imagen",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse([$_FILES,$img], Response::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
+        }
+
+        // Upload image
+        $errors = $fileUploader->uploadImage($img,CustomFileUploader::USER_PROFILE, $user->getProfileImage());
+
+        // if could upload image
+
+        // send response
+        if (count($errors) === 0){
+            try {
+                $user->setProfileImage($fileUploader->getFileName());
+                $user->setUpdatedAt(new \DateTime('now'));
+            }catch (Exception $e){
+                $apiUtils->errorResponse($e, "No se pudieron insertar los datos al usuario");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+            }
+
+            // Check errors, if there is any error return it
+            try {
+                $apiUtils->validateData($validator, $user);
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+            }
+
+            // Upload obj to the database
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, "No se pudo editar el usuario en la bbdd");
+
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+
+            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$user);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+        } else {
+            $apiUtils->setFormErrors($errors);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo subir la imagen",
+                "errors" => $apiUtils->getFormErrors(),
+                "results" => $user
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
+
     }
 
     /**
@@ -718,7 +766,7 @@ class UserController extends AbstractController
         }
 
         // Upload image
-        $errors = $fileUploader->uploadImage($img_profile,$user->getProfileImage(),CustomFileUploader::USER_PROFILE);
+        $errors = $fileUploader->uploadImage($img_profile,CustomFileUploader::USER_PROFILE, $user->getProfileImage());
         // if could upload image
 
         // send response

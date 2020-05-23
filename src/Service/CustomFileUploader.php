@@ -50,7 +50,7 @@ class CustomFileUploader
     /**
      *
      */
-    const SONG = "/public/songs/songs/";
+    const SONG = "/public/songs/";
 
     /**
      * AVAIABLE EXTENSIONS
@@ -100,7 +100,7 @@ class CustomFileUploader
      * @param $directory
      * @return bool|string[]
      */
-    public function uploadSong($song, $directory)
+    public function uploadSong($song, $directory, $old_song = null)
     {
         // Prepare the full file path
         $directory = $this->root_directory.$directory;
@@ -109,10 +109,16 @@ class CustomFileUploader
         $file_name = $file_name.'-'.uniqid().'.'.$extension;
         $song_route = $directory.basename($file_name);
 
+        // this property will be used at the controller, where is called this function
+        $this->setFileName($file_name);
 
         if ($this->validateAudioExtension($extension)){
-            if (move_uploaded_file($song['tmp_name'],$song_route))
+            if (move_uploaded_file($song['tmp_name'],$song_route)){
+                // delete old song unless is the default one
+                if ($old_song !== null)
+                    unlink($directory.basename($old_song));
                 return [];
+            }
             else
                 return ["cant_upload"=>"No se pudo subir la canción"];
         } else {
@@ -126,7 +132,7 @@ class CustomFileUploader
      * @param $directory
      * @return bool|string[]
      */
-    public function uploadImage($img, $old_profile_img, $directory)
+    public function uploadImage($img, $directory, $old_img= null)
     {
 
         // Prepare the full file path
@@ -145,9 +151,12 @@ class CustomFileUploader
             // Upload image
             $uploaded = move_uploaded_file($img['tmp_name'],$img_route);
             if ($uploaded){
-                // delete old profile image
-                if ($old_profile_img !== "user-default.png")
-                    unlink($directory.basename($old_profile_img));
+                // delete old image unless is the default one
+                if ($old_img !== null && $old_img !== "user-default.png" && $old_img !== "default-album.png"
+                && $old_img !== "artist-default.png" && $old_img !== "default-event.png"
+                    && $old_img !== "product-default.png" && $old_img !== "song-default.png" && $old_img !== "header-default.jpg")
+
+                    unlink($directory.basename($old_img));
                 return [];
             }
             else

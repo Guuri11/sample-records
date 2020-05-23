@@ -49,7 +49,7 @@ ReactDOM.render(
             <Route path="/admin/eventos" component={Events}/>
             <Route exact path="/admin/noticias/tags/:tag" component={Tag}/>
             <Route path="/admin/noticias/tags" component={Tags}/>
-            <Route exact path="/admin/noticias/:noticias" component={Post}/>
+            <Route exact path="/admin/noticias/:post" component={Post}/>
             <Route path="/admin/noticias" component={Blog}/>
             <Route exact path="/admin/productos/categorias/:category" component={Category}/>
             <Route exact path="/admin/productos/:product" component={Product}/>

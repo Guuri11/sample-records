@@ -8,6 +8,7 @@ use App\Repository\ArtistRepository;
 use App\Repository\PostRepository;
 use App\Repository\TagRepository;
 use App\Service\ApiUtils;
+use App\Service\CustomFileUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -101,17 +102,13 @@ class PostController extends AbstractController
             $post->setTitle($data['title']);
             $post->setDescription($data['description']);
             $post->setArtist($artistRepository->find($data['artist']));
-            if ($data['imageFile'] !== ""){
-                $post->setImageFile($data['imageFile']);
-                $post->setImageName($data['imageName']);
-                $post->setImageSize($data['imageSize']);
-            }else {
-                $post->setImageName('post-default.png');
-                $post->setImageSize(123);
-            }
+            $post->setImageName('post-default.png');
+            $post->setImageSize(123);
             if($data['tag'] !== ""){
-                $tag = $tagRepository->find($data['tag']);
-                $post->addTag($tag);
+                foreach ($data['tag'] as $tag) {
+                    $tag = $tagRepository->find($tag);
+                    $post->addTag($tag);
+                }
             }
             $post->setCreatedAt(new \DateTime());
             $post->setUpdatedAt(new \DateTime());
@@ -172,15 +169,12 @@ class PostController extends AbstractController
             $post->setTitle($data['title']);
             $post->setDescription($data['description']);
             $post->setArtist($artistRepository->find($data['artist']));
-            if ($data['imageFile'] !== ""){
-                $post->setImageFile($data['imageFile']);
-                $post->setImageName($data['imageName']);
-                $post->setImageSize($data['imageSize']);
-            }
             if($data['tag'] !== ""){
-                $tag = $tagRepository->find($data['tag']);
-                $post->removeTag($post->getTag()->first());
-                $post->addTag($tag);
+                $post->getTag()->clear();
+                foreach ($data['tag'] as $tag) {
+                    $tag = $tagRepository->find($tag);
+                    $post->addTag($tag);
+                }
             }
             $post->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
@@ -206,7 +200,7 @@ class PostController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Noticia editada!");
+        $apiUtils->successResponse("¡Noticia editada!", $post);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
@@ -237,5 +231,81 @@ class PostController extends AbstractController
 
         $apiUtils->successResponse("¡Noticia borrada!");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+    }
+
+    /**
+     * @Route("/upload-img/{id}", name="api_post_upload_image", methods={"POST"})
+     * @param Request $request
+     * @param Post $post
+     * @param ApiUtils $apiUtils
+     * @param CustomFileUploader $fileUploader
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function uploadFile(Request $request, Post $post, ApiUtils $apiUtils, CustomFileUploader $fileUploader,
+                               ValidatorInterface $validator): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Get image
+        $img = $_FILES['img'];
+
+        // check if not empty
+        if (!array_key_exists('img',$_FILES)) {
+            $apiUtils->setFormErrors(["not_found"=>"No se ha enviado ninguna foto"]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se ha enviado ninguna imagen",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse([$_FILES,$img], Response::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
+        }
+
+        // Upload image
+        $errors = $fileUploader->uploadImage($img,CustomFileUploader::POST, $post->getImageName());
+
+        // if could upload image
+
+        // send response
+        if (count($errors) === 0){
+            try {
+                $post->setImageName($fileUploader->getFileName());
+                $post->setUpdatedAt(new \DateTime('now'));
+            }catch (Exception $e){
+                $apiUtils->errorResponse($e, "No se pudieron insertar los datos al artista");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+            }
+
+            // Check errors, if there is any error return it
+            try {
+                $apiUtils->validateData($validator, $post);
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+            }
+
+            // Upload obj to the database
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, "No se pudo editar la noticia en la bbdd");
+
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+
+            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$post);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+        } else {
+            $apiUtils->setFormErrors($errors);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo subir la imagen",
+                "errors" => $apiUtils->getFormErrors(),
+                "results" => $post
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
+
     }
 }

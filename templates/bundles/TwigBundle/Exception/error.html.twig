@@ -1,0 +1,19 @@
+{# templates/bundles/TwigBundle/Exception/error.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mt-5 mb-5">
+        <h1 class="error-code">404</h1>
+        <h2 class="error-message">Lo sentimos pero no existe la página solicitada.</h2>
+        <h2 class="error-message">¿Por qué no intenta buscar algo y nosotros le ayudamos? 🕵️‍♂️😊</h2>
+        <form method="get" action="/search">
+            <div class="input-group md-form form-sm form-1 pl-0">
+                <button class="btn btn-primary">
+                    <span class="fa fa-search"></span>
+                </button>
+                <input class="form-control my-0 py-1" id="searchErrorPage" name="s" type="text" placeholder="Escriba aquí lo que está buscando" aria-label="Search"/>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

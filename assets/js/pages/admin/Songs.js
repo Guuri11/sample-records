@@ -155,6 +155,13 @@ class Songs extends Component {
                                                         :
                                                         null
                                                 }
+                                                {
+                                                    // Delete message
+                                                    this.props.location.state !== undefined ?
+                                                        <h6 className={"text-info"}>{this.props.location.state.delete_success}</h6>
+                                                        :
+                                                        null
+                                                }
                                             </div>
                                             <div className="card-body">
                                                 <div className="table-responsive">
@@ -247,7 +254,7 @@ class Songs extends Component {
                                                                 return (
                                                                     <tr key={idx} className={"row-sr"}>
                                                                         <td>
-                                                                            <Link to={`/admin/productos/${item.id}`} className={"font-weight-bolder"}>
+                                                                            <Link to={`/admin/canciones/${item.id}`} className={"font-weight-bolder"}>
                                                                                 {idx+1+items_per_page*(active_page-1)}
                                                                             </Link>
                                                                         </td>

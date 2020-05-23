@@ -7,6 +7,7 @@ use App\Repository\AlbumRepository;
 use App\Repository\ArtistRepository;
 use App\Repository\SongRepository;
 use App\Service\ApiUtils;
+use App\Service\CustomFileUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -103,14 +104,8 @@ class SongController extends AbstractController
             $song->setSongFileName($data['song_file']);
             $song->setVideoSrc($data['video_src']);
             $song->setReleasedAt(new \DateTime($data['released_at']));
-            if ($data['imageFile'] !== ""){
-                $song->setImageFile($data['imageFile']);
-                $song->setImageName($data['imageName']);
-                $song->setImageSize($data['imageSize']);
-            } else {
-                $song->setImageName('song-default.png');
-                $song->setImageSize(1234);
-            }
+            $song->setImageName('song-default.png');
+            $song->setImageSize(1234);
             $song->setCreatedAt(new \DateTime());
             $song->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
@@ -166,19 +161,18 @@ class SongController extends AbstractController
         $data = $apiUtils->getData();
 
         try {
-            $song->setName($data['name']);
-            $song->setArtist($artistRepository->find($data['artist']));
+            if ($data['name'] !== "")
+                $song->setName($data['name']);
+            if ($data['artist'] !== "")
+                $song->setArtist($artistRepository->find($data['artist']));
             if ($data['album'] !== "")
                 $song->setAlbum($albumRepository->find($data['album']));
-            $song->setDuration($data['duration']);
-            $song->setSongFileName($data['song_file']);
-            $song->setVideoSrc($data['video_src']);
-            $song->setReleasedAt(new \DateTime($data['released_at']));
-            if ($data['imageFile'] !== ""){
-                $song->setImageFile($data['imageFile']);
-                $song->setImageName($data['imageName']);
-                $song->setImageSize($data['imageSize']);
-            }
+            if ($data['duration'] !== "")
+                $song->setDuration($data['duration']);
+            if ($data['duration'] !== "")
+                $song->setVideoSrc($data['video_src']);
+            if ($data['released_at'] !== "")
+                $song->setReleasedAt(new \DateTime($data['released_at']));
             $song->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores a la canción", $song);
@@ -203,7 +197,7 @@ class SongController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Canción editada!");
+        $apiUtils->successResponse("¡Canción editada!", $song);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
@@ -235,5 +229,155 @@ class SongController extends AbstractController
 
         $apiUtils->successResponse("¡Canción borrada!");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+    }
+
+    /**
+     * @Route("/upload-img/{id}", name="api_song_upload_image", methods={"POST"})
+     * @param Request $request
+     * @param Song $song
+     * @param ApiUtils $apiUtils
+     * @param CustomFileUploader $fileUploader
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function uploadImg(Request $request, Song $song, ApiUtils $apiUtils, CustomFileUploader $fileUploader,
+                               ValidatorInterface $validator): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Get image
+        $img = $_FILES['img'];
+
+        // check if not empty
+        if (!array_key_exists('img',$_FILES)) {
+            $apiUtils->setFormErrors(["not_found"=>"No se ha enviado ninguna foto"]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se ha enviado ninguna imagen",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
+        }
+
+        // Upload image
+        $errors = $fileUploader->uploadImage($img,CustomFileUploader::IMG_SONG, $song->getImageName());
+
+        // if could upload image
+
+        // send response
+        if (count($errors) === 0){
+            try {
+                $song->setImageName($fileUploader->getFileName());
+                $song->setUpdatedAt(new \DateTime('now'));
+            }catch (Exception $e){
+                $apiUtils->errorResponse($e, "No se pudieron insertar los datos a la canción");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+            }
+
+            // Check errors, if there is any error return it
+            try {
+                $apiUtils->validateData($validator, $song);
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+            }
+
+            // Upload obj to the database
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, "No se pudo editar la canción en la bbdd");
+
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+
+            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$song);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+        } else {
+            $apiUtils->setFormErrors($errors);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo subir la imagen",
+                "errors" => $apiUtils->getFormErrors(),
+                "results" => $song
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
+    }
+
+    /**
+     * @Route("/upload-song/{id}", name="api_song_upload_song", methods={"POST"})
+     * @param Request $request
+     * @param Song $song
+     * @param ApiUtils $apiUtils
+     * @param CustomFileUploader $fileUploader
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function uploadSong(Request $request, Song $song, ApiUtils $apiUtils, CustomFileUploader $fileUploader,
+                              ValidatorInterface $validator): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Get image
+        $song_file = $_FILES['song'];
+
+        // check if not empty
+        if (!array_key_exists('song',$_FILES)) {
+            $apiUtils->setFormErrors(["not_found"=>"No se ha enviado ninguna canción"]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se ha enviado ninguna canción",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse([$_FILES,$song], Response::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
+        }
+
+        // Upload image
+        $errors = $fileUploader->uploadSong($song_file,CustomFileUploader::SONG, $song->getSongFileName());
+
+        // if could upload image
+
+        // send response
+        if (count($errors) === 0){
+            try {
+                $song->setSongFileName($fileUploader->getFileName());
+                $song->setUpdatedAt(new \DateTime('now'));
+            }catch (Exception $e){
+                $apiUtils->errorResponse($e, "No se pudieron insertar los datos a la canción");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+            }
+
+            // Check errors, if there is any error return it
+            try {
+                $apiUtils->validateData($validator, $song);
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+            }
+
+            // Upload obj to the database
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, "No se pudo editar la canción en la bbdd");
+
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+
+            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$song);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+        } else {
+            $apiUtils->setFormErrors($errors);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo subir la imagen",
+                "errors" => $apiUtils->getFormErrors(),
+                "results" => $song
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
     }
 }

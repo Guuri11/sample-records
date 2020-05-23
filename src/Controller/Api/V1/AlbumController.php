@@ -4,6 +4,7 @@ namespace App\Controller\Api\V1;
 
 use App\Repository\ArtistRepository;
 use App\Service\ApiUtils;
+use App\Service\CustomFileUploader;
 use DateTime;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -97,14 +98,8 @@ class AlbumController extends AbstractController
             $album->setArtist($artistRepository->find($data['artist']));
             $album->setPrice($data['price']);
             $album->setDuration($data['duration']);
-            if ($data['imageFile'] !== "") {
-                $album->setImageFile(new File($data['imageFile']));
-                $album->setImageName($data['imageName']);
-                $album->setImageSize($data['imageSize']);
-            }else {
-                $album->setImageName('artist-default.jpg');
-                $album->setImageSize(234);
-            }
+            $album->setImageName('artist-default.jpg');
+            $album->setImageSize(234);
             $album->setReleasedAt(new DateTime($data['released_at']));
             $album->setUpdatedAt(new DateTime());
             $album->setCreatedAt(new DateTime());
@@ -167,11 +162,6 @@ class AlbumController extends AbstractController
                 $album->setPrice($data['price']);
             if ($data['duration'] !== "")
                 $album->setDuration($data['duration']);
-            if ($data['imageFile'] !== "") {
-                $album->setImageFile(new File($data['imageFile']));
-                $album->setImageName($data['imageName']);
-                $album->setImageSize($data['imageSize']);
-            }
             if ($data['released_at'] !== "")
                 $album->setReleasedAt(new DateTime($data['released_at']));
             $album->setUpdatedAt(new DateTime());
@@ -199,7 +189,7 @@ class AlbumController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("¡Album editado!");
+        $apiUtils->successResponse("¡Album editado!",$album);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
@@ -231,5 +221,81 @@ class AlbumController extends AbstractController
 
         $apiUtils->successResponse("¡Album borrado!");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+    }
+
+    /**
+     * @Route("/upload-img/{id}", name="api_album_upload_image", methods={"POST"})
+     * @param Request $request
+     * @param Album $album
+     * @param ApiUtils $apiUtils
+     * @param CustomFileUploader $fileUploader
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    public function uploadFile(Request $request, Album $album, ApiUtils $apiUtils, CustomFileUploader $fileUploader,
+                                ValidatorInterface $validator): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Get image
+        $img = $_FILES['img'];
+
+        // check if not empty
+        if (!array_key_exists('img',$_FILES)) {
+            $apiUtils->setFormErrors(["not_found"=>"No se ha enviado ninguna foto"]);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se ha enviado ninguna imagen",
+                "errors" => $apiUtils->getFormErrors()
+            ]);
+            return new JsonResponse([$_FILES,$img], Response::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
+        }
+
+        // Upload image
+        $errors = $fileUploader->uploadImage($img,CustomFileUploader::ALBUM, $album->getImageName());
+
+        // if could upload image
+
+        // send response
+        if (count($errors) === 0){
+            try {
+                $album->setImageName($fileUploader->getFileName());
+                $album->setUpdatedAt(new \DateTime('now'));
+            }catch (Exception $e){
+                $apiUtils->errorResponse($e, "No se pudieron insertar los datos al album");
+                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+            }
+
+            // Check errors, if there is any error return it
+            try {
+                $apiUtils->validateData($validator, $album);
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+            }
+
+            // Upload obj to the database
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+            } catch (Exception $e) {
+                $apiUtils->errorResponse($e, "No se pudo editar el album en la bbdd");
+
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+
+            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$album);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+        } else {
+            $apiUtils->setFormErrors($errors);
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "No se pudo subir la imagen",
+                "errors" => $apiUtils->getFormErrors(),
+                "results" => $album
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
+
     }
 }

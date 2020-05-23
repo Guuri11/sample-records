@@ -155,6 +155,13 @@ class Blog extends Component {
                                                         :
                                                         null
                                                 }
+                                                {
+                                                    // Delete message
+                                                    this.props.location.state !== undefined ?
+                                                        <h6 className={"text-info"}>{this.props.location.state.delete_success}</h6>
+                                                        :
+                                                        null
+                                                }
                                             </div>
                                             <div className="card-body">
                                                 <div className="table-responsive">
@@ -245,8 +252,8 @@ class Blog extends Component {
                                                                         <td>{item.description}</td>
                                                                         <td>{item.artist ? <Link to={`/admin/artistas/${item.artist.alias}`}>{item.artist.alias}</Link> : ''}</td>
                                                                         <td>
-                                                                            {item.tags.map(tag => {
-                                                                                return <Link to={`/admin/tags/${tag.id}`}>{tag.tag} </Link>
+                                                                            {item.tags.map((tag,idx) => {
+                                                                                return <Link key={idx} to={`/admin/tags/${tag.id}`}>{tag.tag} </Link>
                                                                             })}
                                                                         </td>
                                                                         <td>
