@@ -94,13 +94,18 @@ class AlbumController extends AbstractController
 
         // Process data
         try {
-            $album->setName($data['name']);
-            $album->setArtist($artistRepository->find($data['artist']));
-            $album->setPrice($data['price']);
-            $album->setDuration($data['duration']);
-            $album->setImageName('artist-default.jpg');
+            if ($data['name'] !== "")
+                $album->setName($data['name']);
+            if ($data['artist'] !== "")
+                $album->setArtist($artistRepository->find($data['artist']));
+            if ($data['price'] !== "")
+                $album->setPrice($data['price']);
+            if ($data['duration'] !== "")
+                $album->setDuration($data['duration']);
+            if ($data['released_at'] !== "")
+                $album->setReleasedAt(new DateTime($data['released_at']));
+            $album->setImageName('default-album.png');
             $album->setImageSize(234);
-            $album->setReleasedAt(new DateTime($data['released_at']));
             $album->setUpdatedAt(new DateTime());
             $album->setCreatedAt(new DateTime());
         } catch (Exception $e) {

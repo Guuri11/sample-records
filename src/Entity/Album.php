@@ -27,7 +27,7 @@ class Album implements \JsonSerializable
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Nombre requerido")
      * @Assert\Regex(
-     *     pattern="/^[a-zA-Z0-9 ]*$/",
+     *     pattern="/^[a-zA-Z0-9\s ]*$/",
      *     message="El nombre del album solo debería contener letras"
      * )
      */

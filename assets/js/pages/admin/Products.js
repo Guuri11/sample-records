@@ -5,6 +5,7 @@ import axios from "axios";
 import {Link, Redirect} from "react-router-dom";
 import Header from "../../components/admin/Header";
 import Pagination from "react-js-pagination";
+import Loading from "../../components/public/Loading";
 
 class Products extends Component {
 
@@ -16,15 +17,24 @@ class Products extends Component {
     state = {
         loading: true,
         items: [],
+        categories: [],
+        artists: [],
         total_items: [],
         active_page : 1,
         items_per_page: 10,
-        message: ''
+        message: this.props.location.state ? this.props.location.state.delete_success: '',
+        section: "index",
+        submited: false,
+        success: false,
+        sending: false,
+        errors: {}
     }
 
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {
+            this.getArtists();
+            this.getCategories();
             this.getProducts();
         }
     }
@@ -34,15 +44,39 @@ class Products extends Component {
 
     getProducts = () => {
         axios.get('/api/v1.0/product').then(res => {
-            console.log(res.data);
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
                 <Redirect to={'error404'}/>
             }
 
-        }).catch(e => console.log(e.response))
+        }).catch(e => {})
     }
+
+    getArtists = () =>  {
+        axios.get(`/api/v1.0/artist`).then(res => {
+            if (res.data.success === true) {
+                const artists = res.data.results;
+
+                this.setState({artists: artists, loading: false});
+            }
+        }).catch(error => {
+            this.props.history.push('/admin/error404');
+        });
+    }
+
+    getCategories = () =>  {
+        axios.get(`/api/v1.0/category`).then(res => {
+            if (res.data.success === true) {
+                const categories = res.data.results;
+
+                this.setState({categories: categories, loading: false});
+            }
+        }).catch(error => {
+            this.props.history.push('/admin/error404');
+        });
+    }
+
 
     // Filter by search
     handleSearch = (e) => {
@@ -122,14 +156,462 @@ class Products extends Component {
         }
     }
 
+    _renderIndex = () => {
 
-    render() {
-        const { active_page, items_per_page, items, loading, message} = this.state;
+        const { active_page, items_per_page, items, message} = this.state;
 
         // Logic for pagination
         const indexLastEvent = active_page * items_per_page;
         const indexFirstEvent = indexLastEvent - items_per_page;
         const currentItems = items.slice(indexFirstEvent, indexLastEvent);
+
+
+        return (
+            <div className={"row"}>
+                <div className="card shadow mb-4 w-100">
+                    <div className="card-header py-3">
+                        <h5 className="m-0 font-weight-bold text-sr">Todos los productos</h5>
+                        {
+                            message !== '' ?
+                                <h6 className={"text-info"}>{message}</h6>
+                                :
+                                null
+                        }
+                    </div>
+                    <div className="card-body">
+                        <div className="table-responsive">
+                            <div className="row">
+                                <div className="col-sm-12 col-md-3">
+                                    <div className="quantity_items" id="quantity_items">
+                                        <label>Mostrar
+                                            <select name="quantity_items" aria-controls="dataTable"
+                                                    className="custom-select custom-select-sm form-control form-control-sm"
+                                                    onChange={this.handleItemsPerPage}>
+                                                <option value={5}>5</option>
+                                                <option value={10}>10</option>
+                                                <option value={15}>15</option>
+                                                <option value={20}>20</option>
+                                            </select> productos
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="col-sm-12 col-md-3">
+                                    <div className="items_order" id="items_order">
+                                        <label>Ordenar por
+                                            <select name="items_order" aria-controls="dataTable"
+                                                    className="custom-select custom-select-sm form-control form-control-sm">
+                                                <option value="newest" onClick={this.orderByNewest}>Más nuevos</option>
+                                                <option value="oldest" onClick={this.orderByOldest}>Más antiguos</option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="col-sm-12 col-md-3">
+                                    <div id="dataTable_filter" className="dataTables_filter">
+                                        <label>Buscar:<input type="search"
+                                                             className="form-control form-control-sm"
+                                                             placeholder=""
+                                                             aria-controls="dataTable"
+                                                             onChange={this.handleSearch}/></label>
+                                    </div>
+                                </div>
+                                <div className="col-sm-12 col-md-3">
+                                    <button className="btn btn-primary btn-success mt-3"
+                                            onClick={() => this.setState({section:"new"}) }>Crear producto</button>
+                                </div>
+                            </div>
+                            <table className="table table-bordered" id="dataTable" width={100}
+                                   cellSpacing="0">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Descuento</th>
+                                    <th>Talla</th>
+                                    <th>Stock</th>
+                                    <th>Disponible</th>
+                                    <th>Descripcion</th>
+                                    <th>Artista</th>
+                                    <th>Categoria/s</th>
+                                    <th>Imagen</th>
+                                    <th>Creado el dia</th>
+                                    <th>Actualizado el dia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                                </thead>
+                                <tfoot>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Descuento</th>
+                                    <th>Talla</th>
+                                    <th>Stock</th>
+                                    <th>Disponible</th>
+                                    <th>Descripcion</th>
+                                    <th>Artista</th>
+                                    <th>Categoria/s</th>
+                                    <th>Imagen</th>
+                                    <th>Creado el dia</th>
+                                    <th>Actualizado el dia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                                </tfoot>
+                                <tbody>
+                                {
+                                    currentItems.map( ( item,idx ) =>{
+                                        const created_at_day = new Date(item.created_at.date).getDate();
+                                        const created_at_month = new Date(item.created_at.date).getMonth();
+                                        const created_at_year = new Date(item.created_at.date).getFullYear();
+
+                                        const updated_at_day = new Date(item.updated_at.date).getDate();
+                                        const updated_at_month = new Date(item.updated_at.date).getMonth();
+                                        const updated_at_year = new Date(item.updated_at.date).getFullYear();
+
+                                        return (
+                                            <tr key={idx} className={"row-sr"}>
+                                                <td>{idx+1+items_per_page*(active_page-1)}</td>
+                                                <td>{item.name}</td>
+                                                <td>{item.price}</td>
+                                                <td>{item.discount !== null ? item.discount:''}</td>
+                                                <td>{item.size !== null ? item.size:''}</td>
+                                                <td>{item.stock}</td>
+                                                <td>{item.avaiable ? "Sí":"No"}</td>
+                                                <td>{item.description}</td>
+                                                <td>{item.artist !== null ?<Link to={`/admin/artistas/${item.artist.id}`}>{item.artist.alias} </Link>:'' }</td>
+                                                <td>
+                                                    {item.category !== null ?<Link to={`/admin/productos/categorias/${item.category.id}`}>{item.category.name} </Link>:'' }
+                                                </td>
+                                                <td><img src={item.img_name} alt={"No se ha encontrado la imagen"}
+                                                         className="img-thumbnail" width={300}/></td>
+                                                <td>{created_at_day+"-"+created_at_month+"-"+created_at_year}</td>
+                                                <td>{updated_at_day+"-"+updated_at_month+"-"+updated_at_year}</td>
+
+                                                <td>
+                                                    <Link to={`/admin/productos/${item.id}`} className={"font-weight-bolder"}>
+                                                        <button className="btn btn-primary d-block mb-2">Ver</button>
+                                                    </Link>
+                                                    <button className={"btn btn-danger"}
+                                                            onClick={this.handleDelete.bind(this,item.id)}>Borrar</button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
+                                }
+                                </tbody>
+                            </table>
+                            <div className={"row"}>
+                                <Pagination
+                                    activePage={active_page}
+                                    itemsCountPerPage={items_per_page}
+                                    totalItemsCount={items.length}
+                                    pageRangeDisplayed={4}
+                                    onChange={this.handlePageChange.bind(this)}
+                                    itemClass="page-item"
+                                    linkClass="page-link"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    _renderNew = () => {
+        const { artists, categories, errors } = this.state;
+
+        return (
+            <div className={"row"}>
+                <div className="card shadow mb-4 w-100">
+                    <div className="card-header py-3">
+                        <h5 className="m-0 font-weight-bold text-sr">Crear artista</h5>
+                        {
+                            errors.hasOwnProperty('cant_delete') ?
+                                <h6 className={"text-danger"}>{errors.cant_delete}</h6> : null
+                        }
+                    </div>
+                    <div className="card-body">
+                        <div className="row">
+                            <div className="col-md-12">
+                                {
+                                    this.state.sending ?
+                                        <div>
+                                            <h5 className="text-info">Enviando...</h5>
+                                            <Loading/>
+                                        </div>
+                                        :
+                                        null
+                                }
+                                {
+                                    this.state.submited ?
+                                        this.state.success ?
+                                            null
+                                            :
+                                            <p className={"text-danger"}>¡No se pudo crear!</p>
+                                        :
+                                        null
+                                }
+                            </div>
+
+                            <div className="col-md-12">
+                                <form onSubmit={this.handleCreate}>
+                                    <div className="form-group row">
+                                        <label htmlFor="name" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Nombre
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('name') ?
+                                                <p className={"text-danger"}>{this.state.errors.name}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <input id="name" name="name"
+                                                   className="form-control here"
+                                                   type="text"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="price" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Precio
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('price') ?
+                                                <p className={"text-danger"}>{this.state.errors.price}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <input id="price" name="price"
+                                                   className="form-control here"
+                                                   type="number" step="0.01"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="discount" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Descuento
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('discount') ?
+                                                <p className={"text-danger"}>{this.state.errors.discount}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <input id="discount" name="discount"
+                                                   className="form-control here"
+                                                   type="number" step="0.01"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="size" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Talla
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('sizze') ?
+                                                <p className={"text-danger"}>{this.state.errors.size}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <input id="size" name="size"
+                                                   className="form-control here"
+                                                   type="text"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="stock" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Stock
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('stock') ?
+                                                <p className={"text-danger"}>{this.state.errors.stock}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <input id="stock" name="stock"
+                                                   className="form-control here"
+                                                   type="number" step="0.01"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="available" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Disponible
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('avaiable') ?
+                                                <p className={"text-danger"}>{this.state.errors.avaiable}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <select id={"available"} name={"available"}>
+                                                <option value={"1"}>Sí</option>
+                                                <option value={"0"}>No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="description" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Descripción
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('description') ?
+                                                <p className={"text-danger"}>{this.state.errors.description}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <textarea cols={80} rows={10} name={"description"} id={"description"} />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="artist" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Artista
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('artist') ?
+                                                <p className={"text-danger"}>{this.state.errors.artist}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <select name={"artist"} id={"artist"} defaultValue={''}>
+                                                <option value={''}/>
+                                                {
+                                                    artists.map( (artist, idx) => {
+                                                        return (
+                                                            <option key={idx} value={artist.id}>{artist.alias}</option>
+                                                        )
+                                                    } )
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="category" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Categoria
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('category') ?
+                                                <p className={"text-danger"}>{this.state.errors.category}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <select name={"category"} id={"category"}>
+                                                {
+                                                    categories.map( (category, idx) => {
+                                                        return (
+                                                            <option key={idx} value={category.id}>{category.name}</option>
+                                                        )
+                                                    } )
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group row">
+                                        <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Imagen
+                                        </label>
+                                        {
+                                            this.state.errors.hasOwnProperty('cant_upload_img') ?
+                                                <p className={"text-danger"}>{this.state.errors.cant_upload_img}</p> : null
+                                        }
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <input id="img" name="img"
+                                                   className="form-control here"
+                                                   type="file"/>
+                                        </div>
+                                    </div>
+
+
+                                    <div className="form-group row">
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <button name="submit" type="submit"
+                                                    className="btn btn-success">Actualizar
+                                            </button>
+                                            <button className="btn btn-primary ml-2"
+                                                    onClick={() => this.setState({section:"index"})}>Volver atrás
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        )
+    }
+
+    handleCreate = (e) => {
+
+        e.preventDefault();
+
+        const name = document.querySelector('#name').value;
+        const price = document.querySelector('#price').value;
+        const discount = document.querySelector('#discount').value;
+        const size = document.querySelector('#size').value;
+        const stock = document.querySelector('#stock').value;
+        const available = document.querySelector('#available').value;
+        const description = document.querySelector('#description').value;
+        const artist = document.querySelector('#artist').value;
+        const category = document.querySelector('#category').value;
+        const img = document.querySelector('#img').files[0];
+
+        const { total_items } = this.state;
+
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name, artist: artist, price: price, discount: discount, size: size, stock: stock,
+                avaiable: available, description: description, category: category})
+        };
+
+        this.setState( { sending: true } )
+
+        fetch('/api/v1.0/product/new', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success){
+                    let product = data.results;
+                    // If image is submited too send it, if not update state
+                    if (img !== undefined){
+                        const formData = new FormData();
+                        formData.append('img',img);
+
+                        // Make the API call
+                        axios.post(`/api/v1.0/product/upload-img/${product.id}`, formData, {})
+                            .then(res=> {
+                                if (res.data.success){
+                                    // Get new product
+                                    product = res.data.results;
+                                    // Update albums list
+                                    total_items.unshift(product);
+
+                                    this.setState({ total_items:total_items, items: total_items, submited: true,
+                                        message:"¡Producto creado!",success: true,section: "index", sending: false })
+                                }else
+                                    this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
+                            } )
+                            .catch(e=>{
+                                let {errors} = this.state;
+                                errors.cant_upload_img = "No se ha podido subir la imagen";
+                                this.setState({ success: false, errors: errors, submited: true, sending: false }) })
+
+                    }else{
+                        // Get new product
+                        product = data.results;
+                        // Update product list
+                        total_items.unshift(product);
+                        this.setState({ total_items:total_items, items: total_items, submited: true,
+                            message:"¡Producto creado!",success: true,section: "index", sending: false})
+                    }
+                }else
+                    this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            }).catch(e=>{});
+
+    }
+
+
+    render() {
+        const {loading, section} = this.state;
 
         return(
             <div id="wrapper">
@@ -145,160 +627,10 @@ class Products extends Component {
                                 loading ?
                                     null
                                     :
-                                    <div className={"row"}>
-                                        <div className="card shadow mb-4 w-100">
-                                            <div className="card-header py-3">
-                                                <h5 className="m-0 font-weight-bold text-sr">Todos los productos</h5>
-                                                {
-                                                    message !== '' ?
-                                                        <h6 className={"text-info"}>{message}</h6>
-                                                        :
-                                                        null
-                                                }
-                                                {
-                                                    // Delete message
-                                                    this.props.location.state !== undefined ?
-                                                        <h6 className={"text-info"}>{this.props.location.state.delete_success}</h6>
-                                                        :
-                                                        null
-                                                }
-                                            </div>
-                                            <div className="card-body">
-                                                <div className="table-responsive">
-                                                    <div className="row">
-                                                        <div className="col-sm-12 col-md-4">
-                                                            <div className="quantity_items" id="quantity_items">
-                                                                <label>Mostrar
-                                                                    <select name="quantity_items" aria-controls="dataTable"
-                                                                            className="custom-select custom-select-sm form-control form-control-sm"
-                                                                            onChange={this.handleItemsPerPage}>
-                                                                        <option value={5}>5</option>
-                                                                        <option value={10}>10</option>
-                                                                        <option value={15}>15</option>
-                                                                        <option value={20}>20</option>
-                                                                    </select> productos
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-sm-12 col-md-4">
-                                                            <div className="items_order" id="items_order">
-                                                                <label>Ordenar por
-                                                                    <select name="items_order" aria-controls="dataTable"
-                                                                            className="custom-select custom-select-sm form-control form-control-sm">
-                                                                        <option value="newest" onClick={this.orderByNewest}>Más nuevos</option>
-                                                                        <option value="oldest" onClick={this.orderByOldest}>Más antiguos</option>
-                                                                    </select>
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-sm-12 col-md-4">
-                                                            <div id="dataTable_filter" className="dataTables_filter">
-                                                                <label>Buscar:<input type="search"
-                                                                                     className="form-control form-control-sm"
-                                                                                     placeholder=""
-                                                                                     aria-controls="dataTable"
-                                                                                     onChange={this.handleSearch}/></label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <table className="table table-bordered" id="dataTable" width={100}
-                                                           cellSpacing="0">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Nombre</th>
-                                                            <th>Precio</th>
-                                                            <th>Descuento</th>
-                                                            <th>Talla</th>
-                                                            <th>Stock</th>
-                                                            <th>Disponible</th>
-                                                            <th>Descripcion</th>
-                                                            <th>Artista</th>
-                                                            <th>Categoria/s</th>
-                                                            <th>Imagen</th>
-                                                            <th>Creado el dia</th>
-                                                            <th>Actualizado el dia</th>
-                                                            <th>Acciones</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tfoot>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Nombre</th>
-                                                            <th>Precio</th>
-                                                            <th>Descuento</th>
-                                                            <th>Talla</th>
-                                                            <th>Stock</th>
-                                                            <th>Disponible</th>
-                                                            <th>Descripcion</th>
-                                                            <th>Artista</th>
-                                                            <th>Categoria/s</th>
-                                                            <th>Imagen</th>
-                                                            <th>Creado el dia</th>
-                                                            <th>Actualizado el dia</th>
-                                                            <th>Acciones</th>
-                                                        </tr>
-                                                        </tfoot>
-                                                        <tbody>
-                                                        {
-                                                            currentItems.map( ( item,idx ) =>{
-                                                                const created_at_day = new Date(item.created_at.date).getDate();
-                                                                const created_at_month = new Date(item.created_at.date).getMonth();
-                                                                const created_at_year = new Date(item.created_at.date).getFullYear();
-
-                                                                const updated_at_day = new Date(item.updated_at.date).getDate();
-                                                                const updated_at_month = new Date(item.updated_at.date).getMonth();
-                                                                const updated_at_year = new Date(item.updated_at.date).getFullYear();
-
-                                                                return (
-                                                                    <tr key={idx} className={"row-sr"}>
-                                                                        <td>
-                                                                            <Link to={`/admin/productos/${item.id}`} className={"font-weight-bolder"}>
-                                                                                {idx+1+items_per_page*(active_page-1)}
-                                                                            </Link>
-                                                                        </td>
-                                                                        <td>{item.name}</td>
-                                                                        <td>{item.price}</td>
-                                                                        <td>{item.discount !== null ? item.discount:''}</td>
-                                                                        <td>{item.size !== null ? item.size:''}</td>
-                                                                        <td>{item.stock}</td>
-                                                                        <td>{item.avaiable ? "Sí":"No"}</td>
-                                                                        <td>{item.description}</td>
-                                                                        <td>{item.artist !== null ?<Link to={`/admin/artistas/${item.artist.id}`}>{item.artist.alias} </Link>:'' }</td>
-                                                                        <td>
-                                                                            {item.category !== null ?<Link to={`/admin/productos/categorias/${item.category.id}`}>{item.category.name} </Link>:'' }
-                                                                        </td>
-                                                                        <td><img src={item.img_name} alt={"No se ha encontrado la imagen"}
-                                                                                 className="img-thumbnail" width={100}/></td>
-                                                                        <td>{created_at_day+"-"+created_at_month+"-"+created_at_year}</td>
-                                                                        <td>{updated_at_day+"-"+updated_at_month+"-"+updated_at_year}</td>
-
-                                                                        <td>
-                                                                            <button className="btn btn-primary d-block mb-2">Editar</button>
-                                                                            <button className={"btn btn-danger"}
-                                                                                onClick={this.handleDelete.bind(this,item.id)}>Borrar</button>
-                                                                        </td>
-                                                                    </tr>
-                                                                )
-                                                            })
-                                                        }
-                                                        </tbody>
-                                                    </table>
-                                                    <div className={"row"}>
-                                                        <Pagination
-                                                            activePage={active_page}
-                                                            itemsCountPerPage={items_per_page}
-                                                            totalItemsCount={items.length}
-                                                            pageRangeDisplayed={4}
-                                                            onChange={this.handlePageChange.bind(this)}
-                                                            itemClass="page-item"
-                                                            linkClass="page-link"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    section === "index" ?
+                                        this._renderIndex()
+                                        :
+                                        section === "new" ? this._renderNew() : null
                             }
                         </div>
                     </div>

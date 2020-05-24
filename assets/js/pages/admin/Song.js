@@ -22,7 +22,7 @@ class Song extends Component {
         submited: false,
         success: false,
         sending: false,
-        errors: {},
+        errors: {}
     }
 
     componentDidMount() {
@@ -292,7 +292,7 @@ class Song extends Component {
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="duration" name="duration" defaultValue={song.duration}
                                        className="form-control here"
-                                       type="number"/>
+                                       type="number" step="0.01"/>
                             </div>
                         </div>
 
@@ -333,6 +333,10 @@ class Song extends Component {
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_song') ?
                                     <p className={"text-danger"}>{this.state.errors.cant_upload_song}</p> : null
+                            }
+                            {
+                                this.state.errors.hasOwnProperty('song') ?
+                                    <p className={"text-danger"}>{this.state.errors.song}</p> : null
                             }
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="song" name="song"
@@ -471,7 +475,6 @@ class Song extends Component {
                         this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                 } )
                 .catch(e=>{
-                    console.log(e.response)
                     let {errors} = this.state;
                     errors.cant_upload_song = "No se ha podido subir la canción";
                     this.setState({ success: false, errors: errors, submited: true, sending: false }) })

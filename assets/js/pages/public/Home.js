@@ -44,14 +44,14 @@ class Home extends Component{
         const day = now.getDay();
         const now_formated = year+"-"+month+"-"+day;
 
-        axios.get(`/api/v1.0/search/last?last=2?until${now_formated}`).then(res => {
+        axios.get(`/api/v1.0/search/last?last=2&until=${now_formated}`).then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { last_two: res.data.results } );
             } else {
                 <Redirect to={'error404'}/>
             }
 
-        })
+        }).catch(e=>{})
     }
 
 

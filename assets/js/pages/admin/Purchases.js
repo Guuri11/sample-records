@@ -34,14 +34,13 @@ class Purchases extends Component {
 
     getPurchases = () => {
         axios.get('/api/v1.0/purchase').then(res => {
-            console.log(res.data);
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
                 <Redirect to={'error404'}/>
             }
 
-        }).catch(e => console.log(e.response))
+        }).catch(e => {})
     }
 
     // Filter by search
@@ -259,11 +258,7 @@ class Purchases extends Component {
 
                                                                 return (
                                                                     <tr key={idx} className={"row-sr"}>
-                                                                        <td>
-                                                                            <Link to={`/admin/ventas/${item.id}`} className={"font-weight-bolder"}>
-                                                                                {idx+1+items_per_page*(active_page-1)}
-                                                                            </Link>
-                                                                        </td>
+                                                                        <td>{idx+1+items_per_page*(active_page-1)}</td>
                                                                         <td>{item.serial_number}</td>
                                                                         <td key={idx}>{day+"-"+month+"-"+year}</td>
                                                                         <td>{item.time !== null ? item.time:''}</td>
@@ -281,7 +276,9 @@ class Purchases extends Component {
                                                                         <td>{updated_at_day+"-"+updated_at_month+"-"+updated_at_year}</td>
 
                                                                         <td>
-                                                                            <button className="btn btn-primary d-block mb-2">Editar</button>
+                                                                            <Link to={`/admin/ventas/${item.id}`} className={"font-weight-bolder"}>
+                                                                                <button className="btn btn-primary d-block mb-2">Editar</button>
+                                                                            </Link>
                                                                             <button className={"btn btn-danger"}
                                                                                 onClick={this.handleDelete.bind(this,item.id)}>Borrar</button>
                                                                         </td>

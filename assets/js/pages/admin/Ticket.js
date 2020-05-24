@@ -191,7 +191,7 @@ class Ticket extends Component {
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="price" name="price" defaultValue={ticket.price}
                                        className="form-control here"
-                                       type="number"/>
+                                       type="number" step="0.01"/>
                             </div>
                         </div>
 

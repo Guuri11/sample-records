@@ -106,7 +106,8 @@ class CommentController extends AbstractController
 
 
         try {
-            $comment->setComment($data['comment']);
+            if ($data['comment'] !== "")
+                $comment->setComment($data['comment']);
             $comment->setUser($userRepository->findOneBy(["email"=>$data['user']]));
             if (isset($data['event']))
                 $comment->setEvent($eventRepository->find($data['event']));

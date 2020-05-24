@@ -79,8 +79,8 @@ class SearchController extends AbstractController
     public function getLastTwo(Request $request, ApiUtils $apiUtils, AlbumRepository $albumRepository, SongRepository $songRepository,
                                 EventRepository $eventRepository, PostRepository $postRepository) : JsonResponse
     {
-        // Get request data
-        $apiUtils->getContent($request);
+        // Get params
+        $apiUtils->getRequestParams($request);
 
         // Sanitize data
         $apiUtils->setParameters($apiUtils->sanitizeData($apiUtils->getParameters()));
@@ -103,7 +103,7 @@ class SearchController extends AbstractController
             return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
         }
 
-        $apiUtils->successResponse("OK",$results);
+        $apiUtils->successResponse("OK",$resultsQuery);
         return new JsonResponse($apiUtils->getResponse(),Response::HTTP_OK);
     }
 }

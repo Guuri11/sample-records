@@ -112,7 +112,7 @@ class UserController extends AbstractController
             $user->setPassword(
                 $passwordEncoder->encodePassword(
                     $user,
-                    $data['new_password']
+                    $data['password']
                 )
             );
             $user->setRoles([$data['roles']]);

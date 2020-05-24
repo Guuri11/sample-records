@@ -19,7 +19,7 @@ class Comments extends Component {
         total_items: [],
         active_page : 1,
         items_per_page: 10,
-        message: ''
+        message: '',
     }
 
     componentDidMount() {
@@ -34,14 +34,13 @@ class Comments extends Component {
 
     getComments = () => {
         axios.get('/api/v1.0/comment').then(res => {
-            console.log(res.data);
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
                 <Redirect to={'error404'}/>
             }
 
-        }).catch(e => console.log(e.response))
+        }).catch(e => {})
     }
 
     // Filter by search
@@ -52,7 +51,7 @@ class Comments extends Component {
 
             // Filter artists searching in his name and artist alias
             const search_results = this.state.items.filter( (comment) => {
-                let comment_slug = comment.comment + comment.user.email;
+                let comment_slug = comment.comment ;
                 comment_slug = comment.product !== null ? comment_slug + comment.product.name : comment_slug;
                 comment_slug = comment.event !== null ? comment_slug + comment.event.name : comment_slug;
                 comment_slug = comment.purchase !== null ? comment_slug + comment.purchase.serial_number : comment_slug;
@@ -245,11 +244,7 @@ class Comments extends Component {
 
                                                                 return (
                                                                     <tr key={idx} className={"row-sr"}>
-                                                                        <td>
-                                                                            <Link to={`/admin/comentarios/${item.id}`} className={"font-weight-bolder"}>
-                                                                                {idx+1+items_per_page*(active_page-1)}
-                                                                            </Link>
-                                                                        </td>
+                                                                        <td>{idx+1+items_per_page*(active_page-1)}</td>
                                                                         <td>{item.comment}</td>
                                                                         <td>{item.product !== null ?
                                                                             <Link to={`/admin/productos/${item.product.id}`}>{item.product.name}</Link> : ''}</td>
@@ -263,9 +258,11 @@ class Comments extends Component {
                                                                         <td>{updated_at_day+"-"+updated_at_month+"-"+updated_at_year}</td>
 
                                                                         <td>
-                                                                            <button className="btn btn-primary d-block mb-2">Editar</button>
+                                                                            <Link to={`/admin/comentarios/${item.id}`} className={"font-weight-bolder"}>
+                                                                                <button className="btn btn-primary d-block mb-2">Ver</button>
+                                                                            </Link>
                                                                             <button className={"btn btn-danger"}
-                                                                                onClick={this.handleDelete.bind(this,item.id)}>Borrar</button>
+                                                                            onClick={this.handleDelete.bind(this,item.id)}>Borrar</button>
                                                                         </td>
                                                                     </tr>
                                                                 )

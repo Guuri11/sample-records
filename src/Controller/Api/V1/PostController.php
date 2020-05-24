@@ -168,7 +168,8 @@ class PostController extends AbstractController
         try {
             $post->setTitle($data['title']);
             $post->setDescription($data['description']);
-            $post->setArtist($artistRepository->find($data['artist']));
+            if($data['artist'] !== "")
+                $post->setArtist($artistRepository->find($data['artist']));
             if($data['tag'] !== ""){
                 $post->getTag()->clear();
                 foreach ($data['tag'] as $tag) {

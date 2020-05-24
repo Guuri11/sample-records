@@ -29,25 +29,26 @@ class SongRepository extends ServiceEntityRepository
         $result = $this->createQueryBuilder('s');
         if (key_exists("search",$params)) {
             $result->where('s.name LIKE :search')
-                ->setParameter('search', '%'.$params['search'].'%');
+                ->setParameter('search', '%'.$params["search"].'%');
         }
         if (key_exists("first",$params)) {
             $result->andWhere('s.id >= :id_song')
-                ->setParameter('id_song',$params['first']);
+                ->setParameter('id_song',$params["first"]);
         }
+
         if (key_exists("artist",$params)) {
             $result->andWhere('s.artist = :id_artist')
-                ->setParameter('id_artist',$params['artist']);
+                ->setParameter('id_artist',$params["artist"]);
         }
         if (key_exists("album",$params)) {
             $result->andWhere('s.album = :id_album')
-                ->setParameter('id_album',$params['album']);
+                ->setParameter('id_album',$params["album"]);
         }
         if (key_exists("last",$params)) {
-            $result->setMaxResults($params['last']);
+            $result->setMaxResults($params["last"]);
         }
         if (key_exists("ord",$params)) {
-            $result->orderBy('s.released_at', $params['ord']);
+            $result->orderBy('s.released_at', $params["ord"]);
         }
         if (count($result->getQuery()->getResult()) > 0 )
             return $result->getQuery()->getResult();

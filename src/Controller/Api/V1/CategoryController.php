@@ -147,7 +147,8 @@ class CategoryController extends AbstractController
 
         // Process data
         try {
-            $category->setName($data['name']);
+            if ($data['name'] !== "")
+                $category->setName($data['name']);
             $category->setUpdatedAt(new \DateTime());
         }catch (Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la categoria", $category);

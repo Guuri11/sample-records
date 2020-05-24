@@ -115,7 +115,7 @@ class CustomFileUploader
         if ($this->validateAudioExtension($extension)){
             if (move_uploaded_file($song['tmp_name'],$song_route)){
                 // delete old song unless is the default one
-                if ($old_song !== null)
+                if ($old_song !== "song-default.mp3")
                     unlink($directory.basename($old_song));
                 return [];
             }
@@ -154,7 +154,8 @@ class CustomFileUploader
                 // delete old image unless is the default one
                 if ($old_img !== null && $old_img !== "user-default.png" && $old_img !== "default-album.png"
                 && $old_img !== "artist-default.png" && $old_img !== "default-event.png"
-                    && $old_img !== "product-default.png" && $old_img !== "song-default.png" && $old_img !== "header-default.jpg")
+                    && $old_img !== "product-default.png" && $old_img !== "song-default.png" && $old_img !== "header-default.jpg"
+                    && $old_img !== "post-default.png")
 
                     unlink($directory.basename($old_img));
                 return [];

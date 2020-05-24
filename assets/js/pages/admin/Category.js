@@ -21,6 +21,7 @@ class Category extends Component {
         success: false,
         sending: false,
         errors: {},
+
     }
 
     componentDidMount() {

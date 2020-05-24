@@ -293,7 +293,7 @@ class Shop extends Component {
                                             {/* SEARCH */}
                                             <div className="col-12 col-lg-6">
                                                 <input className="form-control form-control-sm mr-3 w-75" type="text"
-                                                       placeholder="Search"
+                                                       placeholder="Buscar"
                                                        aria-label="Search"
                                                         onChange={this.handleSearch}/>
                                             </div>

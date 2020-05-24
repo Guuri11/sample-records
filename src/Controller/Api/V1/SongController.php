@@ -100,10 +100,10 @@ class SongController extends AbstractController
             $song->setArtist($artistRepository->find($data['artist']));
             if ($data['album'] !== "")
                 $song->setAlbum($albumRepository->find($data['album']));
-            $song->setDuration($data['duration']);
-            $song->setSongFileName($data['song_file']);
+            $song->setDuration(intval($data['duration']));
             $song->setVideoSrc($data['video_src']);
             $song->setReleasedAt(new \DateTime($data['released_at']));
+            $song->setSongFileName("song-default.mp3");
             $song->setImageName('song-default.png');
             $song->setImageSize(1234);
             $song->setCreatedAt(new \DateTime());
@@ -168,7 +168,7 @@ class SongController extends AbstractController
             if ($data['album'] !== "")
                 $song->setAlbum($albumRepository->find($data['album']));
             if ($data['duration'] !== "")
-                $song->setDuration($data['duration']);
+                $song->setDuration(intval($data['duration']));
             if ($data['duration'] !== "")
                 $song->setVideoSrc($data['video_src']);
             if ($data['released_at'] !== "")

@@ -48,7 +48,6 @@ class Song implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string")
-     *
      */
     private $songFileName;
 

@@ -228,7 +228,8 @@ class Post extends Component {
                                     <p className={"text-danger"}>{this.state.errors.artist}</p> : null
                             }
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
-                                <select name={"artist"} id={"artist"}>
+                                <select name={"artist"} id={"artist"} defaultValue={''}>
+                                    <option value={''}/>
                                     {
                                         artists.map( (artist, idx) => {
                                             return (

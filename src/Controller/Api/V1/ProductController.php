@@ -174,17 +174,24 @@ class ProductController extends AbstractController
         $data = $apiUtils->getData();
 
         try {
-            $product->setName($data['name']);
-            $product->setCategory($categoryRepository->find($data['category']));
-            $product->setArtist($artistRepository->find($data['artist']));
-            $product->setPrice($data['price']);
+            if($data['name'] !== "")
+                $product->setName($data['name']);
+            if($data['category'] !== "")
+                $product->setCategory($categoryRepository->find($data['category']));
+            if($data['artist'] !== "")
+                $product->setArtist($artistRepository->find($data['artist']));
+            if($data['price'] !== "")
+                $product->setPrice($data['price']);
             if($data['discount'] !== "")
                 $product->setDiscount($data['discount']);
             if($data['size'] !== "")
                 $product->setSize($data['size']);
-            $product->setStock($data['stock']);
-            $product->setAvaiable($data['avaiable']);
-            $product->setDescription($data['description']);
+            if($data['stock'] !== "")
+                $product->setStock($data['stock']);
+            if($data['avaiable'] !== "")
+                $product->setAvaiable($data['avaiable']);
+            if($data['description'] !== "")
+                $product->setDescription($data['description']);
             $product->setUpdatedAt(new \DateTime());
         }catch (\Exception $e){
             $apiUtils->errorResponse($e, "No se pudo actualizar los valores al producto",$product);

@@ -188,7 +188,7 @@ class Artist extends Component {
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('name') ?
-                                    <p className={"text-danger"}>{this.state.errors.tag}</p> : null
+                                    <p className={"text-danger"}>{this.state.errors.name}</p> : null
                             }
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="name" name="name" defaultValue={artist.name}
@@ -273,7 +273,7 @@ class Artist extends Component {
 
                         <div className="form-group row">
                             <label htmlFor="img" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
-                                image
+                                Imagen
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('cant_upload_img') ?

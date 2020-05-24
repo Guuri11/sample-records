@@ -10798,4 +10798,7 @@ body.sidebar-toggled footer.sticky-footer {
 .row-sr td a:hover {
   color: black;
 }
+a {
+  text-decoration: none !important;
+}
 /*# sourceMappingURL=sr-admin.css.map */

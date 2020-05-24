@@ -349,7 +349,7 @@ class Purchase extends Component {
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="final_price" name="final_price" defaultValue={purchase.final_price.toFixed(2)}
                                        className="form-control here"
-                                       type="number"/>
+                                       type="number" step="0.01"/>
                             </div>
                         </div>
 

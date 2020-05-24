@@ -28,24 +28,27 @@ class Artist implements \JsonSerializable
     /**
      * @ORM\Column(type="string", length=20, nullable=true)
      * @Assert\Regex(
-     *     pattern="/^[a-zA-Z ]*$/",
+     *     pattern="/^[a-zA-ZÀ-ú ]*$/",
      *     message="El nombre solo deberia contener letras"
      * )
+     * @Assert\Length(maxMessage="El nombre no puede pasar de los 20 carácteres", max="20")
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=50)
      * @Assert\NotBlank(message="Alias requerido")
+     * @Assert\Length(maxMessage="El nombre no puede pasar de los 50 carácteres", max="50")
      */
     private $alias;
 
     /**
      * @ORM\Column(type="string", length=75, nullable=true)
      * @Assert\Regex(
-     *     pattern="/^[a-zA-Z ]*$/",
+     *     pattern="/^[a-zA-ZÀ-ú ]*$/",
      *     message="El apellido del artista solo deberia contener letras"
      * )
+     * @Assert\Length(maxMessage="El nombre no puede pasar de los 75 carácteres", max="75")
      */
     private $surname;
 
@@ -61,6 +64,7 @@ class Artist implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=750, nullable=true)
+     * @Assert\Length(maxMessage="El nombre no puede pasar de los 750 carácteres", max="750")
      */
     private $bio;
 

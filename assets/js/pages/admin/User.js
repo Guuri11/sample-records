@@ -213,7 +213,7 @@ class User extends Component {
                             </label>
                             {
                                 this.state.errors.hasOwnProperty('name') ?
-                                    <p className={"text-danger"}>{this.state.errors.tag}</p> : null
+                                    <p className={"text-danger"}>{this.state.errors.user}</p> : null
                             }
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="name" name="name" defaultValue={user.name}
@@ -447,14 +447,12 @@ class User extends Component {
             // Make the API call
             axios.post(`/api/v1.0/user/upload-img/${user.id}`, formData, {})
                 .then(res=> {
-                    console.log(e.response)
                     if (res.data.success){
                         this.setState({ user:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                 } )
                 .catch(e=>{
-                    console.log(e.response)
                     let {errors} = this.state;
                     errors.cant_upload_img = "No se ha podido subir la imagen";
                     this.setState({ success: false, errors: errors, submited: true, sending: false }) })
@@ -463,12 +461,11 @@ class User extends Component {
             fetch(`/api/v1.0/user/edit/${user.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     if (data.success){
                         this.setState({ user:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{console.log(e)});
+                }).catch(e=>{});
         }
 
     }

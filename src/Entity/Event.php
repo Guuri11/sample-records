@@ -116,7 +116,7 @@ class Event implements \JsonSerializable
     private $comments;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Ticket", mappedBy="event")
+     * @ORM\OneToMany(targetEntity="App\Entity\Ticket", mappedBy="event", cascade={"remove"})
      */
     private $tickets;
 
@@ -379,7 +379,7 @@ class Event implements \JsonSerializable
             'date'=>$this->getDate(),
             'prefix_serial_number'=>$this->getPrefixSerialNumber(),
             'comments'=>$this->getComments(),
-            'ticket_price'=>$this->getTickets()->first()->getPrice(),
+            'ticket_price'=>$this->getTickets()->first() ? $this->getTickets()->first()->getPrice():0,
             'ticket_quantity'=>$this->getTicketQuantity(),
             'img_name'=>"/img/events/".$this->getImageName(),
             'img_size'=>$this->getImageSize(),

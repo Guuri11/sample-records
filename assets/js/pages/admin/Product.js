@@ -259,7 +259,7 @@ class Product extends Component {
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="price" name="price" defaultValue={product.price}
                                        className="form-control here"
-                                       type="number"/>
+                                       type="number" step="0.01"/>
                             </div>
                         </div>
 
@@ -274,7 +274,7 @@ class Product extends Component {
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="discount" name="discount" defaultValue={product.discount !== null ? product.discount : 0}
                                        className="form-control here"
-                                       type="number"/>
+                                       type="number" step="0.01"/>
                             </div>
                         </div>
 
@@ -304,7 +304,7 @@ class Product extends Component {
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                 <input id="stock" name="stock" defaultValue={product.stock}
                                        className="form-control here"
-                                       type="number"/>
+                                       type="number" step="0.01"/>
                             </div>
                         </div>
 
@@ -368,7 +368,8 @@ class Product extends Component {
                                     <p className={"text-danger"}>{this.state.errors.category}</p> : null
                             }
                             <div className="col-12 col-sm-12 col-md-3 col-lg-3">
-                                <select name={"category"} id={"category"}>
+                                <select name={"category"} id={"category"} defaultValue={''}>
+                                    <option value={''}/>
                                     {
                                         categories.map( (category, idx) => {
                                             return (

@@ -181,12 +181,10 @@ class ArtistController extends AbstractController
         try {
             if ($data['name'] !== "")
                 $artist->setName($data['name']);
-            if ($data['name'] !== "")
+            if ($data['aliass'] !== "")
                 $artist->setAlias($data['alias']);
-            if ($data['surname'] !== "")
-                $artist->setSurname($data['surname']);
-            if ($data['is_from'] !== "")
-                $artist->setIsFrom($data['is_from']);
+            $artist->setSurname($data['surname']);
+            $artist->setIsFrom($data['is_from']);
             $artist->setBio($data['bio']);
             if ($data['birth'] !== "")
                 $artist->setBirth(New DateTime($data['birth']));
