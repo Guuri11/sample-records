@@ -1,10 +1,4 @@
 {
-    "auth0/auth0-php": {
-        "version": "5.7.0"
-    },
-    "auth0/jwt-auth-bundle": {
-        "version": "3.3.1"
-    },
     "beberlei/assert": {
         "version": "v2.9.9"
     },
@@ -110,15 +104,6 @@
     },
     "fgrosse/phpasn1": {
         "version": "v2.1.1"
-    },
-    "firebase/php-jwt": {
-        "version": "v5.2.0"
-    },
-    "guzzlehttp/guzzle": {
-        "version": "6.5.3"
-    },
-    "guzzlehttp/promises": {
-        "version": "v1.3.1"
     },
     "guzzlehttp/psr7": {
         "version": "1.6.1"
