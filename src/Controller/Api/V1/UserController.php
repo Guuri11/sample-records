@@ -601,6 +601,7 @@ class UserController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
+
         $apiUtils->successResponse("Usuario logueado");
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_OK);
     }
@@ -909,5 +910,4 @@ class UserController extends AbstractController
         $apiUtils->setResponse($response);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_OK,['Content-type' => 'application/json']);
     }
-
 }

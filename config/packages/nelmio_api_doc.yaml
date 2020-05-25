@@ -210,6 +210,23 @@ nelmio_api_doc:
                             description: Not found
                     tags:
                         - album
+            "/api/v1.0/album/upload-img/{id}":
+              post:
+                description: Upload a new image to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new image
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - album
             "/api/v1.0/artist/":
                 get:
                     parameters:
@@ -237,11 +254,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all artists
-                            schema:
-                                properties:
-                                    artist:
-                                        "$ref": "#/definitions/Artist"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -258,11 +270,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one artist
-                            schema:
-                                properties:
-                                    artist:
-                                        "$ref": "#/definitions/Artist"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -279,11 +286,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one artist by alias
-                            schema:
-                                properties:
-                                    artist:
-                                        "$ref": "#/definitions/Artist"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -341,11 +343,6 @@ nelmio_api_doc:
                     responses:
                         '201':
                             description: Creates a new Artist object
-                            schema:
-                                properties:
-                                    artist:
-                                        "$ref": "#/definitions/Artist"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -408,11 +405,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: updates a new Artist object
-                            schema:
-                                properties:
-                                    artist:
-                                        "$ref": "#/definitions/Artist"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -429,17 +421,29 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Delete a artist
-                            schema:
-                                properties:
-                                    artist:
-                                        "$ref": "#/definitions/Artist"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
                             description: Not found
                     tags:
                         - artist
+            "/api/v1.0/artist/upload-img/{id}":
+              post:
+                description: Upload a new image to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new image
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - artist 
             "/api/v1.0/category/":
                 get:
                     parameters:
@@ -467,11 +471,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all categories
-                            schema:
-                                properties:
-                                    category:
-                                        "$ref": "#/definitions/Category"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -488,11 +487,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one categories
-                            schema:
-                                properties:
-                                    category:
-                                        "$ref": "#/definitions/Category"
-                                type: object
                         '400':
                             description: Not found
                         '401':
@@ -518,11 +512,6 @@ nelmio_api_doc:
                 responses:
                   '201':
                     description: Creates a new Category object
-                    schema:
-                      properties:
-                        category:
-                          "$ref": "#/definitions/Category"
-                      type: object
                   '404':
                     description: Not found
                   '401':
@@ -552,11 +541,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Updates a new Category object
-                            schema:
-                                properties:
-                                    category:
-                                        "$ref": "#/definitions/Category"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -573,11 +557,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Deletes a category
-                            schema:
-                                properties:
-                                    category:
-                                        "$ref": "#/definitions/Category"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -640,11 +619,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all comments
-                            schema:
-                                properties:
-                                    comment:
-                                        "$ref": "#/definitions/Comment"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -661,11 +635,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one comment
-                            schema:
-                                properties:
-                                    comment:
-                                        "$ref": "#/definitions/Comment"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -707,11 +676,6 @@ nelmio_api_doc:
                     responses:
                         '201':
                             description: Creates a new Comment object
-                            schema:
-                                properties:
-                                    comment:
-                                        "$ref": "#/definitions/Comment"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -758,11 +722,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: updates a new Comment object
-                            schema:
-                                properties:
-                                    comment:
-                                        "$ref": "#/definitions/Comment"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -779,11 +738,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Deletes a comment
-                            schema:
-                                properties:
-                                    comment:
-                                        "$ref": "#/definitions/Comment"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -828,11 +782,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all events
-                            schema:
-                                properties:
-                                    event:
-                                        "$ref": "#/definitions/Event"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -849,11 +798,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one event
-                            schema:
-                                properties:
-                                    event:
-                                        "$ref": "#/definitions/Event"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -918,11 +862,6 @@ nelmio_api_doc:
                   responses:
                         '201':
                             description: Creates a new Event object
-                            schema:
-                                properties:
-                                    event:
-                                        "$ref": "#/definitions/Event"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -989,11 +928,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: updates a new Event object
-                            schema:
-                                properties:
-                                    event:
-                                        "$ref": "#/definitions/Event"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1010,17 +944,30 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Delete a event
-                            schema:
-                                properties:
-                                    event:
-                                        "$ref": "#/definitions/Event"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
                             description: Not found
                     tags:
                         - event
+            "/api/v1.0/event/upload-img/{id}":
+              post:
+                description: Upload a new image to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new image
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - event
+
             "/api/v1.0/post/":
                 get:
                     parameters:
@@ -1058,11 +1005,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all posts
-                            schema:
-                                properties:
-                                    post:
-                                        "$ref": "#/definitions/Post"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1079,11 +1021,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one post
-                            schema:
-                                properties:
-                                    post:
-                                        "$ref": "#/definitions/Post"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -1135,11 +1072,6 @@ nelmio_api_doc:
                   responses:
                         '201':
                             description: Creates a new Post object
-                            schema:
-                                properties:
-                                    post:
-                                        "$ref": "#/definitions/Post"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1196,11 +1128,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: updates a new Post object
-                            schema:
-                                properties:
-                                    post:
-                                        "$ref": "#/definitions/Post"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1217,17 +1144,29 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Deletes a post
-                            schema:
-                                properties:
-                                    post:
-                                        "$ref": "#/definitions/Post"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
                             description: Not found
                     tags:
                         - post
+            "/api/v1.0/post/upload-img/{id}":
+              post:
+                description: Upload a new image to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new image
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - post
             "/api/v1.0/product/":
                 get:
                     parameters:
@@ -1270,11 +1209,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all products
-                            schema:
-                                properties:
-                                    product:
-                                        "$ref": "#/definitions/Product"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1291,11 +1225,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one product
-                            schema:
-                                properties:
-                                    product:
-                                        "$ref": "#/definitions/Product"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -1362,11 +1291,6 @@ nelmio_api_doc:
                   responses:
                         '201':
                             description: Creates a new Product object
-                            schema:
-                                properties:
-                                    product:
-                                        "$ref": "#/definitions/Product"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1435,11 +1359,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: updates a new Product object
-                            schema:
-                                properties:
-                                    product:
-                                        "$ref": "#/definitions/Product"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1456,15 +1375,27 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Delete a product
-                            schema:
-                                properties:
-                                    product:
-                                        "$ref": "#/definitions/Product"
-                                type: object
                         '401':
                             description: Unauthorized
                     tags:
                         - product
+            "/api/v1.0/product/upload-img/{id}":
+              post:
+                description: Upload a new image to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new image
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - product
             "/api/v1.0/purchase/":
                 get:
                     parameters:
@@ -1497,11 +1428,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all purchases
-                            schema:
-                                properties:
-                                    purchase:
-                                        "$ref": "#/definitions/Purchase"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1518,11 +1444,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one purchase
-                            schema:
-                                properties:
-                                    purchase:
-                                        "$ref": "#/definitions/Purchase"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -1590,11 +1511,6 @@ nelmio_api_doc:
                   responses:
                         '201':
                             description: Creates a new Purchase object
-                            schema:
-                                properties:
-                                    purchase:
-                                        "$ref": "#/definitions/Purchase"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1668,11 +1584,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: updates a new Purchase object
-                            schema:
-                                properties:
-                                    purchase:
-                                        "$ref": "#/definitions/Purchase"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1689,11 +1600,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Delete a purchase
-                            schema:
-                                properties:
-                                    purchase:
-                                        "$ref": "#/definitions/Purchase"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -1705,11 +1611,6 @@ nelmio_api_doc:
                 responses:
                   '202':
                     description: Get earns of this month
-                    schema:
-                      properties:
-                        purchase:
-                          "$ref": "#/definitions/Purchase"
-                      type: object
                   '401':
                     description: Unauthorized
                   '404':
@@ -1770,11 +1671,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Buy a product/event ticket
-                            schema:
-                                properties:
-                                    purchase:
-                                        "$ref": "#/definitions/Purchase"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -1868,11 +1764,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one song
-                            schema:
-                                properties:
-                                    song:
-                                        "$ref": "#/definitions/Song"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -1936,11 +1827,6 @@ nelmio_api_doc:
                   responses:
                         '201':
                             description: Creates a new Song object
-                            schema:
-                                properties:
-                                    song:
-                                        "$ref": "#/definitions/Song"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2007,11 +1893,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: updates a new Song object
-                            schema:
-                                properties:
-                                    song:
-                                        "$ref": "#/definitions/Song"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2028,17 +1909,46 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Delete a song
-                            schema:
-                                properties:
-                                    song:
-                                        "$ref": "#/definitions/Song"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
                             description: Not found
                     tags:
                         - song
+            "/api/v1.0/song/upload-img/{id}":
+              post:
+                description: Upload a new image to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new image
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - song
+            "/api/v1.0/song/upload-song/{id}":
+              post:
+                description: Upload a new audio file to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new audio file
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - song
             "/api/v1.0/tag/":
                 get:
                     parameters:
@@ -2066,11 +1976,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all tags
-                            schema:
-                                properties:
-                                    tag:
-                                        "$ref": "#/definitions/Tag"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2087,11 +1992,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one tag
-                            schema:
-                                properties:
-                                    tag:
-                                        "$ref": "#/definitions/Tag"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -2117,11 +2017,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Creates a new Tag object
-                            schema:
-                                properties:
-                                    tag:
-                                        "$ref": "#/definitions/Tag"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2151,11 +2046,6 @@ nelmio_api_doc:
                     responses:
                         '201':
                             description: updates a new Tag object
-                            schema:
-                                properties:
-                                    tag:
-                                        "$ref": "#/definitions/Tag"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2172,11 +2062,6 @@ nelmio_api_doc:
                     responses:
                         '201':
                             description: Delete a tag
-                            schema:
-                                properties:
-                                    tag:
-                                        "$ref": "#/definitions/Tag"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -2219,11 +2104,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all tickets
-                            schema:
-                                properties:
-                                    ticket:
-                                        "$ref": "#/definitions/Ticket"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2240,11 +2120,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one ticket
-                            schema:
-                                properties:
-                                    ticket:
-                                        "$ref": "#/definitions/Ticket"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -2273,11 +2148,6 @@ nelmio_api_doc:
                     responses:
                         '201':
                             description: Creates a new Ticket object
-                            schema:
-                                properties:
-                                    ticket:
-                                        "$ref": "#/definitions/Ticket"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2336,11 +2206,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Delete a ticket
-                            schema:
-                                properties:
-                                    ticket:
-                                        "$ref": "#/definitions/Ticket"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -2374,11 +2239,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all users
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2395,11 +2255,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get one user
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -2484,11 +2339,6 @@ nelmio_api_doc:
                     responses:
                         '201':
                             description: Creates a new User object
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2578,11 +2428,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: updates a new User object
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2599,11 +2444,6 @@ nelmio_api_doc:
                     responses:
                         '202':
                             description: Delete a user
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '401':
                             description: Unauthorized
                         '404':
@@ -2615,11 +2455,6 @@ nelmio_api_doc:
                 responses:
                   '202':
                     description: Delete your own account
-                    schema:
-                      properties:
-                        user:
-                          "$ref": "#/definitions/User"
-                      type: object
                   '401':
                     description: Unauthorized
                   '404':
@@ -2631,11 +2466,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get personal info from the user logged
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2683,11 +2513,6 @@ nelmio_api_doc:
                   responses:
                       '202':
                         description: updates personal user data
-                        schema:
-                          properties:
-                            user:
-                              "$ref": "#/definitions/User"
-                          type: object
                       '400':
                         description: Bad request
                       '401':
@@ -2700,11 +2525,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all the comments from the user logged
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2716,11 +2536,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Get all the purchases from the user logged
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2754,11 +2569,6 @@ nelmio_api_doc:
                     responses:
                         '201':
                             description: Register a user
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2789,11 +2599,6 @@ nelmio_api_doc:
                   responses:
                       '200':
                           description: Log the user
-                          schema:
-                              properties:
-                                  user:
-                                      "$ref": "#/definitions/User"
-                              type: object
                       '401':
                           description: Unauthorized
                   tags:
@@ -2803,11 +2608,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Logout the user
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '401':
                             description: Unauthorized
                     tags:
@@ -2847,11 +2647,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Log the user
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2887,11 +2682,6 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: Send the user question to email account
-                            schema:
-                                properties:
-                                    user:
-                                        "$ref": "#/definitions/User"
-                                type: object
                         '400':
                             description: Bad request
                         '401':
@@ -2903,41 +2693,44 @@ nelmio_api_doc:
                   responses:
                       '200':
                           description: User can comment
-                          schema:
-                            properties:
-                              user:
-                                "$ref": "#/definitions/User"
-                            type: object
                       '401':
                         description: Unauthorized
                   tags:
                     - user
-
-        definitions:
-            Album:
-                type: object
-            Artist:
-                type: object
-            Category:
-                type: object
-            Comment:
-                type: object
-            Event:
-                type: object
-            Post:
-                type: object
-            Product:
-                type: object
-            Purchase:
-                type: object
-            Song:
-                type: object
-            Tag:
-                type: object
-            Ticket:
-                type: object
-            User:
-                type: object
+            "/api/v1.0/user/upload-img/{id}":
+              post:
+                description: Upload a new image to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new image
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - user
+            "/api/v1.0/user/profile/change-profile-img":
+              post:
+                description: Replace user profile image to the item (don't try, showing only for knowledge)
+                parameters:
+                  - name: id
+                    in: path
+                    required: true
+                    type: string
+                responses:
+                  '202':
+                    description: Upload new image
+                  '401':
+                    description: Unauthorized
+                  '404':
+                    description: Not found
+                tags:
+                  - user
 
     areas: # to filter documented areas
         path_patterns:

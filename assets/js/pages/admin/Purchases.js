@@ -122,7 +122,6 @@ class Purchases extends Component {
         }
     }
 
-
     render() {
         const { active_page, items_per_page, items, loading, message} = this.state;
 
@@ -309,7 +308,6 @@ class Purchases extends Component {
                     <Footer/>
                 </div>
             </div>
-
         )
     }
 }

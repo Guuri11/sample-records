@@ -17,11 +17,11 @@ class Footer extends Component {
                                     </div>
                                     <div className="col-12 col-md-3 text-center">
                                         <ul className="social-network social-circle">
-                                            <li><a href="#" className="icoTwitter" title="Twitter"><i
+                                            <li><a href="https://twitter.com/SampleRecords" className="icoTwitter" title="Twitter"><i
                                                 className="fa fa-twitter"/></a></li>
-                                            <li><a href="#" className="icoGmail" title="Gmail"><i
+                                            <li><a href="mailto:sample.records11@gmail.com" className="icoGmail" title="Gmail"><i
                                                 className="fa fa-google-plus"/></a></li>
-                                            <li><a href="#" className="icoGithub" title="Github"><i
+                                            <li><a href="https://github.com/Guuri11" className="icoGithub" title="Github"><i
                                                 className="fa fa-github"/></a></li>
                                         </ul>
                                     </div>
