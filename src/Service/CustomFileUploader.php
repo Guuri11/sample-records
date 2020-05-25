@@ -68,6 +68,10 @@ class CustomFileUploader
      *
      */
     private const MP3 = "mp3";
+    /**
+     *
+     */
+    private const MPEG = "mpeg";
 
 
     /**
@@ -180,7 +184,7 @@ class CustomFileUploader
      * @return bool
      */
     public function validateAudioExtension(string $extension) : bool {
-        return $extension === self::MP3;
+        return $extension === self::MP3 || $extension === self::MPEG;
     }
 
     /**

@@ -367,13 +367,13 @@ class SongController extends AbstractController
                 return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
 
-            $apiUtils->successResponse("¡Subida de imagen con éxtio!",$song);
+            $apiUtils->successResponse("¡Subida de canción con éxtio!",$song);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
         } else {
             $apiUtils->setFormErrors($errors);
             $apiUtils->setResponse([
                 "success" => false,
-                "message" => "No se pudo subir la imagen",
+                "message" => "No se pudo subir la canción",
                 "errors" => $apiUtils->getFormErrors(),
                 "results" => $song
             ]);

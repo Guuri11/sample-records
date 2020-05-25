@@ -112,7 +112,7 @@ class Artist extends Component {
                     {
                         songs.length > 0 ?
                             <div className="row table-sr-music">
-                                <h3 className={"one-day"}>Canciones</h3>
+                                <h3 className={"one-day ml-3"}> Canciones</h3>
                                 <div className="col-12">
                                     <div style={{height: 300, overflow: "auto"}}>
                                         <table className="table">

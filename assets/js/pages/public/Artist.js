@@ -123,10 +123,15 @@ class Artist extends Component {
                         null
                         :
                         songs.map((song,i) => {
+                            if (song.video_src !== ""){
                                 return (
-                                    <VideoClip key={i} id_videoclip={"videoclip"+i} idx_song={"song"+i} src_videoclip={song.video_src}/>
+                                    <div key={i}>
+                                        <VideoClip id_videoclip={"videoclip"+i} idx_song={"song"+i} src_videoclip={song.video_src}/>
+                                    </div>
                                 )
-                            })
+                            }
+                        })
+
                 }
 
                 {
@@ -188,7 +193,7 @@ class Artist extends Component {
                                 songs.length > 0 ?
                                     <div className="box-rounded">
                                         <div className="container caption">
-                                            <h2 className="text-sr">Videoclips</h2>
+                                            <h2 className="text-sr">Canciones</h2>
                                             <hr/>
                                         </div>
                                         <Slider {...this.MultipleSettings(songs.length)}>
@@ -201,8 +206,13 @@ class Artist extends Component {
                                                         <div key={i}>
                                                             <div className="card card-post">
                                                                 <img src={song.img_name} className="card-img-top" alt={song.name} height={200} width={100}/>
-                                                                <span className="fa fa-play-circle-o play-button-videoclip"
-                                                                      data-toggle="modal" data-target={"#videoclip"+i} id={"song"+i}/>
+                                                                {
+                                                                    song.video_src !== "" ?
+                                                                        <span className="fa fa-play-circle-o play-button-videoclip"
+                                                                              data-toggle="modal" data-target={"#videoclip"+i} id={"song"+i}/>
+                                                                              :
+                                                                        null
+                                                                }
                                                                 <div className="card-body">
                                                                         <h5 className="card-title">{song.name}</h5>
                                                                         <p>{months[month]} {day}, {year}</p>
@@ -259,12 +269,6 @@ class Artist extends Component {
 
                         </div>
                 }
-
-                {/* IMAGE */}
-                {/* POSTS */}
-                {/* VIDEOS */}
-                {/* PRODUCTS */}
-                {/* EVENTS */}
                 <Footer/>
             </div>
         );

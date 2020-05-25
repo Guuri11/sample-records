@@ -469,6 +469,7 @@ class Song extends Component {
             // Make the API call
             axios.post(`/api/v1.0/song/upload-song/${song.id}`, formData, {})
                 .then(res=> {
+
                     if (res.data.success){
                         this.setState({ song:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
