@@ -87,5 +87,5 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return $results;
         else
             throw new Exception("Usuario no encontrado");
-    }p
+    }
 }
