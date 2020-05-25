@@ -44,16 +44,17 @@ class Profile extends Component {
                 }
                 // Get comments and purchases by the user filtering by his ID
                 const [comments,purchases] = await Promise.all([
-                    axios.get(`/api/v1.0/comment?user=${info.data.results[0].id}`).catch(e=>{}),
-                    axios.get(`/api/v1.0/purchase?user=${info.data.results[0].id}`).catch(e=>{})
+                    axios.get('/api/v1.0/user/profile/comments').catch(e=>{}),
+                    axios.get('/api/v1.0/user/profile/purchases').catch(e=>{})
                 ])
 
+                console.log(comments,purchases)
                 this.setState({
                     info: info.data.results[0],
                     profile_img: info.data.results[0].profile_image,
                     header_img: info.data.results[0].header_image,
-                    comments: comments ? comments.data.results:[],
-                    purchases: purchases ? purchases.data.results:[],
+                    comments: comments !== undefined ? comments.data:[],
+                    purchases: purchases !== undefined ? purchases.data:[],
                     loading: false })
 
             } else {
@@ -569,6 +570,7 @@ class Profile extends Component {
         const menu_inactive = "list-group-item list-group-item-action menu-item-profile";
         const dropdown_active = "dropdown-item active";
         const dropdown_inactive = "dropdown-item";
+
         return (
             <div>
                 <Title title={"SR - INICIO"}/>

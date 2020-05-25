@@ -44,7 +44,7 @@ class PurchaseController extends AbstractController
     public function index(Request $request, PurchaseRepository $purchaseRepository,
                           ApiUtils $apiUtils, UserRepository $userRepository) : JsonResponse
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         // Get params
         $apiUtils->getRequestParams($request);
@@ -78,7 +78,7 @@ class PurchaseController extends AbstractController
      */
     public function show(Purchase $purchase, ApiUtils $apiUtils): JsonResponse
     {
-        
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         if ($purchase === ""){
             $apiUtils->notFoundResponse("Compra no encontrada");

@@ -87,45 +87,5 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return $results;
         else
             throw new Exception("Usuario no encontrado");
-    }
-
-    /**
-     * @param $email
-     * @return mixed[]
-     * @throws Exception
-     */
-    public function getComments($email)
-    {
-        $conn = $this->getEntityManager()->getConnection();
-
-        $sql = 'SELECT comment FROM comment, user WHERE user.email = :email';
-        $stmt = $conn->prepare($sql);
-        $stmt->execute(['email'=>$email]);
-
-        $results = $stmt->fetchAll();
-        if ($results)
-            return $results;
-        else
-            throw new Exception("No hay comentarios");
-    }
-
-    /**
-     * @param $email
-     * @return mixed[]
-     * @throws Exception
-     */
-    public function getPurchases($email)
-    {
-        $conn = $this->getEntityManager()->getConnection();
-
-        $sql = 'SELECT serial_number FROM purchase, user WHERE user.email = :email';
-        $stmt = $conn->prepare($sql);
-        $stmt->execute(['email'=>$email]);
-
-        $results = $stmt->fetchAll();
-        if ($results)
-            return $results;
-        else
-            throw new Exception("No hay compras");
-    }
+    }p
 }

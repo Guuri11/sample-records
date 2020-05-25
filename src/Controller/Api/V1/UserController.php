@@ -4,6 +4,8 @@ namespace App\Controller\Api\V1;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\CommentRepository;
+use App\Repository\PurchaseRepository;
 use App\Repository\UserRepository;
 use App\Service\ApiUtils;
 use App\Service\CustomFileUploader;
@@ -466,12 +468,13 @@ class UserController extends AbstractController
      * @param UserRepository $userRepository
      * @return JsonResponse
      */
-    public function getComments(ApiUtils $apiUtils, UserRepository $userRepository)
+    public function getComments(ApiUtils $apiUtils, UserRepository $userRepository, CommentRepository $commentRepository)
     {
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         try {
-            $info = $userRepository->getComments($this->getUser()->getUsername());
+            $user = $userRepository->findOneBy(["email"=>$this->getUser()->getUsername()]);
+            $info = $commentRepository->getRequestResult(["user"=>$user]);
         } catch (Exception $e) {
             $apiUtils->errorResponse($e, "No hay comentarios", null);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED, ['Content-type' => 'application/json']);
@@ -485,14 +488,16 @@ class UserController extends AbstractController
      * @Route("/profile/purchases", name="api_user_purchases", methods={"GET"})
      * @param ApiUtils $apiUtils
      * @param UserRepository $userRepository
+     * @param PurchaseRepository $purchaseRepository
      * @return JsonResponse
      */
-    public function purchases(ApiUtils $apiUtils, UserRepository $userRepository)
+    public function purchases(ApiUtils $apiUtils, UserRepository $userRepository, PurchaseRepository $purchaseRepository)
     {
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         try {
-            $info = $userRepository->getPurchases($this->getUser()->getUsername());
+            $user = $userRepository->findOneBy(["email"=>$this->getUser()->getUsername()]);
+            $info = $purchaseRepository->getRequestResult(["user"=>$user]);
         } catch (Exception $e) {
             $apiUtils->errorResponse($e,"No hay compras realizadas",null);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);

@@ -36,7 +36,7 @@ class CommentRepository extends ServiceEntityRepository
                 ->setParameter('id_comment',$params['first']);
         }
         if (key_exists("user",$params)) {
-            $result->andWhere('c.user >= :user')
+            $result->andWhere('c.user = :user')
                 ->setParameter('user',$params['user']);
         }
         if (key_exists("post",$params)) {

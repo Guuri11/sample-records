@@ -37,11 +37,11 @@ class TicketRepository extends ServiceEntityRepository
                 ->setParameter('id',$params['first']);
         }
         if (key_exists("event",$params)) {
-            $result->andWhere('t.event >= :id_event')
+            $result->andWhere('t.event = :id_event')
                 ->setParameter('id_event',$params['event']);
         }
         if (key_exists("available",$params)) {
-            $result->andWhere('t.sold >= :available')
+            $result->andWhere('t.sold = :available')
                 ->setParameter('available',$params['available']);
         }
         if (key_exists("last",$params)) {

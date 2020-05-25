@@ -32,21 +32,21 @@ class PurchaseRepository extends ServiceEntityRepository
         $result = $this->createQueryBuilder('p');
         if (key_exists("search",$params)) {
             $result->where('p.serial_number LIKE :search')
-                ->setParameter('search', '%'.$params['search'].'%');
+                ->setParameter("search", '%'.$params["search"].'%');
         }
         if (key_exists("first",$params)) {
             $result->andWhere('p.id >= :id')
-                ->setParameter('id',$params['first']);
+                ->setParameter('id',$params["first"]);
         }
         if (key_exists("user",$params)) {
-            $result->andWhere('p.user >= :user')
-                ->setParameter('user',$params['user']);
+            $result->andWhere('p.user = :user')
+                ->setParameter('user',$params["user"]);
         }
         if (key_exists("last",$params)) {
-            $result->setMaxResults($params['last']);
+            $result->setMaxResults($params["last"]);
         }
         if (key_exists("ord",$params)) {
-            $result->orderBy('p.id', $params['ord']);
+            $result->orderBy('p.id', $params["ord"]);
         }
         if (count($result->getQuery()->getResult()) > 0 )
             return $result->getQuery()->getResult();

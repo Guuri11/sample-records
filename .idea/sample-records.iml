@@ -70,6 +70,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/spomky-labs/jose" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/spomky-labs/php-aes-gcm" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/swiftmailer/swiftmailer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/apache-pack" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/asset" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/browser-kit" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/cache" />
