@@ -23,7 +23,7 @@ class Blog extends Component {
         tags: [],
         artists: [],
         active_page : 1,
-        posts_per_page: 2,
+        posts_per_page: 5,
     }
 
     componentDidMount() {
@@ -98,9 +98,9 @@ class Blog extends Component {
                                     </div>
 
                                     <div className="blog-content">
-                                        <Link to={`/noticia/${post.id}`} className={"post-title"}>{post.title}</Link>
+                                        <Link to={`/noticias/${post.id}`} className={"post-title"}>{post.title}</Link>
                                         <p>{post.description}</p>
-                                        <Link to={`/noticia/${post.id}`}>
+                                        <Link to={`/noticias/${post.id}`}>
                                             <button className="btn btn-primary btn-primary-sr mt-2">Ver</button>
                                         </Link>
                                     </div>

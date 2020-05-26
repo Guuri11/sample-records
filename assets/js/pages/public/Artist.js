@@ -168,7 +168,7 @@ class Artist extends Component {
                                                         <div key={i}>
                                                             <div className="card card-post">
                                                                 <img src={post.img_name} className="card-img-top" alt={post.name} height={200} width={100}/>
-                                                                <Link to={`/noticia/${post.id}`}>
+                                                                <Link to={`/noticias/${post.id}`}>
                                                                     <div className="card-body">
                                                                         <div className="post-date">
                                                                             <span>{day}</span>

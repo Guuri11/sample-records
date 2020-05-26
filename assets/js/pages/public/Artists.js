@@ -84,15 +84,6 @@ class Artists extends Component {
                                                 null
                                         }
                                     </div>
-
-                                    <div className="row ">
-                                        <div className="col-12">
-                                            <div className="load-more-btn text-center mt-70">
-                                                <a href="#" className="btn btn-primary btn-primary-sr">Load More <i
-                                                    className="fa fa-angle-double-right"/></a>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </section>
                         </div>

@@ -516,19 +516,21 @@ class Profile extends Component {
     handleChangeProfileImage = (e) => {
         e.preventDefault();
         const image_profile = document.querySelector('#input-img-profile').files[0];
+        console.log(image_profile)
 
         if (image_profile !== undefined){
             const formData = new FormData();
 
             formData.append('img_profile',image_profile)
             // Make the API call
-            axios.post("/api/v1.0/user/profile/change-profile-image", formData, {
-
-            }).then(res => { // then print response status
+            axios.post("/api/v1.0/user/profile/change-profile-image", formData, {})
+                .then(res => { // then print response status
+                    console.log(formData)
+                    console.log(res);
                 if (res.data.success){
                     this.setState({ profile_img: res.data.results.profile_image })
                 }
-            }).catch(e=>{})
+            }).catch(e=>{console.log(e.response)})
         }
     }
 

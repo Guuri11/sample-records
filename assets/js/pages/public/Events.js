@@ -19,7 +19,7 @@ class Events extends Component {
         loading: true,
         events: [],
         active_page : 1,
-        events_per_page: 3,
+        events_per_page: 9,
         comments:[],
         user_data: [],
         can_comment: false,
@@ -48,7 +48,7 @@ class Events extends Component {
         const day = now.getDay();
         const now_formated = year+"-"+month+"-"+day;
 
-        axios.get(`/api/v1.0/event?until${now_formated}`).then(res => {
+        axios.get(`/api/v1.0/event?until=${now_formated}`).then(res => {
             if (res.data.success === true){
                 this.setState( { events: res.data.results, loading: false } )
             } else {
@@ -124,7 +124,7 @@ class Events extends Component {
                         <span/>
                         :
                         <div className="row">
-                            <div className="col-12 col-md-9">
+                            <div className="col-12">
                                 <section className="events-area section-padding-100">
                                     <div className="container">
 
@@ -147,23 +147,6 @@ class Events extends Component {
                                     </div>
                                 </section>
                             </div>
-
-                            {/* TWEETS AND COMMENTS */}
-                            <div className="col-12 col-md-3 event-extra section-padding-100">
-
-                                <div className="twitter card center-box mb-5" style={{width: "18rem"}}>
-                                    <div className="card-body">
-                                        <h5 className="card-title">Twitter</h5>
-                                        <h6 className="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                                        <p className="card-text">Some quick example text to build on the
-                                            card title and make up the bulk of the card's content.</p>
-                                        <a href="#" className="card-link">Card link</a>
-                                        <a href="#" className="card-link">Another link</a>
-                                    </div>
-                                </div>
-
-                            </div>
-
                         </div>
                 }
                 <Footer/>

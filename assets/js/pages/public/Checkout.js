@@ -229,7 +229,7 @@ class Checkout extends Component {
                                                                required defaultValue={isAuth ? user_data.email: ''}/>
                                                     </div>
                                                     <div className="md-form mb-5">
-                                                        <label htmlFor="address">Address</label>
+                                                        <label htmlFor="address">Dirección</label>
                                                         {
                                                             errors.hasOwnProperty("required_address") ?
                                                                 <p className={"text-danger"}>{errors.required_address}</p>
