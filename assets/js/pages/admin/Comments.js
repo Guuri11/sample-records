@@ -33,7 +33,7 @@ class Comments extends Component {
     }
 
     getComments = () => {
-        axios.get('/api/v1.0/comment').then(res => {
+        axios.get('/index.php/api/v1.0/comment').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
@@ -110,7 +110,7 @@ class Comments extends Component {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/comment/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/comment/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);

@@ -33,7 +33,7 @@ class Login extends Component {
         };
 
         // Make the Post call
-        fetch("/api/v1.0/user/login", requestOptions)
+        fetch("/index.php/api/v1.0/user/login", requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.hasOwnProperty('success')){

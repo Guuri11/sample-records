@@ -36,7 +36,7 @@ class Artist extends Component {
     }
 
     getArtist( id ) {
-        axios.get(`/api/v1.0/artist/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist/${id}`).then(res => {
             if (res.data.success === true) {
                 const artist = res.data.results;
 
@@ -309,7 +309,7 @@ class Artist extends Component {
 
         if (ans) {
 
-            axios.delete(`/api/v1.0/artist/delete/${artist.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/artist/delete/${artist.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -352,7 +352,7 @@ class Artist extends Component {
             formData.append('img',img);
 
             // Make the API call
-            fetch(`/api/v1.0/artist/edit/${artist.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/artist/edit/${artist.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -362,7 +362,7 @@ class Artist extends Component {
                 }).catch(e=>{});
 
             // Make the API call
-            axios.post(`/api/v1.0/artist/upload-img/${artist.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/artist/upload-img/${artist.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ artist:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
@@ -375,7 +375,7 @@ class Artist extends Component {
                     this.setState({ success: false, errors: errors, submited: true, sending: false }) })
 
         } else {
-            fetch(`/api/v1.0/artist/edit/${artist.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/artist/edit/${artist.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){

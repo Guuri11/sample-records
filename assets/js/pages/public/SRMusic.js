@@ -34,11 +34,11 @@ class SRMusic extends Component {
             if (sessionStorage.getItem('auth') === "true") {
                 // Get data
                 let [artists, songs, albums] = await Promise.all([
-                    axios.get(`/api/v1.0/artist`).catch(e => {
+                    axios.get(`/index.php/api/v1.0/artist`).catch(e => {
                     }),
-                    axios.get(`/api/v1.0/song?last=5`).catch(e => {
+                    axios.get(`/index.php/api/v1.0/song?last=5`).catch(e => {
                     }),
-                    axios.get(`/api/v1.0/album?last=3`).catch(e => {
+                    axios.get(`/index.php/api/v1.0/album?last=3`).catch(e => {
                     })
                 ])
 

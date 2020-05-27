@@ -48,7 +48,7 @@ class Product extends Component {
     }
 
     getProduct( id ) {
-        axios.get(`/api/v1.0/product/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/product/${id}`).then(res => {
             if (res.data.success === true) {
                 const product = res.data.results;
 
@@ -60,7 +60,7 @@ class Product extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -72,7 +72,7 @@ class Product extends Component {
     }
 
     getCategories = () =>  {
-        axios.get(`/api/v1.0/category`).then(res => {
+        axios.get(`/index.php/api/v1.0/category`).then(res => {
             if (res.data.success === true) {
                 const categories = res.data.results;
 
@@ -420,7 +420,7 @@ class Product extends Component {
         if (ans) {
 
 
-            axios.delete(`/api/v1.0/product/delete/${product.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/product/delete/${product.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -467,7 +467,7 @@ class Product extends Component {
             formData.append('img',img);
 
             // Make the API call
-            fetch(`/api/v1.0/product/edit/${product.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/product/edit/${product.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -477,7 +477,7 @@ class Product extends Component {
                 }).catch(e=>{});
 
             // Make the API call
-            axios.post(`/api/v1.0/product/upload-img/${product.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/product/upload-img/${product.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ product:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
@@ -490,7 +490,7 @@ class Product extends Component {
                     this.setState({ success: false, errors: errors, submited: true, sending: false }) })
 
         } else {
-            fetch(`/api/v1.0/product/edit/${product.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/product/edit/${product.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){

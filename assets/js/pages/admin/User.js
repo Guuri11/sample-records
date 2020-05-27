@@ -36,7 +36,7 @@ class User extends Component {
     }
 
     getUser( id ) {
-        axios.get(`/api/v1.0/user/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/user/${id}`).then(res => {
             if (res.data.success === true) {
                 const user = res.data.results;
 
@@ -381,7 +381,7 @@ class User extends Component {
 
         if (ans) {
 
-            axios.delete(`/api/v1.0/user/delete/${user.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/user/delete/${user.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -435,7 +435,7 @@ class User extends Component {
             formData.append('img',img);
 
             // Make the API call
-            fetch(`/api/v1.0/user/edit/${user.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/user/edit/${user.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -445,7 +445,7 @@ class User extends Component {
                 }).catch(e=>{});
 
             // Make the API call
-            axios.post(`/api/v1.0/user/upload-img/${user.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/user/upload-img/${user.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ user:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
@@ -458,7 +458,7 @@ class User extends Component {
                     this.setState({ success: false, errors: errors, submited: true, sending: false }) })
 
         } else {
-            fetch(`/api/v1.0/user/edit/${user.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/user/edit/${user.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){

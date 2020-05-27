@@ -45,7 +45,7 @@ class Tag extends Component {
     }
 
     getTag( id ) {
-        axios.get(`/api/v1.0/tag/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/tag/${id}`).then(res => {
             if (res.data.success === true) {
                 const tag = res.data.results;
 
@@ -159,7 +159,7 @@ class Tag extends Component {
         if (ans) {
 
 
-            axios.delete(`/api/v1.0/tag/delete/${tag.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/tag/delete/${tag.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -191,7 +191,7 @@ class Tag extends Component {
         this.setState( { sending: true } )
 
         // Make the API call
-        fetch(`/api/v1.0/tag/edit/${tag.id}`, requestOptions)
+        fetch(`/index.php/api/v1.0/tag/edit/${tag.id}`, requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){

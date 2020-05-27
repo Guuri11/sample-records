@@ -51,7 +51,7 @@ class Product extends Component {
     }
 
     getProduct({ id }) {
-        axios.get(`/api/v1.0/product/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/product/${id}`).then(res => {
             if (res.data.success === true) {
                 this.setState({product: res.data.results})
             }
@@ -62,7 +62,7 @@ class Product extends Component {
 
     // Api call to get all the comments
     getComments({ id }) {
-        axios.get(`/api/v1.0/comment/?product=${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/comment/?product=${id}`).then(res => {
             this.setState( { comments: res.data.results } )
         }).catch( e => {
             console.warn('No hay comentarios');
@@ -72,7 +72,7 @@ class Product extends Component {
     // Check if user can comment
     userCanComment () {
         // check that user is loggued and get data
-        axios.get('/api/v1.0/user/datatocomment').then(res => {
+        axios.get('/index.php/api/v1.0/user/datatocomment').then(res => {
             if (res.data.success)
                 this.setState( { user_data: res.data.results, can_comment: true, loading: false } )
         }).catch(error => {
@@ -94,7 +94,7 @@ class Product extends Component {
             };
 
             // Make the Event call
-            fetch("/api/v1.0/comment/new", requestOptions)
+            fetch("/index.php/api/v1.0/comment/new", requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     const {id} = this.props.match.params;

@@ -40,7 +40,7 @@ class Artist extends Component {
             // Get artist by the url
             const {artist} = this.props.match.params;
             // api call to get artist data
-            const artist_data = await axios.get(`/api/v1.0/artist/${artist}`).catch(error => {
+            const artist_data = await axios.get(`/index.php/api/v1.0/artist/${artist}`).catch(error => {
                 this.props.history.push('/error404');
             });
             const now = new Date();
@@ -50,11 +50,11 @@ class Artist extends Component {
             const now_formated = year+"-"+month+"-"+day;
             const artist_id = artist_data.data.results.id;
 
-            const posts = await axios.get(`/api/v1.0/post?artist=${artist_id}`).catch(error => {});
+            const posts = await axios.get(`/index.php/api/v1.0/post?artist=${artist_id}`).catch(error => {});
 
-            const songs = await axios.get(`/api/v1.0/song?artist=${artist_id}`).catch(error => {});
+            const songs = await axios.get(`/index.php/api/v1.0/song?artist=${artist_id}`).catch(error => {});
 
-            const events = await axios.get(`/api/v1.0/event?until${now_formated}&artist=${artist_id}`).catch(error => {});
+            const events = await axios.get(`/index.php/api/v1.0/event?until${now_formated}&artist=${artist_id}`).catch(error => {});
 
             this.setState( {
                 artist: artist_data.data.results,

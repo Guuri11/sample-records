@@ -47,7 +47,7 @@ class Event extends Component {
     }
 
     getEvent( id ) {
-        axios.get(`/api/v1.0/event/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/event/${id}`).then(res => {
             if (res.data.success === true) {
                 const event = res.data.results;
 
@@ -59,7 +59,7 @@ class Event extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -380,7 +380,7 @@ class Event extends Component {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
 
         if (ans) {
-            axios.delete(`/api/v1.0/event/delete/${event.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/event/delete/${event.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -426,7 +426,7 @@ class Event extends Component {
             formData.append('img',img);
 
             // Make the API call
-            fetch(`/api/v1.0/event/edit/${event.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/event/edit/${event.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -436,7 +436,7 @@ class Event extends Component {
                 }).catch(e=>{});
 
             // Make the API call
-            axios.post(`/api/v1.0/event/upload-img/${event.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/event/upload-img/${event.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ event:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
@@ -449,7 +449,7 @@ class Event extends Component {
                     this.setState({ success: false, errors: errors, submited: true, sending: false }) })
 
         } else {
-            fetch(`/api/v1.0/event/edit/${event.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/event/edit/${event.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){

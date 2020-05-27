@@ -43,7 +43,7 @@ class Register extends Component {
         };
 
         // Make the Post call
-        fetch("/api/v1.0/user/register", requestOptions)
+        fetch("/index.php/api/v1.0/user/register", requestOptions)
             .then(response => response.json())
             .then(data => {
                 this.setState({ success:data.success, message:data.message, errors: data.error.errors, submited: true, sending:false });

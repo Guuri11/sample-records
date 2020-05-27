@@ -47,7 +47,7 @@ class Album extends Component {
     }
 
     getAlbum( id ) {
-        axios.get(`/api/v1.0/album/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/album/${id}`).then(res => {
             if (res.data.success === true) {
                 const album = res.data.results;
 
@@ -59,7 +59,7 @@ class Album extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -308,7 +308,7 @@ class Album extends Component {
         if (ans) {
 
 
-            axios.delete(`/api/v1.0/album/delete/${album.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/album/delete/${album.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -350,7 +350,7 @@ class Album extends Component {
             formData.append('img',img);
 
             // Make the API call
-            fetch(`/api/v1.0/album/edit/${album.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/album/edit/${album.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -360,7 +360,7 @@ class Album extends Component {
                 }).catch(e=>{});
 
             // Make the API call
-            axios.post(`/api/v1.0/album/upload-img/${album.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/album/upload-img/${album.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ album:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
@@ -373,7 +373,7 @@ class Album extends Component {
                     this.setState({ success: false, errors: errors, submited: true, sending: false }) })
 
         } else {
-            fetch(`/api/v1.0/album/edit/${album.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/album/edit/${album.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){

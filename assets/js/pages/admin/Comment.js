@@ -49,7 +49,7 @@ class Comment extends Component {
     }
 
     getComment( id ) {
-        axios.get(`/api/v1.0/comment/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/comment/${id}`).then(res => {
             if (res.data.success === true) {
                 const comment = res.data.results;
                 // Check from which entity comes the comment
@@ -66,7 +66,7 @@ class Comment extends Component {
     getItemsRelation() {
         const {relation} = this.state;
 
-        axios.get(`/api/v1.0/${relation}`).then(res => {
+        axios.get(`/index.php/api/v1.0/${relation}`).then(res => {
             if (res.data.success === true) {
                 const items_relation = res.data.results;
 
@@ -78,7 +78,7 @@ class Comment extends Component {
     }
 
     getUsers() {
-        axios.get(`/api/v1.0/user`).then(res => {
+        axios.get(`/index.php/api/v1.0/user`).then(res => {
             if (res.data.success === true) {
                 const users = res.data.results;
 
@@ -302,7 +302,7 @@ class Comment extends Component {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
 
         if (ans) {
-            axios.delete(`/api/v1.0/comment/delete/${comment.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/comment/delete/${comment.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -341,7 +341,7 @@ class Comment extends Component {
         this.setState( { sending: true } )
 
         // Make the API call
-        fetch(`/api/v1.0/comment/edit/${comment.id}`, requestOptions)
+        fetch(`/index.php/api/v1.0/comment/edit/${comment.id}`, requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){

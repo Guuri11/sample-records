@@ -34,7 +34,7 @@ class Album extends Component {
     /* API REQUESTS */
 
     getSongs(album) {
-        axios.get(`/api/v1.0/song/?album=${album.id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/song/?album=${album.id}`).then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { songs: res.data.results, loading: false } );
             }

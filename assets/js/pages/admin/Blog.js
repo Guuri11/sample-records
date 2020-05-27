@@ -43,7 +43,7 @@ class Blog extends Component {
     }
 
     getPosts = () => {
-        axios.get('/api/v1.0/post').then(res => {
+        axios.get('/index.php/api/v1.0/post').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
@@ -54,7 +54,7 @@ class Blog extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -66,7 +66,7 @@ class Blog extends Component {
     }
 
     getTags = () =>  {
-        axios.get(`/api/v1.0/tag`).then(res => {
+        axios.get(`/index.php/api/v1.0/tag`).then(res => {
             if (res.data.success === true) {
                 const tags = res.data.results;
 
@@ -141,7 +141,7 @@ class Blog extends Component {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/post/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/post/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -475,7 +475,7 @@ class Blog extends Component {
 
         this.setState( { sending: true } )
 
-        fetch('/api/v1.0/post/new', requestOptions)
+        fetch('/index.php/api/v1.0/post/new', requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){
@@ -486,7 +486,7 @@ class Blog extends Component {
                         formData.append('img',img);
 
                         // Make the API call
-                        axios.post(`/api/v1.0/post/upload-img/${post.id}`, formData, {})
+                        axios.post(`/index.php/api/v1.0/post/upload-img/${post.id}`, formData, {})
                             .then(res=> {
                                 if (res.data.success){
                                     // Get new album

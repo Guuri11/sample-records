@@ -8,7 +8,7 @@ class Header extends Component{
     }
 
     handleLogout = () => {
-        axios.get(`/api/v1.0/user/logout`).then(()=>{
+        axios.get(`/index.php/api/v1.0/user/logout`).then(()=>{
             sessionStorage.setItem('auth',false);
             sessionStorage.setItem('is_admin',false);
             window.location.assign('/');

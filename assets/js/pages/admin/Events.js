@@ -41,7 +41,7 @@ class Events extends Component {
     }
 
     getEvents = () => {
-        axios.get('/api/v1.0/event').then(res => {
+        axios.get('/index.php/api/v1.0/event').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
@@ -52,7 +52,7 @@ class Events extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -127,7 +127,7 @@ class Events extends Component {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/event/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/event/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -545,7 +545,7 @@ class Events extends Component {
 
         this.setState( { sending: true } )
 
-        fetch('/api/v1.0/event/new', requestOptions)
+        fetch('/index.php/api/v1.0/event/new', requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){
@@ -557,7 +557,7 @@ class Events extends Component {
                         formData.append('img',img);
 
                         // Make the API call
-                        axios.post(`/api/v1.0/event/upload-img/${event.id}`, formData, {})
+                        axios.post(`/index.php/api/v1.0/event/upload-img/${event.id}`, formData, {})
                             .then(res=> {
                                 if (res.data.success){
                                     // Get new album

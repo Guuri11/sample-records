@@ -39,7 +39,7 @@ class Artists extends Component {
     }
 
     getArtists = () => {
-        axios.get('/api/v1.0/artist').then(res => {
+        axios.get('/index.php/api/v1.0/artist').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { artists: res.data.results, total_artists: res.data.results, loading: false } );
             } else {
@@ -112,7 +112,7 @@ class Artists extends Component {
         if (ans) {
             let {total_artists} = this.state;
 
-            axios.delete(`/api/v1.0/artist/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/artist/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_artists = total_artists.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -466,7 +466,7 @@ class Artists extends Component {
 
         this.setState( { sending: true } )
 
-        fetch('/api/v1.0/artist/new', requestOptions)
+        fetch('/index.php/api/v1.0/artist/new', requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){
@@ -477,7 +477,7 @@ class Artists extends Component {
                         formData.append('img',img);
 
                         // Make the API call
-                        axios.post(`/api/v1.0/artist/upload-img/${artist.id}`, formData, {})
+                        axios.post(`/index.php/api/v1.0/artist/upload-img/${artist.id}`, formData, {})
                             .then(res=> {
                                 if (res.data.success){
                                     // Get new album

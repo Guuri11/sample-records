@@ -47,7 +47,7 @@ class Ticket extends Component {
     }
 
     getTicket( id ) {
-        axios.get(`/api/v1.0/ticket/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/ticket/${id}`).then(res => {
             if (res.data.success === true) {
                 const ticket = res.data.results;
 
@@ -59,7 +59,7 @@ class Ticket extends Component {
     }
 
     getEvents = () =>  {
-        axios.get(`/api/v1.0/event`).then(res => {
+        axios.get(`/index.php/api/v1.0/event`).then(res => {
             if (res.data.success === true) {
                 const events = res.data.results;
 
@@ -256,7 +256,7 @@ class Ticket extends Component {
         if (ans) {
 
 
-            axios.delete(`/api/v1.0/ticket/delete/${ticket.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/ticket/delete/${ticket.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -291,7 +291,7 @@ class Ticket extends Component {
         this.setState( { sending: true } )
 
 
-        fetch(`/api/v1.0/ticket/edit/${ticket.id}`, requestOptions)
+        fetch(`/index.php/api/v1.0/ticket/edit/${ticket.id}`, requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){

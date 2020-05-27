@@ -33,7 +33,7 @@ class Artists extends Component {
     /* API REQUEST TO GET THE ARTISTS DATA */
 
     getArtists() {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true){
                 this.setState( { artists: res.data.results, loading: false } )
             } else {

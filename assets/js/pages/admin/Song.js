@@ -49,7 +49,7 @@ class Song extends Component {
     }
 
     getSong( id ) {
-        axios.get(`/api/v1.0/song/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/song/${id}`).then(res => {
             if (res.data.success === true) {
                 const song = res.data.results;
 
@@ -61,7 +61,7 @@ class Song extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -73,7 +73,7 @@ class Song extends Component {
     }
 
     getAlbums = () =>  {
-        axios.get(`/api/v1.0/album`).then(res => {
+        axios.get(`/index.php/api/v1.0/album`).then(res => {
             if (res.data.success === true) {
                 const albums = res.data.results;
 
@@ -384,7 +384,7 @@ class Song extends Component {
         if (ans) {
 
 
-            axios.delete(`/api/v1.0/song/delete/${song.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/song/delete/${song.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -430,7 +430,7 @@ class Song extends Component {
         if (img !== undefined && song_file === undefined){
             formData.append('img',img);
             // Make the API call
-            fetch(`/api/v1.0/song/edit/${song.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/song/edit/${song.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -440,7 +440,7 @@ class Song extends Component {
                 }).catch(e=>{});
 
             // Make the API call
-            axios.post(`/api/v1.0/song/upload-img/${song.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/song/upload-img/${song.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ song:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
@@ -457,7 +457,7 @@ class Song extends Component {
             formData.append('song',song_file);
 
             // Make the API call
-            fetch(`/api/v1.0/song/edit/${song.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/song/edit/${song.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -467,7 +467,7 @@ class Song extends Component {
                 }).catch(e=>{});
 
             // Make the API call
-            axios.post(`/api/v1.0/song/upload-song/${song.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/song/upload-song/${song.id}`, formData, {})
                 .then(res=> {
 
                     if (res.data.success){
@@ -486,7 +486,7 @@ class Song extends Component {
             formData.append('song',song_file);
 
             // Make the API call
-            fetch(`/api/v1.0/song/edit/${song.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/song/edit/${song.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -497,7 +497,7 @@ class Song extends Component {
 
 
             // Make the API call
-            axios.post(`/api/v1.0/song/upload-song/${song.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/song/upload-song/${song.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ song:res.data.results })
@@ -514,7 +514,7 @@ class Song extends Component {
 
 
             // Make the API call
-            axios.post(`/api/v1.0/song/upload-img/${song.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/song/upload-img/${song.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ song:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
@@ -528,7 +528,7 @@ class Song extends Component {
 
         } // Image and song NOT submited
         else {
-            fetch(`/api/v1.0/song/edit/${song.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/song/edit/${song.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){

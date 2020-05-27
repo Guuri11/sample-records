@@ -48,7 +48,7 @@ class Events extends Component {
         const day = now.getDay();
         const now_formated = year+"-"+month+"-"+day;
 
-        axios.get(`/api/v1.0/event?until=${now_formated}`).then(res => {
+        axios.get(`/index.php/api/v1.0/event?until=${now_formated}`).then(res => {
             if (res.data.success === true){
                 this.setState( { events: res.data.results, loading: false } )
             } else {

@@ -47,7 +47,7 @@ class Purchase extends Component {
     }
 
     getPurchase( id ) {
-        axios.get(`/api/v1.0/purchase/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/purchase/${id}`).then(res => {
             if (res.data.success === true) {
                 const purchase = res.data.results;
                 this.setState({purchase: purchase, loading: false});
@@ -58,7 +58,7 @@ class Purchase extends Component {
     }
 
     getUsers() {
-        axios.get(`/api/v1.0/user`).then(res => {
+        axios.get(`/index.php/api/v1.0/user`).then(res => {
             if (res.data.success === true) {
                 const users = res.data.results;
 
@@ -412,7 +412,7 @@ class Purchase extends Component {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
 
         if (ans) {
-            axios.delete(`/api/v1.0/purchase/delete/${purchase.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/purchase/delete/${purchase.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -455,7 +455,7 @@ class Purchase extends Component {
         this.setState( { sending: true } )
 
         // Make the API call
-        fetch(`/api/v1.0/purchase/edit/${purchase.id}`, requestOptions)
+        fetch(`/index.php/api/v1.0/purchase/edit/${purchase.id}`, requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){

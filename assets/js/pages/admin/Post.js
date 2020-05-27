@@ -49,7 +49,7 @@ class Post extends Component {
     }
 
     getPost( id ) {
-        axios.get(`/api/v1.0/post/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/post/${id}`).then(res => {
             if (res.data.success === true) {
                 const post = res.data.results;
 
@@ -61,7 +61,7 @@ class Post extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -73,7 +73,7 @@ class Post extends Component {
     }
 
     getTags = () =>  {
-        axios.get(`/api/v1.0/tag`).then(res => {
+        axios.get(`/index.php/api/v1.0/tag`).then(res => {
             if (res.data.success === true) {
                 const tags = res.data.results;
 
@@ -301,7 +301,7 @@ class Post extends Component {
         if (ans) {
 
 
-            axios.delete(`/api/v1.0/post/delete/${post.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/post/delete/${post.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -351,7 +351,7 @@ class Post extends Component {
             formData.append('img',img);
 
             // Make the API call
-            fetch(`/api/v1.0/post/edit/${post.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/post/edit/${post.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
@@ -361,7 +361,7 @@ class Post extends Component {
                 }).catch(e=>{});
 
             // Make the API call
-            axios.post(`/api/v1.0/post/upload-img/${post.id}`, formData, {})
+            axios.post(`/index.php/api/v1.0/post/upload-img/${post.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
                         this.setState({ post:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
@@ -374,7 +374,7 @@ class Post extends Component {
                     this.setState({ success: false, errors: errors, submited: true, sending: false }) })
 
         } else {
-            fetch(`/api/v1.0/post/edit/${post.id}`, requestOptions)
+            fetch(`/index.php/api/v1.0/post/edit/${post.id}`, requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){

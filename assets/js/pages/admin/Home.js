@@ -32,7 +32,7 @@ class Home extends Component{
     }
 
     getLastPurchases = () => {
-        axios.get('/api/v1.0/purchase/?last=6').then(res => {
+        axios.get('/index.php/api/v1.0/purchase/?last=6').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { last_purchases: res.data.results } );
             } else {
@@ -43,7 +43,7 @@ class Home extends Component{
     }
 
     getMonthlyEarns = () => {
-        axios.get('/api/v1.0/purchase/monthlyearns').then(res => {
+        axios.get('/index.php/api/v1.0/purchase/monthlyearns').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { monthly_earns: res.data.results.toFixed(2), loading: false } );
             } else {

@@ -35,7 +35,7 @@ class Profile extends Component {
             if (sessionStorage.getItem('auth') === "true"){
 
                 // Get info to the user
-                const info = await axios.get(`/api/v1.0/user/profile/info`).catch(e=>{})
+                const info = await axios.get(`/index.php/api/v1.0/user/profile/info`).catch(e=>{})
                 if (info === undefined){
                     this.props.history.push({
                         pathname: '/login',
@@ -44,8 +44,8 @@ class Profile extends Component {
                 }
                 // Get comments and purchases by the user filtering by his ID
                 const [comments,purchases] = await Promise.all([
-                    axios.get('/api/v1.0/user/profile/comments').catch(e=>{}),
-                    axios.get('/api/v1.0/user/profile/purchases').catch(e=>{})
+                    axios.get('/index.php/api/v1.0/user/profile/comments').catch(e=>{}),
+                    axios.get('/index.php/api/v1.0/user/profile/purchases').catch(e=>{})
                 ])
 
                 console.log(comments,purchases)
@@ -475,7 +475,7 @@ class Profile extends Component {
         };
 
         // Make the API call
-        fetch("/api/v1.0/user/profile/edit/info", requestOptions)
+        fetch("/index.php/api/v1.0/user/profile/edit/info", requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){
@@ -501,7 +501,7 @@ class Profile extends Component {
         };
 
         // Make the API call
-        fetch("/api/v1.0/user/profile/change-password", requestOptions)
+        fetch("/index.php/api/v1.0/user/profile/change-password", requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){
@@ -523,7 +523,7 @@ class Profile extends Component {
 
             formData.append('img_profile',image_profile)
             // Make the API call
-            axios.post("/api/v1.0/user/profile/change-profile-image", formData, {})
+            axios.post("/index.php/api/v1.0/user/profile/change-profile-image", formData, {})
                 .then(res => { // then print response status
                     console.log(formData)
                     console.log(res);
@@ -538,7 +538,7 @@ class Profile extends Component {
         const ans = confirm("¿Estás seguro de que quieres borrar el comentario?");
         let { comments } = this.state;
         if (ans){
-            axios.delete(`/api/v1.0/comment/delete/${comments[idx].id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/comment/delete/${comments[idx].id}`).then(res => {
                 if (res.data.success === true) {
                     comments.splice(idx, 1);
                     this.setState({ comments: comments });
@@ -553,7 +553,7 @@ class Profile extends Component {
         const ans = confirm("¿Estás seguro de que quieres borrar tu cuenta? Todos tus datos se borrarán y no podrás recuperarlos.");
 
         if (ans) {
-            axios.delete('/api/v1.0/user/deleteaccount').then(res => {
+            axios.delete('/index.php/api/v1.0/user/deleteaccount').then(res => {
                 if (res.data.success === true) {
                     sessionStorage.removeItem('auth');
                     sessionStorage.removeItem('is_admin');

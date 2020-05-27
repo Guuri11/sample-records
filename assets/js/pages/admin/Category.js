@@ -46,7 +46,7 @@ class Category extends Component {
     }
 
     getCategory( id ) {
-        axios.get(`/api/v1.0/category/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/category/${id}`).then(res => {
             if (res.data.success === true) {
                 const category = res.data.results;
 
@@ -157,7 +157,7 @@ class Category extends Component {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
 
         if (ans) {
-            axios.delete(`/api/v1.0/category/delete/${category.id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/category/delete/${category.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -189,7 +189,7 @@ class Category extends Component {
         this.setState( { sending: true } )
 
         // Make the API call
-        fetch(`/api/v1.0/category/edit/${category.id}`, requestOptions)
+        fetch(`/index.php/api/v1.0/category/edit/${category.id}`, requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){

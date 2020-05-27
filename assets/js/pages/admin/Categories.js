@@ -39,7 +39,7 @@ class Categories extends Component {
     }
 
     getCategories = () => {
-        axios.get('/api/v1.0/category').then(res => {
+        axios.get('/index.php/api/v1.0/category').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
@@ -113,7 +113,7 @@ class Categories extends Component {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/category/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/category/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -342,7 +342,7 @@ class Categories extends Component {
         this.setState( { sending: true } )
 
         // Make the API call
-        fetch(`/api/v1.0/category/new`, requestOptions)
+        fetch(`/index.php/api/v1.0/category/new`, requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){

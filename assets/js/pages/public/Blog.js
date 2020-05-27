@@ -40,7 +40,7 @@ class Blog extends Component {
     /* API REQUEST TO GET THE BLOG DATA */
 
     getPosts() {
-        axios.get(`/api/v1.0/post`).then(res => {
+        axios.get(`/index.php/api/v1.0/post`).then(res => {
             if (res.data.success === true){
                 const posts = res.data.results;
                 // Get tags from the posts collection

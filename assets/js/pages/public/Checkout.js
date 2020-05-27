@@ -33,7 +33,7 @@ class Checkout extends Component {
             // Check if user is loggued
             if (sessionStorage.getItem('auth') === "true"){
                 // Get user data to use the values in the form
-                axios.get('/api/v1.0/user/profile/info').then(res => {
+                axios.get('/index.php/api/v1.0/user/profile/info').then(res => {
                     if (res.data.success === true) {
                         this.setState({ user_data: res.data.results[0], isAuth: true});
                         // Get cart items
@@ -129,7 +129,7 @@ class Checkout extends Component {
             };
 
             // Make the Post call
-            await fetch("/api/v1.0/purchase/buy", requestOptions)
+            await fetch("/index.php/api/v1.0/purchase/buy", requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if(!data.success) {

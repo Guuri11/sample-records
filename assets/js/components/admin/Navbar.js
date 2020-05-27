@@ -27,7 +27,7 @@ class Navbar extends Component {
                 <hr className="sidebar-divider"/>
 
                 <li className="nav-item active">
-                    <p onClick={() => { window.location.assign('/admin/api/doc') }} className="nav-link pointer">
+                    <p onClick={() => { window.location.assign('/admin/index.php/api/doc') }} className="nav-link pointer">
                         <i className="fa fa-book"/>
                         <span>API Doc</span></p>
                 </li>

@@ -34,7 +34,7 @@ class Contact extends Component{
         };
 
         // Make the Post call
-        fetch("/api/v1.0/user/contact", requestOptions)
+        fetch("/index.php/api/v1.0/user/contact", requestOptions)
             .then(response => response.json())
             .then(data => {
                 this.setState({ success:data.success, message:data.message, errors: data.errors, submited: true, sending:false })

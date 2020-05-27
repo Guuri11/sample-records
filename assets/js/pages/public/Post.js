@@ -62,7 +62,7 @@ class Post extends Component {
     }
 
     getPost({ id }) {
-        axios.get(`/api/v1.0/post/${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/post/${id}`).then(res => {
             if (res.data.success === true) {
                 const post = res.data.results;
                 const day = new Date(post.created_at.date).getDate();
@@ -77,7 +77,7 @@ class Post extends Component {
     }
 
     getComments({ id }) {
-        axios.get(`/api/v1.0/comment/?post=${id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/comment/?post=${id}`).then(res => {
                 if (res.data.success)
                     this.setState( { comments: res.data.results } )
         }).catch(e => {})
@@ -85,7 +85,7 @@ class Post extends Component {
 
     userCanComment () {
         // check that user is loggued and get data
-        axios.get('/api/v1.0/user/datatocomment').then(res => {
+        axios.get('/index.php/api/v1.0/user/datatocomment').then(res => {
             if (res.data.success)
                 this.setState( { user_data: res.data.results, can_comment: true, loading: false } )
         }).catch(error => {
@@ -106,7 +106,7 @@ class Post extends Component {
             };
 
             // Make the Post call
-            fetch("/api/v1.0/comment/new", requestOptions)
+            fetch("/index.php/api/v1.0/comment/new", requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     const {id} = this.props.match.params;

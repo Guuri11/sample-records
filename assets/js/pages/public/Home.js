@@ -44,7 +44,7 @@ class Home extends Component{
         const day = now.getDay();
         const now_formated = year+"-"+month+"-"+day;
 
-        axios.get(`/api/v1.0/search/last?last=2&until=${now_formated}`).then(res => {
+        axios.get(`/index.php/api/v1.0/search/last?last=2&until=${now_formated}`).then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { last_two: res.data.results } );
             } else {
@@ -56,7 +56,7 @@ class Home extends Component{
 
 
     getLastSong () {
-        axios.get(`/api/v1.0/song?last=1`).then(res => {
+        axios.get(`/index.php/api/v1.0/song?last=1`).then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { last_song: res.data.results } );
             } else {
@@ -67,7 +67,7 @@ class Home extends Component{
     }
 
     getLastProducts () {
-        axios.get(`/api/v1.0/product?last=6&available=1s`).then(res => {
+        axios.get(`/index.php/api/v1.0/product?last=6&available=1s`).then(res => {
             if (res.data.success === true){
                 this.setState( { last_products: res.data.results } );
             } else {
@@ -78,7 +78,7 @@ class Home extends Component{
     }
 
     getLastPosts () {
-        axios.get(`/api/v1.0/post?last=6`).then(res => {
+        axios.get(`/index.php/api/v1.0/post?last=6`).then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { last_posts: res.data.results, loading: false } );
             } else {

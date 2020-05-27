@@ -38,7 +38,7 @@ class Artist extends Component {
     /* API REQUESTS */
 
     getSongs(artist) {
-        axios.get(`/api/v1.0/song/?artist=${artist.id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/song/?artist=${artist.id}`).then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { songs: res.data.results, loading: false } );
             }
@@ -46,7 +46,7 @@ class Artist extends Component {
     }
 
     getAlbums(artist) {
-        axios.get(`/api/v1.0/album/?artist=${artist.id}`).then(res => {
+        axios.get(`/index.php/api/v1.0/album/?artist=${artist.id}`).then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { albums: res.data.results, loading: false } );
             }

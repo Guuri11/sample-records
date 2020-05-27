@@ -43,7 +43,7 @@ class Products extends Component {
     }
 
     getProducts = () => {
-        axios.get('/api/v1.0/product').then(res => {
+        axios.get('/index.php/api/v1.0/product').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
@@ -54,7 +54,7 @@ class Products extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -66,7 +66,7 @@ class Products extends Component {
     }
 
     getCategories = () =>  {
-        axios.get(`/api/v1.0/category`).then(res => {
+        axios.get(`/index.php/api/v1.0/category`).then(res => {
             if (res.data.success === true) {
                 const categories = res.data.results;
 
@@ -143,7 +143,7 @@ class Products extends Component {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/product/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/product/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -566,7 +566,7 @@ class Products extends Component {
 
         this.setState( { sending: true } )
 
-        fetch('/api/v1.0/product/new', requestOptions)
+        fetch('/index.php/api/v1.0/product/new', requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){
@@ -577,7 +577,7 @@ class Products extends Component {
                         formData.append('img',img);
 
                         // Make the API call
-                        axios.post(`/api/v1.0/product/upload-img/${product.id}`, formData, {})
+                        axios.post(`/index.php/api/v1.0/product/upload-img/${product.id}`, formData, {})
                             .then(res=> {
                                 if (res.data.success){
                                     // Get new product

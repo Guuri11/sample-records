@@ -41,7 +41,7 @@ class Shop extends Component {
     /* API REQUEST TO GET THE BLOG DATA */
 
     getProducts() {
-        axios.get(`/api/v1.0/product?available=1`).then(res => {
+        axios.get(`/index.php/api/v1.0/product?available=1`).then(res => {
             if (res.data.success === true){
 
                 const products = res.data.results;

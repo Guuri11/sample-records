@@ -39,7 +39,7 @@ class Tags extends Component {
     }
 
     getTags = () => {
-        axios.get('/api/v1.0/tag').then(res => {
+        axios.get('/index.php/api/v1.0/tag').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
@@ -113,7 +113,7 @@ class Tags extends Component {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/tag/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/tag/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -344,7 +344,7 @@ class Tags extends Component {
         this.setState( { sending: true } )
 
         // Make the API call
-        fetch(`/api/v1.0/tag/new`, requestOptions)
+        fetch(`/index.php/api/v1.0/tag/new`, requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){

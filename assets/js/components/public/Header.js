@@ -32,7 +32,7 @@ class Header extends PureComponent {
     }
 
     isUserAuth = () => {
-        axios.get('/api/v1.0/user/authenticated').then(res => {
+        axios.get('/index.php/api/v1.0/user/authenticated').then(res => {
                 sessionStorage.setItem('auth', res.data.success);
                 if (res.data.hasOwnProperty("is_admin"))
                     sessionStorage.setItem('is_admin', res.data.is_admin);

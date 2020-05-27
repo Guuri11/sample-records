@@ -39,7 +39,7 @@ class Search extends Component {
         const day = now.getDay();
         const now_formated = year+"-"+month+"-"+day;
 
-        axios.get(`/api/v1.0/search?search=${search}&available=1&until=${now_formated}`).then(res => {
+        axios.get(`/index.php/api/v1.0/search?search=${search}&available=1&until=${now_formated}`).then(res => {
             this.setState( { results: res.data.results ? res.data.results : [], loading: false } )
         }).catch(error => {});
     }

@@ -41,7 +41,7 @@ class Albums extends Component {
     }
 
     getAlbums = () => {
-        axios.get('/api/v1.0/album').then(res => {
+        axios.get('/index.php/api/v1.0/album').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { albums: res.data.results, total_albums: res.data.results, loading: false } );
             } else {
@@ -52,7 +52,7 @@ class Albums extends Component {
     }
 
     getArtists = () =>  {
-        axios.get(`/api/v1.0/artist`).then(res => {
+        axios.get(`/index.php/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
@@ -127,7 +127,7 @@ class Albums extends Component {
 
             let {total_albums} = this.state;
 
-            axios.delete(`/api/v1.0/album/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/album/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_albums = total_albums.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -454,7 +454,7 @@ class Albums extends Component {
 
         this.setState( { sending: true } )
 
-        fetch('/api/v1.0/album/new', requestOptions)
+        fetch('/index.php/api/v1.0/album/new', requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){
@@ -466,7 +466,7 @@ class Albums extends Component {
                         formData.append('img',img);
 
                         // Make the API call
-                        axios.post(`/api/v1.0/album/upload-img/${album.id}`, formData, {})
+                        axios.post(`/index.php/api/v1.0/album/upload-img/${album.id}`, formData, {})
                             .then(res=> {
                                 if (res.data.success){
                                     // Get new album

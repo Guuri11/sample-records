@@ -41,7 +41,7 @@ class Tickets extends Component {
     }
 
     getTickets = () => {
-        axios.get('/api/v1.0/ticket').then(res => {
+        axios.get('/index.php/api/v1.0/ticket').then(res => {
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
@@ -52,7 +52,7 @@ class Tickets extends Component {
     }
 
     getEvents = () =>  {
-        axios.get(`/api/v1.0/event`).then(res => {
+        axios.get(`/index.php/api/v1.0/event`).then(res => {
             if (res.data.success === true) {
                 const events = res.data.results;
 
@@ -128,7 +128,7 @@ class Tickets extends Component {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/ticket/delete/${id}`).then(res => {
+            axios.delete(`/index.php/api/v1.0/ticket/delete/${id}`).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -391,7 +391,7 @@ class Tickets extends Component {
 
         this.setState( { sending: true } )
 
-        fetch('/api/v1.0/ticket/new', requestOptions)
+        fetch('/index.php/api/v1.0/ticket/new', requestOptions)
             .then(response => response.json())
             .then(data => {
                 if (data.success){
