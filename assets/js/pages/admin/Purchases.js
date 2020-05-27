@@ -34,13 +34,14 @@ class Purchases extends Component {
 
     getPurchases = () => {
         axios.get('/api/v1.0/purchase').then(res => {
+            console.log(res.data)
             if (res.data.success === true){
                 this._isMounted && this.setState( { items: res.data.results, total_items: res.data.results, loading: false } );
             } else {
                 <Redirect to={'error404'}/>
             }
 
-        }).catch(e => {})
+        }).catch(e => {console.log(e.response)})
     }
 
     // Filter by search
@@ -254,13 +255,13 @@ class Purchases extends Component {
                                                                 const updated_at_day = new Date(item.updated_at.date).getDate();
                                                                 const updated_at_month = new Date(item.updated_at.date).getMonth();
                                                                 const updated_at_year = new Date(item.updated_at.date).getFullYear();
-
+                                                                console.log(item.time)
                                                                 return (
                                                                     <tr key={idx} className={"row-sr"}>
                                                                         <td>{idx+1+items_per_page*(active_page-1)}</td>
                                                                         <td>{item.serial_number}</td>
                                                                         <td key={idx}>{day+"-"+month+"-"+year}</td>
-                                                                        <td>{item.time !== null ? item.time:''}</td>
+                                                                        <td>{item.time !== null ? item.time.d+" dia/s y "+item.time.h+" hora/s aprox":''}</td>
                                                                         <td>{item.received ? "Sí":"No"}</td>
                                                                         <td>{item.address}</td>
                                                                         <td>{item.town !== null ? item.town:''}</td>

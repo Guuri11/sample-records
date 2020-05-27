@@ -80,7 +80,7 @@ return (
                                 <h5 className="modal-title" id="title-cart">
                                     Tu carrito
                                 </h5>
-                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Cerrar">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
@@ -130,7 +130,7 @@ return (
                                 </div>
                             </div>
                             <div className="modal-footer border-top-0 d-flex justify-content-between">
-                                <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" className="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                                 <button type="button" className="btn btn-success" onClick={this.handleGoToCheckout}>Comprar</button>
                             </div>
                         </div>

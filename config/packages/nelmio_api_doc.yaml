@@ -1,3 +1,4 @@
+
 nelmio_api_doc:
     documentation:
         info:
@@ -443,7 +444,7 @@ nelmio_api_doc:
                   '404':
                     description: Not found
                 tags:
-                  - artist 
+                  - artist
             "/api/v1.0/category/":
                 get:
                     parameters:
