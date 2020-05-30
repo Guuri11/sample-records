@@ -50,7 +50,7 @@ class Purchases extends Component {
         const search_request = e.target.value.toLowerCase();
         if (search_request !== ""){
 
-            // Filter artists searching in his name and artist alias
+            // Filter purchase searching in his serial number, product or event
             const search_results = this.state.items.filter( (purchase) => {
                 let purchase_slug = product.serial_number;
                 purchase_slug = purchase.product !== null ? purchase_slug+purchase.product.name : product_slug;

@@ -83,7 +83,7 @@ class Songs extends Component {
         const search_request = e.target.value.toLowerCase();
         if (search_request !== ""){
 
-            // Filter artists searching in his name and artist alias
+            // Filter songs searching in his name, artist alias and album if has
             const search_results = this.state.items.filter( (song) => {
                 let song_slug = song.name + song.artist.alias;
                 song_slug = song.album !== null ? song_slug+song.album.name : song_slug;
@@ -225,7 +225,7 @@ class Songs extends Component {
                                     <th>#</th>
                                     <th>Nombre</th>
                                     <th>Artista</th>
-                                    <th>Album</th>
+                                    <th>Álbum</th>
                                     <th>Duración</th>
                                     <th>Enlace videoclip</th>
                                     <th>Fichero canción</th>
@@ -241,7 +241,7 @@ class Songs extends Component {
                                     <th>#</th>
                                     <th>Nombre</th>
                                     <th>Artista</th>
-                                    <th>Album</th>
+                                    <th>Álbum</th>
                                     <th>Duración</th>
                                     <th>Enlace videoclip</th>
                                     <th>Fichero canción</th>
@@ -273,7 +273,7 @@ class Songs extends Component {
                                                 <td>{idx+1+items_per_page*(active_page-1)}</td>
                                                 <td>{item.name}</td>
                                                 <td><Link to={`/admin/artistas/${item.artist.id}`}>{item.artist.alias} </Link></td>
-                                                <td>{item.album !== null ?<Link to={`/admin/albums/${item.album.id}`}>{item.album.name} </Link>:'' }</td>
+                                                <td>{item.album !== null ?<Link to={`/admin/albunes/${item.album.id}`}>{item.album.name} </Link>:'' }</td>
                                                 <td>{item.duration}</td>
                                                 <td>{item.video_src !== null ? item.video_src:''}</td>
                                                 <td>{item.song_file}</td>
@@ -391,7 +391,7 @@ class Songs extends Component {
 
                                     <div className="form-group row">
                                         <label htmlFor="album" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
-                                            Album
+                                            Álbum
                                         </label>
                                         {
                                             this.state.errors.hasOwnProperty('album') ?
@@ -515,6 +515,7 @@ class Songs extends Component {
 
         e.preventDefault();
 
+        // Get form data
         const name = document.querySelector('#name').value;
         const artist = document.querySelector('#artist').value;
         const album = document.querySelector('#album').value;

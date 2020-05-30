@@ -84,7 +84,7 @@ class Products extends Component {
         const search_request = e.target.value.toLowerCase();
         if (search_request !== ""){
 
-            // Filter artists searching in his name and artist alias
+            // Filter products searching in his name, artist alias and category
             const search_results = this.state.items.filter( (product) => {
                 let product_slug = product.name + product.artist.alias;
                 product_slug = product.category !== null ? product_slug+product.category.name : product_slug;
@@ -582,7 +582,7 @@ class Products extends Component {
                                 if (res.data.success){
                                     // Get new product
                                     product = res.data.results;
-                                    // Update albums list
+                                    // Update products list
                                     total_items.unshift(product);
 
                                     this.setState({ total_items:total_items, items: total_items, submited: true,

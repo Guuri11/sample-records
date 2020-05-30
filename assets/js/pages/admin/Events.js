@@ -69,7 +69,7 @@ class Events extends Component {
         const search_request = e.target.value.toLowerCase();
         if (search_request !== ""){
 
-            // Filter artists searching in his name and artist alias
+            // Filter events searching in his name and artist alias and city
             const search_results = this.state.items.filter( (event) => {
                 let event_slug = event.name + event.artist.alias + event.city;
                 return event_slug.toLowerCase().indexOf(search_request) !== -1;
@@ -523,6 +523,7 @@ class Events extends Component {
     handleCreate = (e) => {
         e.preventDefault();
 
+        // Get form data
         const name = document.querySelector('#name').value;
         const artist = document.querySelector('#artist').value;
         const place = document.querySelector('#place').value;
@@ -560,9 +561,9 @@ class Events extends Component {
                         axios.post(`/api/v1.0/event/upload-img/${event.id}`, formData, {})
                             .then(res=> {
                                 if (res.data.success){
-                                    // Get new album
+                                    // Get new event
                                     event = res.data.results;
-                                    // Update albums list
+                                    // Update events list
                                     total_items.unshift(event);
 
                                     this.setState({ total_items:total_items, items: total_items, submited: true,

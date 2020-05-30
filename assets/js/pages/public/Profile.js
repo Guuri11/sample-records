@@ -48,7 +48,6 @@ class Profile extends Component {
                     axios.get('/api/v1.0/user/profile/purchases').catch(e=>{})
                 ])
 
-                console.log(comments,purchases)
                 this.setState({
                     info: info.data.results[0],
                     profile_img: info.data.results[0].profile_image,

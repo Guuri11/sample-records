@@ -10,6 +10,7 @@ class Error404 extends Component {
 
     }
 
+    // Redirect to search page if submits
     handleSubmit = (e) => {
         e.preventDefault();
 

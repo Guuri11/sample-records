@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Tag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,7 +22,7 @@ class TagRepository extends ServiceEntityRepository
 
     /**
      * @param $params
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      * API request result
      */
     public function getRequestResult($params)

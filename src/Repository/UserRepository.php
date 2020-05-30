@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -40,7 +41,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     /**
      * @param $params
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      * API request result
      */
     public function getRequestResult($params)
@@ -69,6 +70,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * This method will return sensitive data about the user to his profile
+     *
      * @param $email
      * @return mixed[]
      * @throws Exception

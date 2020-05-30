@@ -19,6 +19,7 @@ class Artists extends Component {
         artists: []
     }
 
+    // Api call to get all artists
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {

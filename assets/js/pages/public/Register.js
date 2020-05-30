@@ -46,12 +46,13 @@ class Register extends Component {
         fetch("/api/v1.0/user/register", requestOptions)
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 this.setState({ success:data.success, message:data.message, errors: data.error.errors, submited: true, sending:false });
                 if (data.success) {
                     sessionStorage.setItem('auth',"true");
                     this.props.history.push('/perfil');
                 }
-            });
+            }).catch(e => console.log(e.response));
     }
 
     getErrors = (name_form) => {

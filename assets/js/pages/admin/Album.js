@@ -14,7 +14,7 @@ class Album extends Component {
     }
 
     state = {
-        album: {},
+        item: {},
         artists: [],
         loading: true,
         section: 'Mostrar',
@@ -49,9 +49,9 @@ class Album extends Component {
     getAlbum( id ) {
         axios.get(`/api/v1.0/album/${id}`).then(res => {
             if (res.data.success === true) {
-                const album = res.data.results;
+                const item = res.data.results;
 
-                this.setState({album: album, loading: false});
+                this.setState({item: item, loading: false});
             }
         }).catch(error => {
             this.props.history.push('/admin/error404');
@@ -306,14 +306,14 @@ class Album extends Component {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
 
         if (ans) {
-
-
+            // Api call to delete album
             axios.delete(`/api/v1.0/album/delete/${album.id}`).then(res => {
                 if (res.data.success === true) {
+                    // Render to albums page
                     this.props.history.push(
                         {
-                            pathname: '/admin/albums/',
-                            state: {delete_success: "Album eliminado"}
+                            pathname: '/admin/albunes/',
+                            state: {delete_success: "Álbum eliminado"}
                         }
                     );
                 }else {
@@ -328,6 +328,7 @@ class Album extends Component {
     handleUpdate = (e) => {
         e.preventDefault();
 
+        // Get form data
         const name = document.querySelector('#name').value;
         const artist = document.querySelector('#artist').value;
         const price = document.querySelector('#price').value;
@@ -354,7 +355,7 @@ class Album extends Component {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
-                        this.setState({ album:data.results })
+                        this.setState({ item:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
                 }).catch(e=>{});
@@ -363,7 +364,7 @@ class Album extends Component {
             axios.post(`/api/v1.0/album/upload-img/${album.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
-                        this.setState({ album:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
+                        this.setState({ item:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                 } )
@@ -377,7 +378,7 @@ class Album extends Component {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
-                        this.setState({ album:data.results, submited: true, success: true, section: "Mostrar", sending: false })
+                        this.setState({ item:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
                 }).catch(e=>{});
@@ -387,7 +388,7 @@ class Album extends Component {
 
 
     render() {
-        const { album, artists, loading, section, errors } = this.state;
+        const { item, artists, loading, section, errors } = this.state;
 
         return(
             <div id="wrapper">
@@ -397,7 +398,7 @@ class Album extends Component {
                         <Header/>
                         <div className="container-fluid">
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
-                                <h1 className="h3 mb-0 text-gray-800">Album {album.name}</h1>
+                                <h1 className="h3 mb-0 text-gray-800">Álbum {item.name}</h1>
                             </div>
                             {
                                 loading ?
@@ -415,11 +416,11 @@ class Album extends Component {
                                             <div className="card-body">
                                                 {
                                                     section === "Mostrar" ?
-                                                        this._renderInfo(album) : null
+                                                        this._renderInfo(item) : null
                                                 }
                                                 {
                                                     section === "Editar" ?
-                                                        this._renderUpdateInfo(album,artists) : null
+                                                        this._renderUpdateInfo(item,artists) : null
                                                 }
                                             </div>
                                         </div>

@@ -9,7 +9,7 @@ class Navbar extends Component {
 
                 <div className="sidebar-brand d-flex align-items-center justify-content-center">
                     <div className="sidebar-brand-icon pointer" onClick={ () => window.location.assign('/')}>
-                        <img src="/img/core/logo-white-onlylogo.png" width="50" height="50"/>
+                        <img src="/img/core/logo-white-onlylogo.png" width="50" height="50" alt={"Imagen no disponible"}/>
                     </div>
                     <div className="sidebar-brand-text mx-3 pointer text-white font-weight-bolder one-day" onClick={ () => window.location.assign('/')}>
                         Sample Records

@@ -153,7 +153,7 @@ class Albums extends Component {
             <div className={"row"}>
                 <div className="card shadow mb-4 w-100">
                     <div className="card-header py-3">
-                        <h6 className="m-0 font-weight-bold text-sr">Todos los albums</h6>
+                        <h6 className="m-0 font-weight-bold text-sr">Todos los álbunes</h6>
                         {
                             message !== '' ?
                                 <h5 className={"text-info"}>{message}</h5>
@@ -174,7 +174,7 @@ class Albums extends Component {
                                                 <option value={10}>10</option>
                                                 <option value={15}>15</option>
                                                 <option value={20}>20</option>
-                                            </select> albums
+                                            </select> álbunes
                                         </label>
                                     </div>
                                 </div>
@@ -251,7 +251,7 @@ class Albums extends Component {
                                                 <td>{updated_at_day+"-"+updated_at_month+"-"+updated_at_year}</td>
 
                                                 <td>
-                                                    <Link to={`/admin/albums/${album.id}`} className={"font-weight-bolder"}>
+                                                    <Link to={`/admin/albunes/${album.id}`} className={"font-weight-bolder"}>
                                                         <button className="btn btn-primary d-block mb-2">Ver</button>
                                                     </Link>
                                                     <button className={"btn btn-danger"}
@@ -475,7 +475,7 @@ class Albums extends Component {
                                     total_albums.unshift(album);
 
                                     this.setState({ total_albums:total_albums, albums: total_albums, submited: true,
-                                        message:"¡Album creado!",success: true,section: "index", sending: false })
+                                        message:"¡Álbum creado!",success: true,section: "index", sending: false })
                                 }else
                                     this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                             } )
@@ -490,7 +490,7 @@ class Albums extends Component {
                         album = data.results;
                         // Update albums list
                         total_albums.unshift(album);
-                        this.setState({ total_albums:total_albums, albums: total_albums, submited: true, success: true, message:"¡Album creado!",
+                        this.setState({ total_albums:total_albums, albums: total_albums, submited: true, success: true, message:"¡Álbum creado!",
                             section: "index", sending: false })
                     }
                 }else
@@ -513,7 +513,7 @@ class Albums extends Component {
                         <Header/>
                         <div className="container-fluid">
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
-                                <h1 className="h3 mb-0 text-gray-800">Albums</h1>
+                                <h1 className="h3 mb-0 text-gray-800">Álbunes</h1>
                             </div>
                             {
                                 loading ?

@@ -49,11 +49,12 @@ class Comments extends Component {
         const search_request = e.target.value.toLowerCase();
         if (search_request !== ""){
 
-            // Filter artists searching in his name and artist alias
+            // Filter comments searching in his text and product/event/purchase/post name
             const search_results = this.state.items.filter( (comment) => {
                 let comment_slug = comment.comment ;
                 comment_slug = comment.product !== null ? comment_slug + comment.product.name : comment_slug;
                 comment_slug = comment.event !== null ? comment_slug + comment.event.name : comment_slug;
+                comment_slug = comment.post !== null ? comment_slug + comment.post.title : comment_slug;
                 comment_slug = comment.purchase !== null ? comment_slug + comment.purchase.serial_number : comment_slug;
                 return comment_slug.toLowerCase().indexOf(search_request) !== -1;
             } )

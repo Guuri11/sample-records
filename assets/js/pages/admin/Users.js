@@ -55,10 +55,10 @@ class Users extends Component {
         const search_request = e.target.value.toLowerCase();
         if (search_request !== ""){
 
-            // Filter artists searching in his name and artist alias
+            // Filter users searching in his name, email and his surname
             const search_results = this.state.items.filter( (user) => {
                 let user_slug = user.name + user.email;
-                user_slug = user.surname !== null ? user_slug+user.surname : product_slug;
+                user_slug = user.surname !== null ? user_slug+user.surname : user_slug;
                 return user_slug.toLowerCase().indexOf(search_request) !== -1;
             } )
             this.setState( {items: search_results} )
@@ -520,6 +520,7 @@ class Users extends Component {
     handleCreate = (e) => {
         e.preventDefault();
 
+        // Get form data
         const name = document.querySelector('#name').value;
         const surname = document.querySelector('#surname').value;
         const email = document.querySelector('#email').value;
@@ -582,9 +583,9 @@ class Users extends Component {
                                 this.setState({ success: false, errors: errors, submited: true, sending: false }) })
 
                     }else{
-                        // Get new album
+                        // Get new user
                         user = data.results;
-                        // Update albums list
+                        // Update users list
                         total_items.unshift(user);
                         this.setState({ total_items:total_items, items:total_items, submited: true,
                             message:"¡Usuario creado!",success: true,section: "index", sending: false})

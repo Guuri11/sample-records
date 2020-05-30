@@ -157,8 +157,6 @@ class Tag extends Component {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
 
         if (ans) {
-
-
             axios.delete(`/api/v1.0/tag/delete/${tag.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(

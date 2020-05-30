@@ -55,7 +55,7 @@ class Categories extends Component {
         const search_request = e.target.value.toLowerCase();
         if (search_request !== ""){
 
-            // Filter artists searching in his name and artist alias
+            // Filter category searching in his name
             const search_results = this.state.items.filter( (category) => {
                 let category_slug = category.name
                 return category_slug.toLowerCase().indexOf(search_request) !== -1;

@@ -149,6 +149,7 @@ class Blog extends Component {
         )
     }
 
+    /* FILTER POSTS BY ARTISTS/TAGS */
     handleCheck = () => {
 
         // Set the current posts all the posts to filter later

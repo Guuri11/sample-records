@@ -33,6 +33,7 @@ class Search extends Component {
     }
 
     getSearch = ({search}) => {
+        // Format date
         const now = new Date();
         const year = now.getFullYear();
         const month = now.getMonth();
@@ -44,6 +45,7 @@ class Search extends Component {
         }).catch(error => {});
     }
 
+    // Show artists founded
     _renderArtist = (artists) => {
         return(
             artists.map( (artist,idx) => {
@@ -67,6 +69,7 @@ class Search extends Component {
         )
     }
 
+    // Show posts founded
     _renderPosts = (posts) => {
         return(
             posts.map( (post,idx) => {
@@ -90,6 +93,7 @@ class Search extends Component {
         )
     }
 
+    // Show products founded
     _renderProducts = (products) => {
         return(
             products.map( (product,idx) => {
@@ -113,6 +117,7 @@ class Search extends Component {
         )
     }
 
+    // Show events founded
     _renderEvents = (events) => {
         return(
             events.map( (event,idx) => {

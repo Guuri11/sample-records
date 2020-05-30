@@ -440,6 +440,7 @@ class Product extends Component {
     handleUpdate = (e) => {
         e.preventDefault();
 
+        // Get form data
         const name = document.querySelector('#name').value;
         const price = document.querySelector('#price').value;
         const discount = document.querySelector('#discount').value;

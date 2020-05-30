@@ -117,7 +117,7 @@ class UserController extends AbstractController
                     $data['password']
                 )
             );
-            $user->setRoles([$data['roles']]);
+            $user->setRoles($data['roles']);
             if ($data['address'] !== "")
                 $user->setAddress($data['address']);
             if ($data['postal_code'] !== "")

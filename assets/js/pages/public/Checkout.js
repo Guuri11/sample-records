@@ -66,6 +66,7 @@ class Checkout extends Component {
         this.setState({ cart: cart, no_products: cart.length === 0, loading: false, final_price: final_price });
     }
 
+    // Delete a product/item
     handleDeleteItem = (idx) => {
 
         // Get cart's items
@@ -114,6 +115,7 @@ class Checkout extends Component {
 
         this.setState({sending: true})
 
+        // Make a API call to the server for each item and process the purchase
         for (const item of cart) {
             let idx = cart.indexOf(item);
 
@@ -138,6 +140,7 @@ class Checkout extends Component {
                 }).catch(e => {});
         }
 
+        // If theres no errors delete cart and update state
         if(Object.keys(this.state.errors).length === 0) {
             localStorage.removeItem('cart');
             this.setState( { sending: false, submited: true, success: true, cart: [] } )

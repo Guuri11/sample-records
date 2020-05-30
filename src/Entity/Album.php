@@ -7,12 +7,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AlbumRepository")
- * @Vich\Uploadable
  */
 class Album implements \JsonSerializable
 {
@@ -62,10 +60,6 @@ class Album implements \JsonSerializable
     private $released_at;
 
     /**
-     * NOTE: This is not a mapped field of entity metadata, just a simple property.
-     *
-     * @Vich\UploadableField(mapping="albums", fileNameProperty="imageName", size="imageSize")
-     *
      * @var File|null
      *
      * @Assert\File(uploadErrorMessage="Error al subir la imagen",
@@ -236,12 +230,6 @@ class Album implements \JsonSerializable
     }
 
     /**
-     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
-     * of 'UploadedFile' is injected into this setter to trigger the update. If this
-     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
-     * must be able to accept an instance of 'File' as the bundle will inject one here
-     * during Doctrine hydration.
-     *
      * @param File|UploadedFile|null $imageFile
      * @throws \Exception
      */

@@ -400,6 +400,7 @@ class Event extends Component {
     handleUpdate = (e) => {
         e.preventDefault();
 
+        // Get form data
         const name = document.querySelector('#name').value;
         const artist = document.querySelector('#artist').value;
         const place = document.querySelector('#place').value;

@@ -73,7 +73,7 @@ class SRMusic extends Component {
         return (
             <div className="row">
                 <div className=" col-12 box-rounded">
-                    <h4 className="text-align-center font-weight-bolder text-sr">ÚLTIMOS ALBUMS</h4>
+                    <h4 className="text-align-center font-weight-bolder text-sr">ÚLTIMOS ÁLBUNES</h4>
                     <hr/>
                     <Slider {...this.MultipleSettings(albums.length)}>
                         {
@@ -282,7 +282,7 @@ class SRMusic extends Component {
                                                 </li>
                                                 <li className={"pointer"} onClick={this.changeSection.bind(this,"ALBUMS")}>
                                                     <h4 className="menu-item-sr-music">
-                                                        <span className="fa fa-music"/> Albums
+                                                        <span className="fa fa-music"/> Álbunes
                                                     </h4>
                                                 </li>
                                             </ul>

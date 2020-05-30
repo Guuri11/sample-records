@@ -34,6 +34,7 @@ class Artist extends Component {
         })
     }
 
+    // Get artist's data
     async componentDidMount() {
         this._isMounted = true;
         if (this._isMounted){

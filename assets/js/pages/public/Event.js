@@ -153,6 +153,7 @@ class Event extends Component {
         this.setState( { comments : oldest_comments } );
     }
 
+    // Add the event to the cart
     handleAddCart = () => {
 
         // This is item has all the information about the product

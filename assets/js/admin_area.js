@@ -32,8 +32,8 @@ ReactDOM.render(
     <Router>
         <Switch>
             <Route exact path='/admin' component={Home}/>
-            <Route exact path="/admin/albums/:album" component={Album}/>
-            <Route path="/admin/albums" component={Albums}/>
+            <Route exact path="/admin/albunes/:album" component={Album}/>
+            <Route path="/admin/albunes" component={Albums}/>
             <Route exact path="/admin/artistas/:artist" component={Artist}/>
             <Route path="/admin/artistas" component={Artists}/>
             <Route exact path="/admin/canciones/:song" component={Song}/>

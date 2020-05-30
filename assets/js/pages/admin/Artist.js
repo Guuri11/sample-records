@@ -14,7 +14,7 @@ class Artist extends Component {
     }
 
     state = {
-        artist: {},
+        item: {},
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -38,9 +38,9 @@ class Artist extends Component {
     getArtist( id ) {
         axios.get(`/api/v1.0/artist/${id}`).then(res => {
             if (res.data.success === true) {
-                const artist = res.data.results;
+                const item = res.data.results;
 
-                this.setState({artist: artist, loading: false});
+                this.setState({item: item, loading: false});
             }
         }).catch(error => {
             this.props.history.push('/admin/error404');
@@ -308,7 +308,7 @@ class Artist extends Component {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
 
         if (ans) {
-
+            // API call to delete artist
             axios.delete(`/api/v1.0/artist/delete/${artist.id}`).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
@@ -329,6 +329,7 @@ class Artist extends Component {
     handleUpdate = (e) => {
         e.preventDefault();
 
+        // Get form data
         const name = document.querySelector('#name').value;
         const surname = document.querySelector('#surname').value;
         const alias = document.querySelector('#alias').value;
@@ -356,16 +357,16 @@ class Artist extends Component {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
-                        this.setState({ artist:data.results })
+                        this.setState({ item:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
                 }).catch(e=>{});
 
-            // Make the API call
+            // Make the API call to upload image
             axios.post(`/api/v1.0/artist/upload-img/${artist.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
-                        this.setState({ artist:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
+                        this.setState({ item:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                 } )
@@ -389,7 +390,7 @@ class Artist extends Component {
 
     render() {
 
-        const { artist, loading, section, errors } = this.state;
+        const { item, loading, section, errors } = this.state;
 
         return(
             <div id="wrapper">
@@ -399,7 +400,7 @@ class Artist extends Component {
                         <Header/>
                         <div className="container-fluid">
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
-                                <h1 className="h3 mb-0 text-gray-800">Artista {artist.alias}</h1>
+                                <h1 className="h3 mb-0 text-gray-800">Artista {item.alias}</h1>
                             </div>
                             {
                                 loading ?
@@ -417,11 +418,11 @@ class Artist extends Component {
                                             <div className="card-body">
                                                 {
                                                     section === "Mostrar" ?
-                                                        this._renderInfo(artist) : null
+                                                        this._renderInfo(item) : null
                                                 }
                                                 {
                                                     section === "Editar" ?
-                                                        this._renderUpdateInfo(artist) : null
+                                                        this._renderUpdateInfo(item) : null
                                                 }
                                             </div>
                                         </div>

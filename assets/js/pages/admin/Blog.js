@@ -452,6 +452,7 @@ class Blog extends Component {
     handleCreate = (e) => {
         e.preventDefault();
 
+        // Get form data
         const title = document.querySelector('#title').value;
         const artist = document.querySelector('#artist').value;
         const description = document.querySelector('#description').value;
@@ -505,9 +506,9 @@ class Blog extends Component {
                                 this.setState({ success: false, errors: errors, submited: true, sending: false }) })
 
                     }else{
-                        // Get new album
+                        // Get new post
                         post = data.results;
-                        // Update albums list
+                        // Update posts list
                         total_items.unshift(post);
                         this.setState({ total_items:total_items, items: total_items, submited: true,
                             message:"¡Noticia creada!",success: true,section: "index", sending: false})

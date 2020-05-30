@@ -14,7 +14,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @Vich\Uploadable
  * @UniqueEntity(fields={"email"}, message="Ya existe un usuario con ese email")
  */
 class User implements UserInterface, \Serializable, \JsonSerializable
@@ -99,10 +98,6 @@ class User implements UserInterface, \Serializable, \JsonSerializable
     private $created_at;
 
     /**
-     * NOTE: This is not a mapped field of entity metadata, just a simple property.
-     *
-     * @Vich\UploadableField(mapping="users_profile", fileNameProperty="profileImage", size="profileSize")
-     *
      * @var File|null
      * @Assert\File(uploadErrorMessage="Error al subir la imagen",
      *     mimeTypesMessage="Tipo de archivo no válido",
@@ -126,10 +121,6 @@ class User implements UserInterface, \Serializable, \JsonSerializable
     private $profileSize;
 
     /**
-     * NOTE: This is not a mapped field of entity metadata, just a simple property.
-     *
-     * @Vich\UploadableField(mapping="users_header", fileNameProperty="headerImage", size="headerSize")
-     *
      * @var File|null
      * @Assert\File(uploadErrorMessage="Error al subir la imagen",
      *     mimeTypesMessage="Tipo de archivo no válido",

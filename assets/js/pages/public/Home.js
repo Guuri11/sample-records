@@ -54,7 +54,6 @@ class Home extends Component{
         }).catch(e=>{})
     }
 
-
     getLastSong () {
         axios.get(`/api/v1.0/song?last=1`).then(res => {
             if (res.data.success === true){
@@ -160,11 +159,11 @@ class Home extends Component{
                             })
                         }
 
-                        <a href="#magicCarousel" className="carousel-control-prev" role="button" data-slide="prev">
+                        <a href="" className="carousel-control-prev" role="button" data-slide="prev">
                             <span className="carousel-control-prev-icon"/>
                             <span className="sr-only">Previous</span>
                         </a>
-                        <a href="#magicCarousel" className="carousel-control-next" role="button" data-slide="next">
+                        <a href="" className="carousel-control-next" role="button" data-slide="next">
                             <span className="carousel-control-next-icon"/>
                             <span className="sr-only">Next</span>
                         </a>

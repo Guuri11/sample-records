@@ -8,15 +8,6 @@ import {Link} from "react-router-dom";
 import Comment from "../../components/public/Comment";
 import CommentForm from "../../components/public/CommentForm";
 
-/*
-    TODO: estilos responsive de inicio y el header
-          hacer la logica de los comentarios
-          averiguar si el usuario está logueado o no
-          hacer un endpoint para obtener pocos datos para el comentario lol
-
-         another day, another opportunity...
- */
-
 class Post extends Component {
 
     constructor(props) {
@@ -121,6 +112,7 @@ class Post extends Component {
         }
     }
 
+    // Delete comment input value
     handleDelete = () => {
         document.querySelector('#comment_user').value = '';
     }

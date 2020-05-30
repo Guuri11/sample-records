@@ -16,6 +16,7 @@ class Contact extends Component{
         submited: false
     }
 
+    // Send contact data to server
     handleSubmit = (e) => {
         this.setState( { sending:false } )
         e.preventDefault();

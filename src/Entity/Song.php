@@ -5,12 +5,10 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SongRepository")
- * @Vich\Uploadable
  */
 class Song implements \JsonSerializable
 {
@@ -52,10 +50,6 @@ class Song implements \JsonSerializable
     private $songFileName;
 
     /**
-     * NOTE: This is not a mapped field of entity metadata, just a simple property.
-     *
-     * @Vich\UploadableField(mapping="songs_img", fileNameProperty="imageName", size="imageSize")
-     *
      * @var File|null
      * * @Assert\File(uploadErrorMessage="Error al subir la imagen",
      *     mimeTypesMessage="Tipo de archivo no válido",

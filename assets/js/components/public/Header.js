@@ -31,6 +31,7 @@ class Header extends PureComponent {
         sticky: PropTypes.bool
     }
 
+    // Check if user is authenticated
     isUserAuth = () => {
         axios.get('/api/v1.0/user/authenticated').then(res => {
                 sessionStorage.setItem('auth', res.data.success);
