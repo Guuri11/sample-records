@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-//TODO: Añadir carrito
 import Search from "./Search";
 import Cart from "./Cart";
 import {Link} from "react-router-dom";
@@ -16,6 +15,10 @@ class Header extends PureComponent {
         this._isMounted = false;
     }
 
+    state = {
+        is_admin: false,
+    }
+
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted && sessionStorage.getItem('auth') === null){
@@ -28,19 +31,21 @@ class Header extends PureComponent {
     }
 
     static propTypes = {
-        sticky: PropTypes.bool
+        auth: PropTypes.bool,
+        is_admin: PropTypes.bool
     }
 
     // Check if user is authenticated
     isUserAuth = () => {
         axios.get('/api/v1.0/user/authenticated').then(res => {
                 sessionStorage.setItem('auth', res.data.success);
-                if (res.data.hasOwnProperty("is_admin"))
+                if (res.data.hasOwnProperty("is_admin")){
                     sessionStorage.setItem('is_admin', res.data.is_admin);
+                    this.setState({is_admin: res.data.is_admin})
+                }
                 else
                     sessionStorage.removeItem('is_admin');
-        }).catch(error => {
-        });
+        }).catch(error => {});
     }
 
     render() {
@@ -87,7 +92,7 @@ class Header extends PureComponent {
                             <SimpleTooltip target="chartIcon" >Carrito</SimpleTooltip>
                             <span className="fa fa-search" data-toggle="modal" data-target="#searchModal" id={"searchIcon"}/>
                             <SimpleTooltip target="searchIcon" >Encuentra lo quieras aquí</SimpleTooltip>
-                            <SessionIconsNav auth={sessionStorage.getItem('auth')}/>
+                            <SessionIconsNav auth={sessionStorage.getItem('auth')} is_admin={this.state.is_admin}/>
                         </div>
                     </div>
                 </nav>
@@ -97,10 +102,6 @@ class Header extends PureComponent {
             </div>
         );
     }
-}
-
-Header.defaultProps = {
-    sticky:false
 }
 
 export default Header;
