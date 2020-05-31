@@ -41,7 +41,7 @@ class Header extends PureComponent {
                 sessionStorage.setItem('auth', res.data.success);
                 if (res.data.hasOwnProperty("is_admin")){
                     sessionStorage.setItem('is_admin', res.data.is_admin);
-                    this.setState({is_admin: res.data.is_admin})
+                    this.setState({is_admin: sessionStorage.getItem('is_admin')})
                 }
                 else
                     sessionStorage.removeItem('is_admin');

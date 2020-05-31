@@ -20,7 +20,7 @@ class SessionIconsNav extends Component {
                         </Link>
 
                         {
-                            this.props.is_admin !== null ?
+                            this.props.is_admin === "true" ?
                                 <Link to={'#'} className="text-dark">
                                     <span className="fa fa-dashboard" id={"profileIcon"}
                                     onClick={() => window.location.assign('/admin/')}/>
