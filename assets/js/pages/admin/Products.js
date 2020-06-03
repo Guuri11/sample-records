@@ -17,6 +17,7 @@ class Products extends Component {
     state = {
         loading: true,
         items: [],
+        token: '',
         categories: [],
         artists: [],
         total_items: [],
@@ -35,6 +36,7 @@ class Products extends Component {
         if (this._isMounted) {
             this.getArtists();
             this.getCategories();
+            this.getToken();
             this.getProducts();
         }
     }
@@ -51,6 +53,16 @@ class Products extends Component {
             }
 
         }).catch(e => {})
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     getArtists = () =>  {
@@ -138,12 +150,12 @@ class Products extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/product/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/product/delete/${id}`, { data: {token: token } }).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -554,6 +566,7 @@ class Products extends Component {
         const artist = document.querySelector('#artist').value;
         const category = document.querySelector('#category').value;
         const img = document.querySelector('#img').files[0];
+        const {token} = this.state;
 
         const { total_items } = this.state;
 
@@ -561,7 +574,7 @@ class Products extends Component {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: name, artist: artist, price: price, discount: discount, size: size, stock: stock,
-                avaiable: available, description: description, category: category})
+                avaiable: available, description: description, category: category, token: token})
         };
 
         this.setState( { sending: true } )
@@ -605,7 +618,9 @@ class Products extends Component {
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
 
     }
 

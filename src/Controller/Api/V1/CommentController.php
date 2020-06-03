@@ -105,46 +105,68 @@ class CommentController extends AbstractController
         $data = $apiUtils->getData();
 
 
-        try {
-            if ($data['comment'] !== "")
-                $comment->setComment($data['comment']);
-            $comment->setUser($userRepository->findOneBy(["email"=>$data['user']]));
-            if (isset($data['event']))
-                $comment->setEvent($eventRepository->find($data['event']));
-            if (isset($data['post']))
-                $comment->setPost($postRepository->find($data['post']));
-            if (isset($data['product']))
-                $comment->setProduct($productRepository->find($data['product']));
-            if (isset($data['purchase']))
-                $comment->setPurchase($purchaseRepository->find($data['purchase']));
-            $comment->setCreatedAt(new \DateTime());
-            $comment->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores al comentario", $comment);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($data['comment'] !== "")
+                        $comment->setComment($data['comment']);
+                    $comment->setUser($userRepository->findOneBy(["email"=>$data['user']]));
+                    if (isset($data['event']))
+                        $comment->setEvent($eventRepository->find($data['event']));
+                    if (isset($data['post']))
+                        $comment->setPost($postRepository->find($data['post']));
+                    if (isset($data['product']))
+                        $comment->setProduct($productRepository->find($data['product']));
+                    if (isset($data['purchase']))
+                        $comment->setPurchase($purchaseRepository->find($data['purchase']));
+                    $comment->setCreatedAt(new \DateTime());
+                    $comment->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores al comentario", $comment);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator, $comment);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($comment);
+                    $em->flush();
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo crear el comentario en la bbdd", null, $comment);
+
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Comentario creado!",$comment);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator, $comment);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($comment);
-            $em->flush();
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo crear el comentario en la bbdd", null, $comment);
-
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Comentario creado!",$comment);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
@@ -176,42 +198,65 @@ class CommentController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        try {
-            $comment->setComment($data['comment']);
-            $comment->setUser($userRepository->find($data['user']));
-            if (isset($data['event']))
-                $comment->setEvent($eventRepository->find($data['event']));
-            if (isset($data['post']))
-                $comment->setPost($postRepository->find($data['post']));
-            if (isset($data['product']))
-                $comment->setProduct($productRepository->find($data['product']));
-            if (isset($data['purchase']))
-                $comment->setPurchase($purchaseRepository->find($data['purchase']));
-            $comment->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores del comentario", $comment);
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
 
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$comment);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    $comment->setComment($data['comment']);
+                    $comment->setUser($userRepository->find($data['user']));
+                    if (isset($data['event']))
+                        $comment->setEvent($eventRepository->find($data['event']));
+                    if (isset($data['post']))
+                        $comment->setPost($postRepository->find($data['post']));
+                    if (isset($data['product']))
+                        $comment->setProduct($productRepository->find($data['product']));
+                    if (isset($data['purchase']))
+                        $comment->setPurchase($purchaseRepository->find($data['purchase']));
+                    $comment->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores del comentario", $comment);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
 
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar el comentario en la bbdd",null,$comment);
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$comment);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
 
-        $apiUtils->successResponse("¡Comentario editado!",$comment);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar el comentario en la bbdd",null,$comment);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Comentario editado!",$comment);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+        }
     }
 
     /**
@@ -226,21 +271,50 @@ class CommentController extends AbstractController
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        try {
-            if ($comment === ""){
-                $apiUtils->notFoundResponse("Comentario no encontrado");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($comment === ""){
+                        $apiUtils->notFoundResponse("Comentario no encontrado");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($comment);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar el comentario de la base de datos",null,$comment);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Comentario borrado!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($comment);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar el comentario de la base de datos",null,$comment);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Comentario borrado!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 }

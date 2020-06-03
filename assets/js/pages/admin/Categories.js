@@ -17,6 +17,7 @@ class Categories extends Component {
     state = {
         loading: true,
         items: [],
+        token: '',
         total_items: [],
         active_page : 1,
         items_per_page: 10,
@@ -31,6 +32,7 @@ class Categories extends Component {
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {
+            this.getToken();
             this.getCategories();
         }
     }
@@ -48,6 +50,17 @@ class Categories extends Component {
 
         })
     }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
 
     // Filter by search
     handleSearch = (e) => {
@@ -108,12 +121,12 @@ class Categories extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/category/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/category/delete/${id}`, { data: {token:token} }).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -332,12 +345,13 @@ class Categories extends Component {
         e.preventDefault();
 
         const name = document.querySelector('#name').value;
+        const {token} = this.state;
         let { total_items } = this.state;
 
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name })
+            body: JSON.stringify({ name: name, token: token })
         };
         this.setState( { sending: true } )
 
@@ -352,7 +366,9 @@ class Categories extends Component {
                         message: '¡Categoria creada con éxtio!',section: "index", sending: false })
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
     }
 
 

@@ -16,6 +16,7 @@ class Purchases extends Component {
     state = {
         loading: true,
         items: [],
+        token: '',
         total_items: [],
         active_page : 1,
         items_per_page: 10,
@@ -25,6 +26,7 @@ class Purchases extends Component {
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {
+            this.getToken();
             this.getPurchases();
         }
     }
@@ -41,7 +43,19 @@ class Purchases extends Component {
                 <Redirect to={'error404'}/>
             }
 
-        }).catch(e => {console.log(e.response)})
+        }).catch(e => {
+            <Redirect to={'error404'}/>
+        })
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     // Filter by search
@@ -105,12 +119,12 @@ class Purchases extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/purchase/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/purchase/delete/${id}`, {  data: {token: token}}).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);

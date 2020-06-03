@@ -97,47 +97,69 @@ class PostController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        // Process data
-        try {
-            $post->setTitle($data['title']);
-            $post->setDescription($data['description']);
-            $post->setArtist($artistRepository->find($data['artist']));
-            $post->setImageName('post-default.png');
-            $post->setImageSize(123);
-            if($data['tag'] !== ""){
-                foreach ($data['tag'] as $tag) {
-                    $tag = $tagRepository->find($tag);
-                    $post->addTag($tag);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                // Process data
+                try {
+                    $post->setTitle($data['title']);
+                    $post->setDescription($data['description']);
+                    $post->setArtist($artistRepository->find($data['artist']));
+                    $post->setImageName('post-default.png');
+                    $post->setImageSize(123);
+                    if($data['tag'] !== ""){
+                        foreach ($data['tag'] as $tag) {
+                            $tag = $tagRepository->find($tag);
+                            $post->addTag($tag);
+                        }
+                    }
+                    $post->setCreatedAt(new \DateTime());
+                    $post->setUpdatedAt(new \DateTime());
+                }catch (\Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores de la noticia", $post);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
                 }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$post);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($post);
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo crear el noticia en la bbdd",null,$post);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Noticia creada!",$post);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $post->setCreatedAt(new \DateTime());
-            $post->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores de la noticia", $post);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$post);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($post);
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo crear el noticia en la bbdd",null,$post);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Noticia creada!",$post);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED,['Content-type'=>'application/json']);
     }
 
 
@@ -164,45 +186,67 @@ class PostController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        // Process data
-        try {
-            $post->setTitle($data['title']);
-            $post->setDescription($data['description']);
-            if($data['artist'] !== "")
-                $post->setArtist($artistRepository->find($data['artist']));
-            if($data['tag'] !== ""){
-                $post->getTag()->clear();
-                foreach ($data['tag'] as $tag) {
-                    $tag = $tagRepository->find($tag);
-                    $post->addTag($tag);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                // Process data
+                try {
+                    $post->setTitle($data['title']);
+                    $post->setDescription($data['description']);
+                    if($data['artist'] !== "")
+                        $post->setArtist($artistRepository->find($data['artist']));
+                    if($data['tag'] !== ""){
+                        $post->getTag()->clear();
+                        foreach ($data['tag'] as $tag) {
+                            $tag = $tagRepository->find($tag);
+                            $post->addTag($tag);
+                        }
+                    }
+                    $post->setUpdatedAt(new \DateTime());
+                }catch (\Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la noticia",$post);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
                 }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$post);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar la noticia en la bbdd",null,$post);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Noticia editada!", $post);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $post->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la noticia",$post);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$post);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar la noticia en la bbdd",null,$post);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Noticia editada!", $post);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -216,22 +260,51 @@ class PostController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        try {
-            if ($post === ""){
-                $apiUtils->notFoundResponse("Noticia no encontrada");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($post === ""){
+                        $apiUtils->notFoundResponse("Noticia no encontrada");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($post);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar la noticia de la base de datos",null,$post);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Noticia borrada!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($post);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar la noticia de la base de datos",null,$post);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Noticia borrada!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**

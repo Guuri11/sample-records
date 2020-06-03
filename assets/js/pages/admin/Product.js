@@ -15,6 +15,7 @@ class Product extends Component {
     state = {
         product: {},
         artists: [],
+        token: '',
         categories: [],
         loading: true,
         section: 'Mostrar',
@@ -30,6 +31,7 @@ class Product extends Component {
             const {product} = this.props.match.params;
             this.getProduct(product);
             this.getArtists();
+            this.getToken();
             this.getCategories();
         }
     }
@@ -58,6 +60,17 @@ class Product extends Component {
             this.props.history.push('/admin/error404');
         });
     }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
 
     getArtists = () =>  {
         axios.get(`/api/v1.0/artist`).then(res => {
@@ -416,11 +429,12 @@ class Product extends Component {
     /* DELETE CALL */
     handleDelete = (product) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+        const {token} = this.state;
 
         if (ans) {
 
 
-            axios.delete(`/api/v1.0/product/delete/${product.id}`).then(res => {
+            axios.delete(`/api/v1.0/product/delete/${product.id}`, {data: {token: token}}).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -451,13 +465,14 @@ class Product extends Component {
         const artist = document.querySelector('#artist').value;
         const category = document.querySelector('#category').value;
         const img = document.querySelector('#img').files[0];
+        const {token} = this.state;
         const {product} = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: name, artist: artist, price: price, discount: discount, size: size, stock: stock,
-                                        avaiable: available, description: description, category: category})
+                                        avaiable: available, description: description, category: category, token: token})
         };
 
         this.setState( { sending: true } )
@@ -475,7 +490,9 @@ class Product extends Component {
                         this.setState({ product:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
 
             // Make the API call
             axios.post(`/api/v1.0/product/upload-img/${product.id}`, formData, {})
@@ -498,7 +515,9 @@ class Product extends Component {
                         this.setState({ product:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
         }
 
     }

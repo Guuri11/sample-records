@@ -16,6 +16,7 @@ class Song extends Component {
     state = {
         song: {},
         albums: [],
+        token: '',
         artists: [],
         loading: true,
         section: 'Mostrar',
@@ -31,6 +32,7 @@ class Song extends Component {
             const {song} = this.props.match.params;
             this.getSong(song);
             this.getAlbums();
+            this.getToken();
             this.getArtists();
         }
     }
@@ -58,6 +60,16 @@ class Song extends Component {
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     getArtists = () =>  {
@@ -380,11 +392,11 @@ class Song extends Component {
     /* DELETE CALL */
     handleDelete = (song) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
 
 
-            axios.delete(`/api/v1.0/song/delete/${song.id}`).then(res => {
+            axios.delete(`/api/v1.0/song/delete/${song.id}`, { data: {token:token} }).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -413,6 +425,7 @@ class Song extends Component {
         const released_at = document.querySelector('#released_at').value;
         const song_file = document.querySelector('#song').files[0];
         const img = document.querySelector('#img').files[0];
+        const {token} = this.state;
         const {song} = this.state;
 
         let formData = new FormData()
@@ -420,7 +433,7 @@ class Song extends Component {
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name, album: album, artist: artist, duration: duration, video_src: video_src, released_at: released_at })
+            body: JSON.stringify({ name: name, album: album, artist: artist, duration: duration, video_src: video_src, released_at: released_at, token: token })
         };
 
         this.setState( { sending: true } )
@@ -438,7 +451,9 @@ class Song extends Component {
                         this.setState({ song:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
 
             // Make the API call
             axios.post(`/api/v1.0/song/upload-img/${song.id}`, formData, {})
@@ -465,7 +480,9 @@ class Song extends Component {
                         this.setState({ song:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
 
             // Make the API call
             axios.post(`/api/v1.0/song/upload-song/${song.id}`, formData, {})
@@ -494,7 +511,9 @@ class Song extends Component {
                         this.setState({ song:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
 
 
             // Make the API call
@@ -536,7 +555,9 @@ class Song extends Component {
                         this.setState({ song:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
         }
 
     }

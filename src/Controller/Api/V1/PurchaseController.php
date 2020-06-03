@@ -112,71 +112,92 @@ class PurchaseController extends AbstractController
             $data = json_decode($content,true);
         }
 
-        try {
-            $check = true;
-            // Generate a serial number for the purchase
-            while ($check){
-                $serialNumber->setSerialNumber('');
-                $serialNumber->GenerateSerialNumber();
-                $check = $serialNumber->checkSerialNumberPurchase($purchaseRepository);
-            }
-            $purchase->setSerialNumber($serialNumber->getSerialNumber());
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    $check = true;
+                    // Generate a serial number for the purchase
+                    while ($check){
+                        $serialNumber->setSerialNumber('');
+                        $serialNumber->GenerateSerialNumber();
+                        $check = $serialNumber->checkSerialNumberPurchase($purchaseRepository);
+                    }
+                    $purchase->setSerialNumber($serialNumber->getSerialNumber());
 
-            $purchase->setDate(new \DateTime($data['date']));
-            $purchase->setReceived(false);
-            $purchase->setAddress($data['address']);
-            if($data['town'] !== "")
-                $purchase->setTown($data['town']);
-            if($data['city'] !== "")
-                $purchase->setCity($data['city']);
-            $purchase->setCountry($data['country']);
-            // Set comment
-            if ($data['comment'] !== "") {
-                $comment = new Comment();
-                $comment->setComment($data['comment']);
-                $comment->setCreatedAt(new \DateTime());
-                $comment->setUpdatedAt(new \DateTime());
-                $comment->setPurchase($purchase);
-                $purchase->setComment($comment);
-            } else
-                $purchase->setComment(null);
-            if ($data['product'] !== "") {
-                $purchase->addProduct($productRepository->find($data['product']));
+                    $purchase->setDate(new \DateTime($data['date']));
+                    $purchase->setReceived(false);
+                    $purchase->setAddress($data['address']);
+                    if($data['town'] !== "")
+                        $purchase->setTown($data['town']);
+                    if($data['city'] !== "")
+                        $purchase->setCity($data['city']);
+                    $purchase->setCountry($data['country']);
+                    // Set comment
+                    if ($data['comment'] !== "") {
+                        $comment = new Comment();
+                        $comment->setComment($data['comment']);
+                        $comment->setCreatedAt(new \DateTime());
+                        $comment->setUpdatedAt(new \DateTime());
+                        $comment->setPurchase($purchase);
+                        $purchase->setComment($comment);
+                    } else
+                        $purchase->setComment(null);
+                    if ($data['product'] !== "") {
+                        $purchase->addProduct($productRepository->find($data['product']));
+                    }
+                    if ($data['ticket'] !== null) {
+                        $purchase->addTicket($ticketRepository->find($data['ticket']));
+                    }
+                    $purchase->setFinalPrice($data['final_price']);
+                    $purchase->setUser($userRepository->find($data['user']));
+                    $purchase->setCreatedAt(new \DateTime());
+                    $purchase->setTime( $purchase->getCreatedAt()->diff($purchase->getDate()) );
+                    $purchase->setUpdatedAt(new \DateTime());
+                }catch (\Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores a la compra", $purchase);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+                // Check errors, if there is any error return it
+                try {
+                    $apiUtils->validateData($validator, $purchase);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($purchase);
+                    $em->flush();
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo crear la compra en la bbdd", null, $purchase);
+
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Compra creada!",$purchase);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            if ($data['ticket'] !== null) {
-                $purchase->addTicket($ticketRepository->find($data['ticket']));
-            }
-            $purchase->setFinalPrice($data['final_price']);
-            $purchase->setUser($userRepository->find($data['user']));
-            $purchase->setCreatedAt(new \DateTime());
-            $purchase->setTime( $purchase->getCreatedAt()->diff($purchase->getDate()) );
-            $purchase->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores a la compra", $purchase);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any error return it
-        try {
-            $apiUtils->validateData($validator, $purchase);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($purchase);
-            $em->flush();
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo crear la compra en la bbdd", null, $purchase);
-
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Compra creada!",$purchase);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
-
     }
 
 
@@ -202,61 +223,83 @@ class PurchaseController extends AbstractController
         $data = $apiUtils->getData();
 
 
-        // Process data
-        try {
-            $purchase->setSerialNumber($data['serial_number']);
-            if($data['date'] !== "")
-                $purchase->setDate(new \DateTime($data['date']));
-            if($data['received'] !== "")
-                $purchase->setReceived($data['received']);
-            if ($purchase->getReceived())
-                $purchase->setTime( $purchase->getCreatedAt()->diff($purchase->getDate()) );
-            if($data['address'] !== "")
-                $purchase->setAddress($data['address']);
-            if($data['town'] !== "")
-                $purchase->setTown($data['town']);
-            if($data['city'] !== "")
-                $purchase->setCity($data['city']);
-            $purchase->setCountry($data['country']);
-            // Set comment
-            if ($data['comment'] !== "") {
-                $comment = new Comment();
-                $comment->setComment($data['comment']);
-                $comment->setCreatedAt(new \DateTime());
-                $comment->setUpdatedAt(new \DateTime());
-                $comment->setPurchase($purchase);
-                $purchase->setComment($comment);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                // Process data
+                try {
+                    $purchase->setSerialNumber($data['serial_number']);
+                    if($data['date'] !== "")
+                        $purchase->setDate(new \DateTime($data['date']));
+                    if($data['received'] !== "")
+                        $purchase->setReceived($data['received']);
+                    if ($purchase->getReceived())
+                        $purchase->setTime( $purchase->getCreatedAt()->diff($purchase->getDate()) );
+                    if($data['address'] !== "")
+                        $purchase->setAddress($data['address']);
+                    if($data['town'] !== "")
+                        $purchase->setTown($data['town']);
+                    if($data['city'] !== "")
+                        $purchase->setCity($data['city']);
+                    $purchase->setCountry($data['country']);
+                    // Set comment
+                    if ($data['comment'] !== "") {
+                        $comment = new Comment();
+                        $comment->setComment($data['comment']);
+                        $comment->setCreatedAt(new \DateTime());
+                        $comment->setUpdatedAt(new \DateTime());
+                        $comment->setPurchase($purchase);
+                        $purchase->setComment($comment);
+                    }
+                    if($data['final_price'] !== "")
+                        $purchase->setFinalPrice($data['final_price']);
+                    if($data['user'] !== "")
+                        $purchase->setUser($userRepository->find($data['user']));
+                    $purchase->setUpdatedAt(new \DateTime('now'));
+                }catch (\Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la compra", $purchase);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$purchase);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar la compra en la bbdd",null,$purchase);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Compra editada!", $purchase);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            if($data['final_price'] !== "")
-                $purchase->setFinalPrice($data['final_price']);
-            if($data['user'] !== "")
-                $purchase->setUser($userRepository->find($data['user']));
-            $purchase->setUpdatedAt(new \DateTime('now'));
-        }catch (\Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la compra", $purchase);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$purchase);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar la compra en la bbdd",null,$purchase);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Compra editada!", $purchase);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -270,22 +313,51 @@ class PurchaseController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        try {
-            if ($purchase === ""){
-                $apiUtils->notFoundResponse("Compra no encontrada");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($purchase === ""){
+                        $apiUtils->notFoundResponse("Compra no encontrada");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($purchase);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar la compra de la base de datos",null,$purchase);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Compra borrada!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($purchase);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar la compra de la base de datos",null,$purchase);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Compra borrada!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**

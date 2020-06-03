@@ -15,6 +15,7 @@ class Tag extends Component {
 
     state = {
         tag: {},
+        token: '',
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -27,7 +28,8 @@ class Tag extends Component {
         this._isMounted = true;
         if (this._isMounted){
             const {tag} = this.props.match.params;
-            this.getTag(tag)
+            this.getToken();
+            this.getTag(tag);
         }
     }
 
@@ -54,6 +56,16 @@ class Tag extends Component {
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     _renderInfo = (tag) => {
@@ -155,9 +167,9 @@ class Tag extends Component {
     /* DELETE CALL */
     handleDelete = (tag) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
-            axios.delete(`/api/v1.0/tag/delete/${tag.id}`).then(res => {
+            axios.delete(`/api/v1.0/tag/delete/${tag.id}`, { data: {token:token} }).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -179,12 +191,13 @@ class Tag extends Component {
         e.preventDefault();
 
         const tag_value = document.querySelector('#tag').value;
+        const {token} = this.state;
         const {tag} = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tag: tag_value })
+            body: JSON.stringify({ tag: tag_value, token: token })
         };
         this.setState( { sending: true } )
 
@@ -196,7 +209,9 @@ class Tag extends Component {
                     this.setState({ tag:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
 
     }
 

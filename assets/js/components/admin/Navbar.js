@@ -42,7 +42,7 @@ class Navbar extends Component {
                          data-parent="#accordionSidebar">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <Link className="collapse-item" to={'/admin/artistas'}>Artistas</Link>
-                            <Link className="collapse-item" to={'/admin/albums'}>Albums</Link>
+                            <Link className="collapse-item" to={'/admin/albunes'}>Álbunes</Link>
                             <Link className="collapse-item" to={'/admin/canciones'}>Canciones</Link>
                         </div>
                     </div>

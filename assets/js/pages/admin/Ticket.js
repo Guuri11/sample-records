@@ -16,6 +16,7 @@ class Ticket extends Component {
     state = {
         ticket: {},
         events: [],
+        token: '',
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -29,6 +30,7 @@ class Ticket extends Component {
         if (this._isMounted){
             const {ticket} = this.props.match.params;
             this.getTicket(ticket);
+            this.getToken();
             this.getEvents();
         }
     }
@@ -50,12 +52,21 @@ class Ticket extends Component {
         axios.get(`/api/v1.0/ticket/${id}`).then(res => {
             if (res.data.success === true) {
                 const ticket = res.data.results;
-
                 this.setState({ticket: ticket, loading: false});
             }
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     getEvents = () =>  {
@@ -252,9 +263,9 @@ class Ticket extends Component {
     /* DELETE CALL */
     handleDelete = (ticket) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
-            axios.delete(`/api/v1.0/ticket/delete/${ticket.id}`).then(res => {
+            axios.delete(`/api/v1.0/ticket/delete/${ticket.id}`, {data: {token: token}}).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -279,12 +290,13 @@ class Ticket extends Component {
         const event = document.querySelector('#event').value;
         const price = document.querySelector('#price').value;
         const sold = document.querySelector('#sold').value;
+        const {token} = this.state;
         const {ticket} = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ serial_number: serial_number, event: event, price: price, sold: sold})
+            body: JSON.stringify({ serial_number: serial_number, event: event, price: price, sold: sold, token: token})
         };
 
         this.setState( { sending: true } )
@@ -298,7 +310,10 @@ class Ticket extends Component {
                 }else
                     this.setState({ success: false, errors: data.error.errors ? data.error.errors: data.error.code === 0 ? {serial_number:"Número de serie repetido"}:'',
                         submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors ? data.error.errors: data.error.code === 0 ? {serial_number:"Número de serie repetido"}:'',
+                submited: true, sending: false })
+        });
 
     }
 

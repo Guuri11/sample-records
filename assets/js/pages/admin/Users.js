@@ -17,6 +17,7 @@ class Users extends Component {
     state = {
         loading: true,
         items: [],
+        token: '',
         total_items: [],
         active_page : 1,
         items_per_page: 10,
@@ -31,6 +32,7 @@ class Users extends Component {
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {
+            this.getToken();
             this.getUsers();
         }
     }
@@ -48,6 +50,17 @@ class Users extends Component {
 
         }).catch(e => {})
     }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
 
     // Filter by search
     handleSearch = (e) => {
@@ -109,12 +122,13 @@ class Users extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+        const {token} = this.state;
 
         if (ans) {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/user/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/user/delete/${id}`,{data: {token: token}}).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -533,7 +547,7 @@ class Users extends Component {
         const phone = document.querySelector('#phone').value;
         const img = document.querySelector('#img').files[0];
 
-        let { total_items } = this.state;
+        let { total_items, token } = this.state;
 
         let arr_roles = [];
 
@@ -547,7 +561,7 @@ class Users extends Component {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: name, surname: surname, email: email, password: password,roles: arr_roles, address: address, postal_code: postal_code,
-                town: town, city: city, phone: phone})
+                town: town, city: city, phone: phone, token: token})
         };
 
         this.setState( { sending: true } )
@@ -592,7 +606,9 @@ class Users extends Component {
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
     }
 
 

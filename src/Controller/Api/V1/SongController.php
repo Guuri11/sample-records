@@ -94,45 +94,67 @@ class SongController extends AbstractController
         // Sanitize data
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
-        
-        try {
-            $song->setName($data['name']);
-            $song->setArtist($artistRepository->find($data['artist']));
-            if ($data['album'] !== "")
-                $song->setAlbum($albumRepository->find($data['album']));
-            $song->setDuration(intval($data['duration']));
-            $song->setVideoSrc($data['video_src']);
-            $song->setReleasedAt(new \DateTime($data['released_at']));
-            $song->setSongFileName("song-default.mp3");
-            $song->setImageName('song-default.png');
-            $song->setImageSize(1234);
-            $song->setCreatedAt(new \DateTime());
-            $song->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores a la canción", $song);
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    $song->setName($data['name']);
+                    $song->setArtist($artistRepository->find($data['artist']));
+                    if ($data['album'] !== "")
+                        $song->setAlbum($albumRepository->find($data['album']));
+                    $song->setDuration(intval($data['duration']));
+                    $song->setVideoSrc($data['video_src']);
+                    $song->setReleasedAt(new \DateTime($data['released_at']));
+                    $song->setSongFileName("song-default.mp3");
+                    $song->setImageName('song-default.png');
+                    $song->setImageSize(1234);
+                    $song->setCreatedAt(new \DateTime());
+                    $song->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores a la canción", $song);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+                // Check errors, if there is any error return it
+                try {
+                    $apiUtils->validateData($validator, $song);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($song);
+                    $em->flush();
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo crear la canción en la bbdd", null, $song);
+
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Canción creada!",$song);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any error return it
-        try {
-            $apiUtils->validateData($validator, $song);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($song);
-            $em->flush();
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo crear la canción en la bbdd", null, $song);
-
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Canción creada!",$song);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
@@ -160,45 +182,67 @@ class SongController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        try {
-            if ($data['name'] !== "")
-                $song->setName($data['name']);
-            if ($data['artist'] !== "")
-                $song->setArtist($artistRepository->find($data['artist']));
-            if ($data['album'] !== "")
-                $song->setAlbum($albumRepository->find($data['album']));
-            if ($data['duration'] !== "")
-                $song->setDuration(intval($data['duration']));
-            if ($data['duration'] !== "")
-                $song->setVideoSrc($data['video_src']);
-            if ($data['released_at'] !== "")
-                $song->setReleasedAt(new \DateTime($data['released_at']));
-            $song->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores a la canción", $song);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($data['name'] !== "")
+                        $song->setName($data['name']);
+                    if ($data['artist'] !== "")
+                        $song->setArtist($artistRepository->find($data['artist']));
+                    if ($data['album'] !== "")
+                        $song->setAlbum($albumRepository->find($data['album']));
+                    if ($data['duration'] !== "")
+                        $song->setDuration(intval($data['duration']));
+                    if ($data['duration'] !== "")
+                        $song->setVideoSrc($data['video_src']);
+                    if ($data['released_at'] !== "")
+                        $song->setReleasedAt(new \DateTime($data['released_at']));
+                    $song->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores a la canción", $song);
 
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$song);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar la canción en la bbdd",null,$song);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Canción editada!", $song);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$song);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar la canción en la bbdd",null,$song);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Canción editada!", $song);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -213,22 +257,51 @@ class SongController extends AbstractController
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        try {
-            if ($song === ""){
-                $apiUtils->notFoundResponse("Canción no encontrada");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRFT Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($song === ""){
+                        $apiUtils->notFoundResponse("Canción no encontrada");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($song);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar la canción de la base de datos",null,$song);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Canción borrada!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($song);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar la canción de la base de datos",null,$song);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Canción borrada!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**

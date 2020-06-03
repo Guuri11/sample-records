@@ -82,32 +82,19 @@ nelmio_api_doc:
                                 type: float
                               duration:
                                 type: integer
-                              imageFile:
-                                type: string
-                                format: binary
-                                required: false
-                                nullable: true
-                              imageName:
-                                type: string
-                                required: false
-                                nullable: true
-                              imageSize:
-                                type: integer
-                                required: false
-                                nullable: true
                               released_at:
                                 type: string
                                 format: date
+                              token:
+                                type: string
                             type: object
                           example:
                             name: Nombre album
                             artist: 4
                             price: 10.99
                             duration: 185
-                            imageFile: null
-                            imageName: null
-                            imageSize: null
                             released_at: "2020-04-15"
+                            token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '201':
                             description: Creates a new Album object
@@ -140,32 +127,19 @@ nelmio_api_doc:
                                   type: float
                                 duration:
                                   type: integer
-                                imageFile:
-                                  type: string
-                                  format: binary
-                                  required: false
-                                  nullable: true
-                                imageName:
-                                  type: string
-                                  required: false
-                                  nullable: true
-                                imageSize:
-                                  type: integer
-                                  required: false
-                                  nullable: true
                                 released_at:
                                   type: string
                                   format: date
+                                token:
+                                  type: string
                               type: object
                             example:
                               name: Nombre album
                               artist: 4
                               price: 10.99
                               duration: 185
-                              imageFile: null
-                              imageName: null
-                              imageSize: null
                               released_at: "2020-04-15"
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Updates a new Album object
@@ -182,6 +156,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Deletes a album
@@ -189,6 +176,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - album
             "/api/v1.0/album/upload-img/{id}":
@@ -294,22 +283,11 @@ nelmio_api_doc:
                                 type: string
                               bio:
                                 type: string
-                              imageFile:
-                                type: string
-                                format: binary
-                                required: false
-                                nullable: true
-                              imageName:
-                                type: string
-                                required: false
-                                nullable: true
-                              imageSize:
-                                type: integer
-                                required: false
-                                nullable: true
                               birth:
                                 type: string
                                 format: date
+                              token:
+                                type: string
                             type: object
                           example:
                             name: Nombre artista
@@ -317,10 +295,8 @@ nelmio_api_doc:
                             alias: Sample Rapper
                             is_from: Ondara
                             bio: Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum
-                            imageFile: null
-                            imageName: null
-                            imageSize: null
                             birth: "1990-04-15"
+                            token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '201':
                             description: Creates a new Artist object
@@ -355,22 +331,11 @@ nelmio_api_doc:
                                   type: string
                                 bio:
                                   type: string
-                                imageFile:
-                                  type: string
-                                  format: binary
-                                  required: false
-                                  nullable: true
-                                imageName:
-                                  type: string
-                                  required: false
-                                  nullable: true
-                                imageSize:
-                                  type: integer
-                                  required: false
-                                  nullable: true
                                 birth:
                                   type: string
                                   format: date
+                                token:
+                                  type: string
                               type: object
                             example:
                               name: Nombre artista
@@ -378,11 +343,8 @@ nelmio_api_doc:
                               alias: Sample Rapper
                               is_from: Ondara
                               bio: Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum
-                              imageFile: null
-                              imageName: null
-                              imageSize: null
                               birth: "1990-04-15"
-
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: updates a new Artist object
@@ -399,6 +361,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Delete a artist
@@ -406,6 +381,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - artist
             "/api/v1.0/artist/upload-img/{id}":
@@ -487,9 +464,12 @@ nelmio_api_doc:
                         properties:
                           name:
                             type: string
+                          token:
+                            type: string
                         type: object
                       example:
                         name: NombreCategoria
+                        token: "Get token from /user/token endpoint FIRST"
                 responses:
                   '201':
                     description: Creates a new Category object
@@ -516,9 +496,12 @@ nelmio_api_doc:
                               properties:
                                 name:
                                   type: string
+                                token:
+                                  type: string
                               type: object
                             example:
                               name: NombreCategoria
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Updates a new Category object
@@ -535,6 +518,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '200':
                             description: Deletes a category
@@ -542,6 +538,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - category
             "/api/v1.0/comment/":
@@ -649,11 +647,14 @@ nelmio_api_doc:
                               event:
                                 type: integer
                                 nullable: true
+                              token:
+                                type: string
                             type: object
                           example:
                             comment: Esto es un comentario para una noticia
                             user: 2
                             post: 3
+                            token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '201':
                             description: Creates a new Comment object
@@ -694,12 +695,15 @@ nelmio_api_doc:
                                 event:
                                   type: integer
                                   nullable: true
+                                token:
+                                  type: string
                               type: object
                             example:
                               comment: Esto es un comentario para un producto
                               user: 2
                               product: 3
                               post: null
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: updates a new Comment object
@@ -716,6 +720,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Deletes a comment
@@ -813,19 +830,8 @@ nelmio_api_doc:
                               format: date
                             prefix_serial_number:
                               type: string
-                            imageFile:
+                            token:
                               type: string
-                              format: binary
-                              required: false
-                              nullable: true
-                            imageName:
-                              type: string
-                              required: false
-                              nullable: true
-                            imageSize:
-                              type: integer
-                              required: false
-                              nullable: true
                           type: object
                         example:
                           name: Nombre event
@@ -837,9 +843,7 @@ nelmio_api_doc:
                           date: "2020-06-30"
                           prefix_serial_number: NEO1
                           ticket_quantity: 5
-                          imageFile: null
-                          imageName: null
-                          imageSize: null
+                          token: "Get token from /user/token endpoint FIRST"
                   responses:
                         '201':
                             description: Creates a new Event object
@@ -879,19 +883,8 @@ nelmio_api_doc:
                                   format: date
                                 prefix_serial_number:
                                   type: string
-                                imageFile:
+                                token:
                                   type: string
-                                  format: binary
-                                  required: false
-                                  nullable: true
-                                imageName:
-                                  type: string
-                                  required: false
-                                  nullable: true
-                                imageSize:
-                                  type: integer
-                                  required: false
-                                  nullable: true
                               type: object
                             example:
                               name: Nombre event editado
@@ -902,10 +895,7 @@ nelmio_api_doc:
                               date: "2020-07-30"
                               prefix_serial_number: NEO2
                               ticket_quantity: 50
-                              imageFile: null
-                              imageName: null
-                              imageSize: null
-
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: updates a new Event object
@@ -922,6 +912,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '200':
                             description: Delete a event
@@ -929,6 +932,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - event
             "/api/v1.0/event/upload-img/{id}":
@@ -948,7 +953,6 @@ nelmio_api_doc:
                     description: Not found
                 tags:
                   - event
-
             "/api/v1.0/post/":
                 get:
                     parameters:
@@ -1028,28 +1032,15 @@ nelmio_api_doc:
                             tag:
                               type: integer
                               nullable: true
-                            imageFile:
+                            token:
                               type: string
-                              format: binary
-                              required: false
-                              nullable: true
-                            imageName:
-                              type: string
-                              required: false
-                              nullable: true
-                            imageSize:
-                              type: integer
-                              required: false
-                              nullable: true
                           type: object
                         example:
                           title: Nombre noticia
                           description: Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum
                           artist: 4
                           tag: null
-                          imageFile: null
-                          imageName: null
-                          imageSize: null
+                          token: "Get token from /user/token endpoint FIRST"
                   responses:
                         '201':
                             description: Creates a new Post object
@@ -1083,29 +1074,15 @@ nelmio_api_doc:
                                 tag:
                                   type: integer
                                   nullable: true
-                                imageFile:
+                                token:
                                   type: string
-                                  format: binary
-                                  required: false
-                                  nullable: true
-                                imageName:
-                                  type: string
-                                  required: false
-                                  nullable: true
-                                imageSize:
-                                  type: integer
-                                  required: false
-                                  nullable: true
                               type: object
                             example:
                               title: Nombre noticia
                               description: Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum
                               artist: 4
                               tag: null
-                              imageFile: null
-                              imageName: null
-                              imageSize: null
-
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: updates a new Post object
@@ -1122,6 +1099,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '200':
                             description: Deletes a post
@@ -1129,6 +1119,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - post
             "/api/v1.0/post/upload-img/{id}":
@@ -1241,19 +1233,8 @@ nelmio_api_doc:
                               type: boolean
                             description:
                               type: string
-                            imageFile:
+                            token:
                               type: string
-                              format: binary
-                              required: false
-                              nullable: true
-                            imageName:
-                              type: string
-                              required: false
-                              nullable: true
-                            imageSize:
-                              type: integer
-                              required: false
-                              nullable: true
                           type: object
                         example:
                           name: Nombre product
@@ -1265,10 +1246,7 @@ nelmio_api_doc:
                           stock: 56
                           avaiable: true
                           description: Lorem ipsumLorem ipsumLorem ipsumLorem ipsum
-                          imageFile: null
-                          imageName: null
-                          imageSize: null
-
+                          token: "Get token from /user/token endpoint FIRST"
                   responses:
                         '201':
                             description: Creates a new Product object
@@ -1309,19 +1287,8 @@ nelmio_api_doc:
                                   type: boolean
                                 description:
                                   type: string
-                                imageFile:
+                                token:
                                   type: string
-                                  format: binary
-                                  required: false
-                                  nullable: true
-                                imageName:
-                                  type: string
-                                  required: false
-                                  nullable: true
-                                imageSize:
-                                  type: integer
-                                  required: false
-                                  nullable: true
                               type: object
                             example:
                               name: Nombre product editado
@@ -1333,10 +1300,7 @@ nelmio_api_doc:
                               stock: 56
                               avaiable: true
                               description: Lorem ipsumLorem ipsumLorem ipsumLorem ipsum
-                              imageFile: null
-                              imageName: null
-                              imageSize: null
-
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '200':
                             description: updates a new Product object
@@ -1353,11 +1317,28 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '200':
                             description: Delete a product
                         '401':
                             description: Unauthorized
+                        '404':
+                          description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - product
             "/api/v1.0/product/upload-img/{id}":
@@ -1474,6 +1455,8 @@ nelmio_api_doc:
                               type: float
                             user:
                               type: integer
+                            token:
+                              type: string
                           type: object
                         example:
                           serial_number: ADSF123412341234
@@ -1489,6 +1472,7 @@ nelmio_api_doc:
                           ticket: null
                           final_price: 10.99
                           user: 2
+                          token: "Get token from /user/token endpoint FIRST"
                   responses:
                         '201':
                             description: Creates a new Purchase object
@@ -1545,6 +1529,8 @@ nelmio_api_doc:
                                   type: float
                                 user:
                                   type: integer
+                                token:
+                                  type: string
                               type: object
                             example:
                               serial_number: ADSF123412341234
@@ -1561,7 +1547,7 @@ nelmio_api_doc:
                               ticket: null
                               final_price: 10.99
                               user: 2
-
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: updates a new Purchase object
@@ -1578,6 +1564,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Delete a purchase
@@ -1585,6 +1584,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - purchase
             "/api/v1.0/purchase/monthlyearns":
@@ -1773,22 +1774,8 @@ nelmio_api_doc:
                               type: integer
                             video_src:
                               type: string
-                            song_file:
+                            token:
                               type: string
-                              format: binary
-                            imageFile:
-                              type: string
-                              format: binary
-                              required: false
-                              nullable: true
-                            imageName:
-                              type: string
-                              required: false
-                              nullable: true
-                            imageSize:
-                              type: integer
-                              required: false
-                              nullable: true
                             released_at:
                               type: string
                               format: date
@@ -1798,13 +1785,9 @@ nelmio_api_doc:
                           artist: 4
                           album: 2
                           duration: 185
-                          video_src: http://videofalso.prueba/video.mpcasi
-                          song_file: babi-colegas-5e903022d45dd.mpga
-                          imageFile: null
-                          imageName: null
-                          imageSize: null
+                          video_src: http://videofalso.prueba/video.avi
                           released_at: "2020-04-15"
-
+                          token: "Get token from /user/token endpoint FIRST"
                   responses:
                         '201':
                             description: Creates a new Song object
@@ -1840,25 +1823,11 @@ nelmio_api_doc:
                                   type: integer
                                 video_src:
                                   type: string
-                                song_file:
-                                  type: string
-                                  format: binary
-                                imageFile:
-                                  type: string
-                                  format: binary
-                                  required: false
-                                  nullable: true
-                                imageName:
-                                  type: string
-                                  required: false
-                                  nullable: true
-                                imageSize:
-                                  type: integer
-                                  required: false
-                                  nullable: true
                                 released_at:
                                   type: string
                                   format: date
+                                token:
+                                  type: string
                               type: object
                             example:
                               name: Nombre cancion editada
@@ -1866,11 +1835,8 @@ nelmio_api_doc:
                               album: null
                               duration: 185
                               video_src: http://videofalso.prueba/video.mpcasi
-                              song_file: babi-colegas-5e903022d45dd.mpga
-                              imageFile: null
-                              imageName: null
-                              imageSize: null
                               released_at: "2020-04-15"
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: updates a new Song object
@@ -1887,6 +1853,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Delete a song
@@ -1894,6 +1873,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - song
             "/api/v1.0/song/upload-img/{id}":
@@ -1992,9 +1973,12 @@ nelmio_api_doc:
                             properties:
                               tag:
                                 type: string
+                              token:
+                                type: string
                             type: object
                           example:
                             tag: NombreTag
+                            token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Creates a new Tag object
@@ -2021,9 +2005,12 @@ nelmio_api_doc:
                               properties:
                                 tag:
                                   type: string
+                                token:
+                                  type: string
                               type: object
                             example:
                               tag: NombreTagEditado
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '201':
                             description: updates a new Tag object
@@ -2040,6 +2027,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '201':
                             description: Delete a tag
@@ -2047,6 +2047,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - tag
             "/api/v1.0/ticket/":
@@ -2122,10 +2124,13 @@ nelmio_api_doc:
                                 type: integer
                               price:
                                 type: float
+                              token:
+                                type: string
                             type: object
                           example:
                             event: 3
                             price: 12.5
+                            token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '201':
                             description: Creates a new Ticket object
@@ -2158,11 +2163,14 @@ nelmio_api_doc:
                                   type: float
                                 sold:
                                   type: boolean
+                                token:
+                                  type: string
                               type: object
                             example:
                               event: 3
                               serial_number: ASDF1234
                               price: 12.5
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: updates a new Ticket object
@@ -2179,6 +2187,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Delete a ticket
@@ -2186,6 +2207,8 @@ nelmio_api_doc:
                             description: Unauthorized
                         '404':
                             description: Not found
+                        '400':
+                          description: Error in the process
                     tags:
                         - ticket
             "/api/v1.0/user/":
@@ -2273,26 +2296,8 @@ nelmio_api_doc:
                               credit_card:
                                 type: string
                                 nullable: true
-                              profile_file:
+                              token:
                                 type: string
-                                format: binary
-                                nullable: true
-                              profile_image:
-                                type: string
-                                nullable: true
-                              profile_size:
-                                type: integer
-                                nullable: true
-                              header_file:
-                                type: string
-                                format: binary
-                                nullable: true
-                              header_image:
-                                  type: string
-                                  nullable: true
-                              header_size:
-                                  type: integer
-                                  nullable: true
                             type: object
                           example:
                             name: Pepe
@@ -2306,12 +2311,7 @@ nelmio_api_doc:
                             city: Madrid
                             phone: null
                             credit_card: null
-                            profile_image: null
-                            profile_file: null
-                            profile_size: null
-                            header_image: null
-                            header_file: null
-                            header_size: null
+                            token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '201':
                             description: Creates a new User object
@@ -2361,26 +2361,8 @@ nelmio_api_doc:
                                 credit_card:
                                   type: string
                                   nullable: true
-                                profile_file:
+                                token:
                                   type: string
-                                  format: binary
-                                  nullable: true
-                                profile_image:
-                                  type: string
-                                  nullable: true
-                                profile_size:
-                                  type: integer
-                                  nullable: true
-                                header_file:
-                                  type: string
-                                  format: binary
-                                  nullable: true
-                                header_image:
-                                  type: string
-                                  nullable: true
-                                header_size:
-                                  type: integer
-                                  nullable: true
                               type: object
                             example:
                               name: Luis
@@ -2394,13 +2376,7 @@ nelmio_api_doc:
                               city: Madrid
                               phone: null
                               credit_card: null
-                              profile_image: null
-                              profile_file: null
-                              profile_size: null
-                              header_image: null
-                              header_file: null
-                              header_size: null
-
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: updates a new User object
@@ -2417,6 +2393,19 @@ nelmio_api_doc:
                           in: path
                           required: true
                           type: string
+                        - name: token
+                          in: body
+                          type: string
+                          description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                          schema:
+                            type: array
+                            items:
+                              properties:
+                                token:
+                                  type: string
+                              type: object
+                            example:
+                              token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '202':
                             description: Delete a user
@@ -2428,6 +2417,20 @@ nelmio_api_doc:
                         - user
             "/api/v1.0/user/deleteaccount":
               delete:
+                parameters:
+                  - name: token
+                    in: body
+                    type: string
+                    description: "CSRF token required to delete a element, get from /user/token endpoint FIRST"
+                    schema:
+                      type: array
+                      items:
+                        properties:
+                          token:
+                            type: string
+                        type: object
+                      example:
+                        token: "Get token from /user/token endpoint FIRST"
                 responses:
                   '202':
                     description: Delete your own account
@@ -2435,6 +2438,19 @@ nelmio_api_doc:
                     description: Unauthorized
                   '404':
                     description: Not found
+                  '400':
+                    description: Error in the process
+                tags:
+                  - user
+            "/api/v1.0/user/token":
+              get:
+                responses:
+                  '200':
+                    description: Get CSRF Token
+                  '400':
+                    description: Bad request
+                  '401':
+                    description: Unauthorized
                 tags:
                   - user
             "/api/v1.0/user/profile/info":
@@ -2476,6 +2492,8 @@ nelmio_api_doc:
                             credit_card:
                               type: string
                               nullable: true
+                            token:
+                              type: string
                           type: object
                         example:
                           name: Luis
@@ -2486,6 +2504,7 @@ nelmio_api_doc:
                           city: Alicante
                           phone: 658947765
                           credit_card: ASD123456789657
+                          token: "Get token from /user/token endpoint FIRST"
                   responses:
                       '202':
                         description: updates personal user data
@@ -2615,11 +2634,14 @@ nelmio_api_doc:
                                 format: password
                               repeat_password:
                                 type: string password
+                              token:
+                                type: string
                             type: object
                           example:
                             password: contraseña_de_usuario_logueado
                             new_password: nuevapass
                             repeat_password: nuevapass
+                            token: "Get token from /user/token endpoint FIRST"
                     responses:
                         '200':
                             description: Log the user

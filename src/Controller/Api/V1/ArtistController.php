@@ -109,49 +109,72 @@ class ArtistController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));;
         $data = $apiUtils->getData();
 
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
 
-        // Process data
-        try {
-            if ($data['name'] !== "")
-                $artist->setName($data['name']);
-            $artist->setAlias($data['alias']);
-            if ($data['surname'] !== "")
-                $artist->setSurname($data['surname']);
-            if ($data['is_from'] !== "")
-                $artist->setIsFrom($data['is_from']);
-            $artist->setBio($data['bio']);
-            if ($data['birth'] !== "")
-                $artist->setBirth(New DateTime($data['birth']));
-            $artist->setImageName('artist-default.png');
-            $artist->setImageSize(123);
-            $artist->setCreatedAt(new DateTime());
-            $artist->setUpdatedAt(new DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores al artista", $artist);
+                // Process data
+                try {
+                    if ($data['name'] !== "")
+                        $artist->setName($data['name']);
+                    $artist->setAlias($data['alias']);
+                    if ($data['surname'] !== "")
+                        $artist->setSurname($data['surname']);
+                    if ($data['is_from'] !== "")
+                        $artist->setIsFrom($data['is_from']);
+                    $artist->setBio($data['bio']);
+                    if ($data['birth'] !== "")
+                        $artist->setBirth(New DateTime($data['birth']));
+                    $artist->setImageName('artist-default.png');
+                    $artist->setImageSize(123);
+                    $artist->setCreatedAt(new DateTime());
+                    $artist->setUpdatedAt(new DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores al artista", $artist);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator, $artist);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($artist);
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo crear el artista en la bbdd", null, $artist);
+
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Artista creado!",$artist);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator, $artist);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($artist);
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo crear el artista en la bbdd", null, $artist);
-
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Artista creado!",$artist);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
@@ -177,43 +200,67 @@ class ArtistController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        // Process data
-        try {
-            if ($data['name'] !== "")
-                $artist->setName($data['name']);
-            if ($data['aliass'] !== "")
-                $artist->setAlias($data['alias']);
-            $artist->setSurname($data['surname']);
-            $artist->setIsFrom($data['is_from']);
-            $artist->setBio($data['bio']);
-            if ($data['birth'] !== "")
-                $artist->setBirth(New DateTime($data['birth']));
-            $artist->setUpdatedAt(new DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores del artista", $artist);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
 
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                // Process data
+                try {
+                    if ($data['name'] !== "")
+                        $artist->setName($data['name']);
+                    if ($data['aliass'] !== "")
+                        $artist->setAlias($data['alias']);
+                    $artist->setSurname($data['surname']);
+                    $artist->setIsFrom($data['is_from']);
+                    $artist->setBio($data['bio']);
+                    if ($data['birth'] !== "")
+                        $artist->setBirth(New DateTime($data['birth']));
+                    $artist->setUpdatedAt(new DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores del artista", $artist);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator, $artist);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar el artista en la bbdd",null,$artist);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Artista editado!",$artist);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator, $artist);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar el artista en la bbdd",null,$artist);
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Artista editado!",$artist);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -228,22 +275,46 @@ class ArtistController extends AbstractController
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        try {
-            if ($artist === ""){
-                $apiUtils->notFoundResponse("Artista no encontrado");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+
+                try {
+                    if ($artist === ""){
+                        $apiUtils->notFoundResponse("Artista no encontrado");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($artist);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar el artista de la base de datos",null,$artist);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Artista borrado!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($artist);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar el artista de la base de datos",null,$artist);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Artista borrado!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**

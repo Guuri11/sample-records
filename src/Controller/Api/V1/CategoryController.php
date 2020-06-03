@@ -91,37 +91,60 @@ class CategoryController extends AbstractController
         // Sanitize data
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
-        
-        try {
-            $category->setName($data['name']);
-            $category->setCreatedAt(new \DateTime());
-            $category->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores de la categoria", $category);
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    $category->setName($data['name']);
+                    $category->setCreatedAt(new \DateTime());
+                    $category->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores de la categoria", $category);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator, $category);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($category);
+                    $em->flush();
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo crear la categoria en la bbdd", null, $category);
+
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Categoria creada!",$category);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator, $category);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($category);
-            $em->flush();
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo crear la categoria en la bbdd", null, $category);
-
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Categoria creada!",$category);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
     /**
@@ -145,37 +168,59 @@ class CategoryController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        // Process data
-        try {
-            if ($data['name'] !== "")
-                $category->setName($data['name']);
-            $category->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la categoria", $category);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                // Process data
+                try {
+                    if ($data['name'] !== "")
+                        $category->setName($data['name']);
+                    $category->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores de la categoria", $category);
 
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$category);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar la categoria en la bbdd",null,$category);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Categoria editada!",$category);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$category);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar la categoria en la bbdd",null,$category);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Categoria editada!",$category);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -189,21 +234,50 @@ class CategoryController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        try {
-            if ($category === ""){
-                $apiUtils->notFoundResponse("Categoria no encontrado");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($category === ""){
+                        $apiUtils->notFoundResponse("Categoria no encontrado");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($category);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar la categoria de la base de datos",null,$category);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Categoria borrada!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($category);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar la categoria de la base de datos",null,$category);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Categoria borrada!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 }

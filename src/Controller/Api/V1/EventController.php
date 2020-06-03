@@ -102,67 +102,89 @@ class EventController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        // Process data
-        try {
-            $event->setName($data['name']);
-            $event->setArtist($artistRepository->find($data['artist']));
-            $event->setPlace($data['place']);
-            $event->setCity($data['city']);
-            $event->setCountry($data['country']);
-            $event->setDate(new \DateTime($data['date']));
-            $event->setPrefixSerialNumber($data['prefix_serial_number']);
-            $event->setTicketQuantity($data['ticket_quantity']);
-            $event->setImageName('default-event.png');
-            $event->setImageSize(123);
-            $event->setCreatedAt(new \DateTime());
-            $event->setUpdatedAt(new \DateTime());
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                // Process data
+                try {
+                    $event->setName($data['name']);
+                    $event->setArtist($artistRepository->find($data['artist']));
+                    $event->setPlace($data['place']);
+                    $event->setCity($data['city']);
+                    $event->setCountry($data['country']);
+                    $event->setDate(new \DateTime($data['date']));
+                    $event->setPrefixSerialNumber($data['prefix_serial_number']);
+                    $event->setTicketQuantity($data['ticket_quantity']);
+                    $event->setImageName('default-event.png');
+                    $event->setImageSize(123);
+                    $event->setCreatedAt(new \DateTime());
+                    $event->setUpdatedAt(new \DateTime());
 
-            // Create tickets
-            for ( $quantity_idx = 0; $quantity_idx < $event->getTicketQuantity(); $quantity_idx++ ) {
-                $ticket = new Ticket();
-                $ticket->setEvent($event);
+                    // Create tickets
+                    for ( $quantity_idx = 0; $quantity_idx < $event->getTicketQuantity(); $quantity_idx++ ) {
+                        $ticket = new Ticket();
+                        $ticket->setEvent($event);
 
-                $check = true;
-                // Generate a serial number for the ticket
-                while ($check){
-                    $serialNumber->setSerialNumber('');
-                    $serialNumber->GenerateSerialNumber();
-                    $check = $serialNumber->checkSerialNumberTicket($ticketRepository, $event->getPrefixSerialNumber());
+                        $check = true;
+                        // Generate a serial number for the ticket
+                        while ($check){
+                            $serialNumber->setSerialNumber('');
+                            $serialNumber->GenerateSerialNumber();
+                            $check = $serialNumber->checkSerialNumberTicket($ticketRepository, $event->getPrefixSerialNumber());
+                        }
+
+                        $ticket->setSerialNumber($ticket->getEvent()->getPrefixSerialNumber().$serialNumber->getSerialNumber());
+                        $ticket->setPrice($data['price']);
+                        $ticket->setSold(false);
+                        $ticket->setCreatedAt(new \DateTime());
+                        $ticket->setUpdatedAt(new \DateTime());
+
+                        // prepare to upload ticket to the data base
+                        $em->persist($ticket);
+                    }
+                }catch (\Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores al evento", $event);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator, $event);
+                } catch (\Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
                 }
 
-                $ticket->setSerialNumber($ticket->getEvent()->getPrefixSerialNumber().$serialNumber->getSerialNumber());
-                $ticket->setPrice($data['price']);
-                $ticket->setSold(false);
-                $ticket->setCreatedAt(new \DateTime());
-                $ticket->setUpdatedAt(new \DateTime());
+                // Upload obj to the database
+                try {
+                    $em->persist($event);
+                    $em->flush();
+                } catch (\Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo crear el evento en la bbdd", null, $event);
 
-                // prepare to upload ticket to the data base
-                $em->persist($ticket);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Evento creado!",$event);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-        }catch (\Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores al evento", $event);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator, $event);
-        } catch (\Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Upload obj to the database
-        try {
-            $em->persist($event);
-            $em->flush();
-        } catch (\Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo crear el evento en la bbdd", null, $event);
-
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Evento creado!",$event);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
@@ -189,44 +211,66 @@ class EventController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        // Process data
-        try {
-            $event->setName($data['name']);
-            $event->setPlace($data['place']);
-            if ($data['city'] !== "")
-                $event->setCity($data['city']);
-            $event->setCountry($data['country']);
-            $event->setDate(new \DateTime($data['date']));
-            $event->setPrefixSerialNumber($data['prefix_serial_number']);
-            $event->setTicketQuantity($data['ticket_quantity']);
-            $event->setArtist($artistRepository->find($data['artist']));
-            $event->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $error['code'] = $e->getCode();
-            $error['message'] = $e->getMessage();
-            return new JsonResponse($error,Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                // Process data
+                try {
+                    $event->setName($data['name']);
+                    $event->setPlace($data['place']);
+                    if ($data['city'] !== "")
+                        $event->setCity($data['city']);
+                    $event->setCountry($data['country']);
+                    $event->setDate(new \DateTime($data['date']));
+                    $event->setPrefixSerialNumber($data['prefix_serial_number']);
+                    $event->setTicketQuantity($data['ticket_quantity']);
+                    $event->setArtist($artistRepository->find($data['artist']));
+                    $event->setUpdatedAt(new \DateTime());
+                }catch (\Exception $e){
+                    $error['code'] = $e->getCode();
+                    $error['message'] = $e->getMessage();
+                    return new JsonResponse($error,Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
 
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator, $event);
-        } catch (\Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator, $event);
+                } catch (\Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
 
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        } catch (\Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo editar el evento en la bbdd", null, $event);
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                } catch (\Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo editar el evento en la bbdd", null, $event);
 
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Evento editado!",$event);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED, ['Content-type' => 'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Evento editado!",$event);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED, ['Content-type' => 'application/json']);
     }
 
     /**
@@ -241,22 +285,51 @@ class EventController extends AbstractController
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        try {
-            if ($event === ""){
-                $apiUtils->notFoundResponse("Evento no encontrado");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($event === ""){
+                        $apiUtils->notFoundResponse("Evento no encontrado");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($event);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar el evento de la base de datos",null,$event);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Evento borrado!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($event);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar el evento de la base de datos",null,$event);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Evento borrado!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**

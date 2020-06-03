@@ -15,6 +15,7 @@ class Post extends Component {
 
     state = {
         post: {},
+        token:  '',
         artists: [],
         tags: [],
         loading: true,
@@ -31,6 +32,7 @@ class Post extends Component {
             const {post} = this.props.match.params;
             this.getPost(post);
             this.getArtists();
+            this.getToken();
             this.getTags();
         }
     }
@@ -58,6 +60,16 @@ class Post extends Component {
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     getArtists = () =>  {
@@ -297,9 +309,9 @@ class Post extends Component {
     /* DELETE CALL */
     handleDelete = (post) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
-            axios.delete(`/api/v1.0/post/delete/${post.id}`).then(res => {
+            axios.delete(`/api/v1.0/post/delete/${post.id}`, { data: {token: token} }).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -324,6 +336,7 @@ class Post extends Component {
         const artist = document.querySelector('#artist').value;
         const description = document.querySelector('#description').value;
         const tags = document.querySelector('#tag').selectedOptions;
+        const { token } = this.state;
         let arr_tags = [];
 
         // tags variable cant be stringify: https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value
@@ -339,7 +352,7 @@ class Post extends Component {
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title: title, artist: artist, description: description, tag: arr_tags })
+            body: JSON.stringify({ title: title, artist: artist, description: description, tag: arr_tags, token: token })
         };
 
         this.setState( { sending: true } )
@@ -357,7 +370,9 @@ class Post extends Component {
                         this.setState({ post:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
 
             // Make the API call
             axios.post(`/api/v1.0/post/upload-img/${post.id}`, formData, {})
@@ -380,7 +395,9 @@ class Post extends Component {
                         this.setState({ post:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
         }
 
     }

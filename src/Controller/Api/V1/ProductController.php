@@ -102,50 +102,72 @@ class ProductController extends AbstractController
         // Sanitize data
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
-        
-        try {
-            $product->setName($data['name']);
-            $product->setCategory($categoryRepository->find($data['category']));
-            if($data['artist'] !== "")
-                $product->setArtist($artistRepository->find($data['artist']));
-            $product->setPrice($data['price']);
-            if($data['discount'] !== "")
-                $product->setDiscount($data['discount']);
-            if($data['size'] !== "")
-                $product->setSize($data['size']);
-            $product->setStock($data['stock']);
-            $product->setAvaiable($data['avaiable']);
-            $product->setDescription($data['description']);
-            $product->setImageName('product-default.png');
-            $product->setImageSize(1234);
-            $product->setCreatedAt(new \DateTime());
-            $product->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores al producto",$product);
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    $product->setName($data['name']);
+                    $product->setCategory($categoryRepository->find($data['category']));
+                    if($data['artist'] !== "")
+                        $product->setArtist($artistRepository->find($data['artist']));
+                    $product->setPrice($data['price']);
+                    if($data['discount'] !== "")
+                        $product->setDiscount($data['discount']);
+                    if($data['size'] !== "")
+                        $product->setSize($data['size']);
+                    $product->setStock($data['stock']);
+                    $product->setAvaiable($data['avaiable']);
+                    $product->setDescription($data['description']);
+                    $product->setImageName('product-default.png');
+                    $product->setImageSize(1234);
+                    $product->setCreatedAt(new \DateTime());
+                    $product->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores al producto",$product);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator, $product);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($product);
+                    $em->flush();
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo crear el producto en la bbdd", null, $product);
+
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Producto creado!",$product);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator, $product);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($product);
-            $em->flush();
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo crear el producto en la bbdd", null, $product);
-
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Producto creado!",$product);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
@@ -173,51 +195,73 @@ class ProductController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        try {
-            if($data['name'] !== "")
-                $product->setName($data['name']);
-            if($data['category'] !== "")
-                $product->setCategory($categoryRepository->find($data['category']));
-            if($data['artist'] !== "")
-                $product->setArtist($artistRepository->find($data['artist']));
-            if($data['price'] !== "")
-                $product->setPrice($data['price']);
-            if($data['discount'] !== "")
-                $product->setDiscount($data['discount']);
-            if($data['size'] !== "")
-                $product->setSize($data['size']);
-            if($data['stock'] !== "")
-                $product->setStock($data['stock']);
-            if($data['avaiable'] !== "")
-                $product->setAvaiable($data['avaiable']);
-            if($data['description'] !== "")
-                $product->setDescription($data['description']);
-            $product->setUpdatedAt(new \DateTime());
-        }catch (\Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores al producto",$product);
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if($data['name'] !== "")
+                        $product->setName($data['name']);
+                    if($data['category'] !== "")
+                        $product->setCategory($categoryRepository->find($data['category']));
+                    if($data['artist'] !== "")
+                        $product->setArtist($artistRepository->find($data['artist']));
+                    if($data['price'] !== "")
+                        $product->setPrice($data['price']);
+                    if($data['discount'] !== "")
+                        $product->setDiscount($data['discount']);
+                    if($data['size'] !== "")
+                        $product->setSize($data['size']);
+                    if($data['stock'] !== "")
+                        $product->setStock($data['stock']);
+                    if($data['avaiable'] !== "")
+                        $product->setAvaiable($data['avaiable']);
+                    if($data['description'] !== "")
+                        $product->setDescription($data['description']);
+                    $product->setUpdatedAt(new \DateTime());
+                }catch (\Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores al producto",$product);
 
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$product);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar el producto en la bbdd",null,$product);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Producto editado!",$product);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$product);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar el producto en la bbdd",null,$product);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-
-        $apiUtils->successResponse("¡Producto editado!",$product);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -232,22 +276,51 @@ class ProductController extends AbstractController
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        try {
-            if ($product === ""){
-                $apiUtils->notFoundResponse("Producto no encontrado");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($product === ""){
+                        $apiUtils->notFoundResponse("Producto no encontrado");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($product);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar el producto de la base de datos",null,$product);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Producto borrado!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($product);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar el producto de la base de datos",null,$product);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Producto borrado!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**

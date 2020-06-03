@@ -15,6 +15,7 @@ class User extends Component {
 
     state = {
         user: {},
+        token: '',
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -27,6 +28,7 @@ class User extends Component {
         this._isMounted = true;
         if (this._isMounted){
             const {user} = this.props.match.params;
+            this.getToken();
             this.getUser(user);
         }
     }
@@ -45,6 +47,16 @@ class User extends Component {
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     static propTypes = {
@@ -378,10 +390,11 @@ class User extends Component {
     /* DELETE CALL */
     handleDelete = (user) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+        const {token} = this.state;
 
         if (ans) {
 
-            axios.delete(`/api/v1.0/user/delete/${user.id}`).then(res => {
+            axios.delete(`/api/v1.0/user/delete/${user.id}`, {data: {token: token}}).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -411,7 +424,7 @@ class User extends Component {
         const city = document.querySelector('#city').value;
         const phone = document.querySelector('#phone').value;
         const img = document.querySelector('#img').files[0];
-        const {user} = this.state;
+        const {user, token} = this.state;
 
         let arr_roles = [];
 
@@ -425,7 +438,7 @@ class User extends Component {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: name, surname: surname, email: email, roles: arr_roles, address: address, postal_code: postal_code,
-                                        town: town, city: city, phone: phone})
+                                        town: town, city: city, phone: phone, token: token})
         };
         this.setState( { sending: true } )
 
@@ -442,7 +455,9 @@ class User extends Component {
                         this.setState({ user:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
 
             // Make the API call
             axios.post(`/api/v1.0/user/upload-img/${user.id}`, formData, {})
@@ -465,7 +480,9 @@ class User extends Component {
                         this.setState({ user:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
         }
 
     }

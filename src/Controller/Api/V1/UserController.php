@@ -105,62 +105,84 @@ class UserController extends AbstractController
         // Sanitize data
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
-        
-        try {
-            $user->setName($data['name']);
-            if ($data['surname'] !== "")
-                $user->setSurname($data['surname']);
-            $user->setEmail($data['email']);
-            $user->setPassword(
-                $passwordEncoder->encodePassword(
-                    $user,
-                    $data['password']
-                )
-            );
-            $user->setRoles($data['roles']);
-            if ($data['address'] !== "")
-                $user->setAddress($data['address']);
-            if ($data['postal_code'] !== "")
-                $user->setPostalCode($data['postal_code']);
-            if ($data['town'] !== "")
-                $user->setTown($data['town']);
-            if ($data['city'] !== "")
-                $user->setCity($data['city']);
-            if ($data['phone'] !== "")
-                $user->setPhone($data['phone']);
-            $user->setProfileImage('user-default.png');
-            $user->setProfileSize(123);
-            $user->setHeaderImage('header-default.png');
-            $user->setHeaderSize(123);
-            $user->setCreatedAt(new \DateTime());
-            $user->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo insertar los valores al usuario", $user);
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    $user->setName($data['name']);
+                    if ($data['surname'] !== "")
+                        $user->setSurname($data['surname']);
+                    $user->setEmail($data['email']);
+                    $user->setPassword(
+                        $passwordEncoder->encodePassword(
+                            $user,
+                            $data['password']
+                        )
+                    );
+                    $user->setRoles($data['roles']);
+                    if ($data['address'] !== "")
+                        $user->setAddress($data['address']);
+                    if ($data['postal_code'] !== "")
+                        $user->setPostalCode($data['postal_code']);
+                    if ($data['town'] !== "")
+                        $user->setTown($data['town']);
+                    if ($data['city'] !== "")
+                        $user->setCity($data['city']);
+                    if ($data['phone'] !== "")
+                        $user->setPhone($data['phone']);
+                    $user->setProfileImage('user-default.png');
+                    $user->setProfileSize(123);
+                    $user->setHeaderImage('header-default.png');
+                    $user->setHeaderSize(123);
+                    $user->setCreatedAt(new \DateTime());
+                    $user->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo insertar los valores al usuario", $user);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+                // Check errors, if there is any error return it
+                try {
+                    $apiUtils->validateData($validator, $user);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
+
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($user);
+                    $em->flush();
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo crear el usuario en la bbdd", null, $user);
+
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $log = new CustomLog("users_created","new_users");
+                $log->info($user->getEmail()." se ha registrado!");
+                $apiUtils->successResponse("¡Usuario creado!",$user);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any error return it
-        try {
-            $apiUtils->validateData($validator, $user);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->flush();
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo crear el usuario en la bbdd", null, $user);
-
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
-        }
-
-        $log = new CustomLog("users_created","new_users");
-        $log->info($user->getEmail()." se ha registrado!");
-        $apiUtils->successResponse("¡Usuario creado!",$user);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
     }
 
 
@@ -185,50 +207,72 @@ class UserController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        try {
-            $user->setName($data['name']);
-            if ($data['surname'] !== "")
-                $user->setSurname($data['surname']);
-            $user->setSurname($data['surname']);
-            if ($data['email'] !== "")
-            $user->setEmail($data['email']);
-            if ($data['roles'] !== "")
-                $user->setRoles($data['roles']);
-            if ($data['address'] !== "")
-                $user->setAddress($data['address']);
-            if ($data['postal_code'] !== "")
-                $user->setPostalCode($data['postal_code']);
-            if ($data['town'] !== "")
-                $user->setTown($data['town']);
-            if ($data['city'] !== "")
-                $user->setCity($data['city']);
-            if ($data['phone'] !== "")
-                $user->setPhone($data['phone']);
-            $user->setUpdatedAt(new \DateTime());
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores al usuario", $user);
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$user);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    $user->setName($data['name']);
+                    if ($data['surname'] !== "")
+                        $user->setSurname($data['surname']);
+                    $user->setSurname($data['surname']);
+                    if ($data['email'] !== "")
+                        $user->setEmail($data['email']);
+                    if ($data['roles'] !== "")
+                        $user->setRoles($data['roles']);
+                    if ($data['address'] !== "")
+                        $user->setAddress($data['address']);
+                    if ($data['postal_code'] !== "")
+                        $user->setPostalCode($data['postal_code']);
+                    if ($data['town'] !== "")
+                        $user->setTown($data['town']);
+                    if ($data['city'] !== "")
+                        $user->setCity($data['city']);
+                    if ($data['phone'] !== "")
+                        $user->setPhone($data['phone']);
+                    $user->setUpdatedAt(new \DateTime());
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores al usuario", $user);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$user);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
 
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar el usuario en la bbdd",null,$user);
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar el usuario en la bbdd",null,$user);
 
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Usuario editado!",$user);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Usuario editado!",$user);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -243,24 +287,53 @@ class UserController extends AbstractController
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        try {
-            if ($user === ""){
-                $apiUtils->notFoundResponse("Usuario no encontrado");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Get request data
+        $apiUtils->getContent($request);
+
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    if ($user === ""){
+                        $apiUtils->notFoundResponse("Usuario no encontrado");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($user);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar el usuario de la base de datos",null,$user);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $log = new CustomLog("deleted_users","deleted_users");
+                $log->info($user->getEmail()." ha sido eliminado!");
+                $apiUtils->successResponse("¡Usuario borrado!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($user);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar el usuario de la base de datos",null,$user);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $log = new CustomLog("deleted_users","deleted_users");
-        $log->info($user->getEmail()." ha sido eliminado!");
-        $apiUtils->successResponse("¡Usuario borrado!");
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -345,33 +418,82 @@ class UserController extends AbstractController
      * @param ApiUtils $apiUtils
      * @return JsonResponse
      */
-    public function deleteAccount(UserRepository $userRepository,ApiUtils $apiUtils): JsonResponse
+    public function deleteAccount(Request $request ,UserRepository $userRepository,ApiUtils $apiUtils): JsonResponse
     {
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $userRepository->findOneBy(['email'=>$this->getUser()->getUsername()]);
 
-        // logout user
-        $this->get('session')->invalidate();
-        $this->get('security.token_storage')->setToken(null);
+        // Get request data
+        $apiUtils->getContent($request);
 
-        try {
-            if ($user === null){
-                $apiUtils->notFoundResponse("Usuario no encontrado");
-                return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+        // Sanitize data
+        $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
+        $data = $apiUtils->getData();
+
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                // logout user
+                $this->get('session')->invalidate();
+                $this->get('security.token_storage')->setToken(null);
+
+                try {
+                    if ($user === null){
+                        $apiUtils->notFoundResponse("Usuario no encontrado");
+                        return new JsonResponse($apiUtils->getResponse(),Response::HTTP_NOT_FOUND,['Content-type'=>'application/json']);
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->remove($user);
+                    $entityManager->flush();
+
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo borrar el usuario de la base de datos",null,$user);
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+                }
+
+                $log = new CustomLog("deleted_users","deleted_users");
+                $log->info($user->getEmail()." ha sido eliminado!");
+                $apiUtils->successResponse("¡Usuario borrado!");
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($user);
-            $entityManager->flush();
-
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo borrar el usuario de la base de datos",null,$user);
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
+    }
 
-        $log = new CustomLog("deleted_users","deleted_users");
-        $log->info($user->getEmail()." ha sido eliminado!");
-        $apiUtils->successResponse("¡Usuario borrado!");
+    /**
+     * @Route("/token", name="api_user_token", methods={"GET"})
+     * @param ApiUtils $apiUtils
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function getToken(ApiUtils $apiUtils)
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        // Generate CSRF Token
+        if (empty($_SESSION['token'])) {
+            $_SESSION['token'] = bin2hex(random_bytes(32));
+        }
+        $token = $_SESSION['token'];
+
+        $apiUtils->successResponse('',$token);
         return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
@@ -415,51 +537,72 @@ class UserController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                try {
+                    $user = $userRepository->findOneBy(['email'=>$this->getUser()->getUsername()]);
+                    $user->setName($data['name']);
+                    if ($data['surname'] !== "")
+                        $user->setSurname($data['surname']);
+                    if ($data['address'] !== "")
+                        $user->setAddress($data['address']);
+                    if ($data['postal_code'] !== "")
+                        $user->setPostalCode($data['postal_code']);
+                    if ($data['town'] !== "")
+                        $user->setTown($data['town']);
+                    if ($data['city'] !== "")
+                        $user->setCity($data['city']);
+                    if ($data['phone'] !== "")
+                        $user->setPhone($data['phone']);
+                    if ($data['credit_card'] !== "")
+                        $user->setCreditCard($data['credit_card']);
 
-        try {
-            $user = $userRepository->findOneBy(['email'=>$this->getUser()->getUsername()]);
-            $user->setName($data['name']);
-            if ($data['surname'] !== "")
-                $user->setSurname($data['surname']);
-            if ($data['address'] !== "")
-                $user->setAddress($data['address']);
-            if ($data['postal_code'] !== "")
-                $user->setPostalCode($data['postal_code']);
-            if ($data['town'] !== "")
-                $user->setTown($data['town']);
-            if ($data['city'] !== "")
-                $user->setCity($data['city']);
-            if ($data['phone'] !== "")
-                $user->setPhone($data['phone']);
-            if ($data['credit_card'] !== "")
-                $user->setCreditCard($data['credit_card']);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo actualizar los valores al usuario", $user);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+                // Check errors, if there is any errror return it
+                try {
+                    $apiUtils->validateData($validator,$user);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
 
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo actualizar los valores al usuario", $user);
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+
+                // Update obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                }catch (Exception $e) {
+                    $apiUtils->errorResponse($e,"No se pudo actualizar el usuario en la bbdd",null,$user);
+
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
+
+                $info_updated = $userRepository->getInfo($this->getUser()->getUsername());
+                $apiUtils->successResponse("¡Información actualizada!",$info_updated);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
+            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-        // Check errors, if there is any errror return it
-        try {
-            $apiUtils->validateData($validator,$user);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(),$apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
-
-
-        // Update obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        }catch (Exception $e) {
-            $apiUtils->errorResponse($e,"No se pudo actualizar el usuario en la bbdd",null,$user);
-
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
-
-        $info_updated = $userRepository->getInfo($this->getUser()->getUsername());
-        $apiUtils->successResponse("¡Información actualizada!",$info_updated);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_ACCEPTED,['Content-type'=>'application/json']);
     }
 
     /**
@@ -672,72 +815,93 @@ class UserController extends AbstractController
         $apiUtils->setData($apiUtils->sanitizeData($apiUtils->getData()));
         $data = $apiUtils->getData();
 
-        if ($data['password'] === "")
-            $errors['required_old_password'] = "Por favor introduzca su contraseña actual";
-        if ($data['new_password'] === "")
-            $errors['required_new_password'] = "Por favor introduzca su nueva contraseña";
-        if ($data['repeat_password'] === "")
-            $errors['required_repeat_password'] = "Por favor introduzca de nuevo la nueva contraseña";
+        // CSRF Protection process
+        if (!empty($data["token"])) {
+            // if token received is the same than original do process
+            if (hash_equals($_SESSION["token"], $data["token"])) {
+                if ($data['password'] === "")
+                    $errors['required_old_password'] = "Por favor introduzca su contraseña actual";
+                if ($data['new_password'] === "")
+                    $errors['required_new_password'] = "Por favor introduzca su nueva contraseña";
+                if ($data['repeat_password'] === "")
+                    $errors['required_repeat_password'] = "Por favor introduzca de nuevo la nueva contraseña";
 
-        if (count($errors) > 0){
-            $response = [
-                "success"=>false,
-                "message"=>"Cambio de contraseña fallido",
-                "errors"=>$errors
-            ];
-            return new JsonResponse($response,Response::HTTP_BAD_REQUEST);
-        }elseif (!password_verify($data['password'],$user->getPassword())) {
-            $errors['old_password_fail'] = "No ha introducido correctamente su contraseña";
-            $response = [
-                "success"=>false,
-                "message"=>"Contraseña incorrecta",
-                "errors"=>$errors
-            ];
-            return new JsonResponse($response,Response::HTTP_BAD_REQUEST);
-        }elseif ($data['new_password'] !== $data['repeat_password']){
-            $errors['new_password_fail'] = "No ha introducido correctamente su nueva contraseña";
-            $response = [
-                "success"=>false,
-                "message"=>"Contraseña incorrecta",
-                "errors"=>$errors
-            ];
-            return new JsonResponse($response,Response::HTTP_BAD_REQUEST);
-        }
+                if (count($errors) > 0){
+                    $response = [
+                        "success"=>false,
+                        "message"=>"Cambio de contraseña fallido",
+                        "errors"=>$errors
+                    ];
+                    return new JsonResponse($response,Response::HTTP_BAD_REQUEST);
+                }elseif (!password_verify($data['password'],$user->getPassword())) {
+                    $errors['old_password_fail'] = "No ha introducido correctamente su contraseña";
+                    $response = [
+                        "success"=>false,
+                        "message"=>"Contraseña incorrecta",
+                        "errors"=>$errors
+                    ];
+                    return new JsonResponse($response,Response::HTTP_BAD_REQUEST);
+                }elseif ($data['new_password'] !== $data['repeat_password']){
+                    $errors['new_password_fail'] = "No ha introducido correctamente su nueva contraseña";
+                    $response = [
+                        "success"=>false,
+                        "message"=>"Contraseña incorrecta",
+                        "errors"=>$errors
+                    ];
+                    return new JsonResponse($response,Response::HTTP_BAD_REQUEST);
+                }
 
-        try {
-            $user->setPassword(
-                $passwordEncoder->encodePassword(
-                    $user,
-                    $data['new_password']
-                )
-            );
-            $user->setUpdatedAt(new \DateTime('now'));
-        }catch (Exception $e){
-            $apiUtils->errorResponse($e, "No se pudieron insertar los datos al usuario", $user);
-            return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
-        }
+                try {
+                    $user->setPassword(
+                        $passwordEncoder->encodePassword(
+                            $user,
+                            $data['new_password']
+                        )
+                    );
+                    $user->setUpdatedAt(new \DateTime('now'));
+                }catch (Exception $e){
+                    $apiUtils->errorResponse($e, "No se pudieron insertar los datos al usuario", $user);
+                    return new JsonResponse($apiUtils->getResponse(),Response::HTTP_BAD_REQUEST,['Content-type'=>'application/json']);
+                }
 
-        // Check errors, if there is any error return it
-        try {
-            $apiUtils->validateData($validator, $user);
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
-            return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
-        }
+                // Check errors, if there is any error return it
+                try {
+                    $apiUtils->validateData($validator, $user);
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, $e->getMessage(), $apiUtils->getFormErrors());
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST);
+                }
 
-        // Upload obj to the database
-        try {
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
-        } catch (Exception $e) {
-            $apiUtils->errorResponse($e, "No se pudo editar el usuario en la bbdd", null, $user);
+                // Upload obj to the database
+                try {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->flush();
+                } catch (Exception $e) {
+                    $apiUtils->errorResponse($e, "No se pudo editar el usuario en la bbdd", null, $user);
 
+                    return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+                }
+
+                $apiUtils->successResponse("¡Cambio de contraseña con existo!",$user);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
+            }else {
+                // Send error response if csrf token isn't valid
+                $apiUtils->setResponse([
+                    "success" => false,
+                    "message" => "Validación no completada",
+                    "errors" => []
+                ]);
+                return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
+            }
+        }else {
+            // Send error response if there's no csrf token
+            $apiUtils->setResponse([
+                "success" => false,
+                "message" => "Validación no completada",
+                "errors" => $data["token"]
+            ]);
             return new JsonResponse($apiUtils->getResponse(), Response::HTTP_BAD_REQUEST, ['Content-type' => 'application/json']);
         }
-
-        $apiUtils->successResponse("¡Cambio de contraseña con existo!",$user);
-        return new JsonResponse($apiUtils->getResponse(), Response::HTTP_CREATED, ['Content-type' => 'application/json']);
-
     }
 
     /**

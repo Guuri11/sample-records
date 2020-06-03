@@ -21,6 +21,7 @@ class Profile extends Component {
         header_img: '',
         comments: [],
         purchases: [],
+        token: '',
         loading: true,
         data_submited: false,
         data_success: false,
@@ -43,9 +44,10 @@ class Profile extends Component {
                     });
                 }
                 // Get comments and purchases by the user filtering by his ID
-                const [comments,purchases] = await Promise.all([
+                const [comments,purchases, token] = await Promise.all([
                     axios.get('/api/v1.0/user/profile/comments').catch(e=>{}),
-                    axios.get('/api/v1.0/user/profile/purchases').catch(e=>{})
+                    axios.get('/api/v1.0/user/profile/purchases').catch(e=>{}),
+                    axios.get('/api/v1.0/user/token').catch(e=>{})
                 ])
 
                 this.setState({
@@ -54,6 +56,7 @@ class Profile extends Component {
                     header_img: info.data.results[0].header_image,
                     comments: comments !== undefined ? comments.data:[],
                     purchases: purchases !== undefined ? purchases.data:[],
+                    token: token !== undefined ? token.data.results:'',
                     loading: false })
 
             } else {
@@ -465,12 +468,13 @@ class Profile extends Component {
         const city = document.querySelector('#city').value;
         const phone = document.querySelector('#phone').value;
         const credit_card = document.querySelector('#credit_card').value;
+        const { token } = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: name, surname: surname, address: address, town: town,postal_code:postal_code,
-                city: city, phone: phone, credit_card: credit_card})
+                city: city, phone: phone, credit_card: credit_card, token: token})
         };
 
         // Make the API call
@@ -481,7 +485,9 @@ class Profile extends Component {
                     this.setState({ info:data.results[0], data_submited: true, data_success: true })
                 }else
                     this.setState({ data_success: false, message: "No se pudo actualizar el perfil", data_submited: true })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ data_success: false, message: "No se pudo actualizar el perfil", data_submited: true })
+        });
 
     }
 
@@ -492,11 +498,13 @@ class Profile extends Component {
         const password = document.querySelector('#password').value;
         const new_password = document.querySelector('#new_password').value;
         const repeat_password = document.querySelector('#repeat_password').value;
+        const { token } = this.state;
+
 
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password: password, new_password: new_password, repeat_password: repeat_password })
+            body: JSON.stringify({ password: password, new_password: new_password, repeat_password: repeat_password, token: token })
         };
 
         // Make the API call
@@ -509,13 +517,15 @@ class Profile extends Component {
                     this.setState({ data_success: false, message: "No se pudo actualizar la contraseña", data_submited: true,
                                             errors: data.errors})
                 }
-            }).catch(e=>{});
+            }).catch(()=>{
+            this.setState({ data_success: false, message: "No se pudo actualizar la contraseña", data_submited: true,
+                errors: data.errors})
+        });
     }
 
     handleChangeProfileImage = (e) => {
         e.preventDefault();
         const image_profile = document.querySelector('#input-img-profile').files[0];
-        console.log(image_profile)
 
         if (image_profile !== undefined){
             const formData = new FormData();
@@ -524,25 +534,27 @@ class Profile extends Component {
             // Make the API call
             axios.post("/api/v1.0/user/profile/change-profile-image", formData, {})
                 .then(res => { // then print response status
-                    console.log(formData)
-                    console.log(res);
                 if (res.data.success){
                     this.setState({ profile_img: res.data.results.profile_image })
                 }
-            }).catch(e=>{console.log(e.response)})
+            }).catch()
         }
     }
 
     handleDeleteComment = (idx) => {
         const ans = confirm("¿Estás seguro de que quieres borrar el comentario?");
         let { comments } = this.state;
+        const {token} = this.state;
+
         if (ans){
-            axios.delete(`/api/v1.0/comment/delete/${comments[idx].id}`).then(res => {
+            axios.delete(`/api/v1.0/comment/delete/${comments[idx].id}`, { data: { token:token } }).then(res => {
                 if (res.data.success === true) {
                     comments.splice(idx, 1);
                     this.setState({ comments: comments });
+                }else {
+                    this.setState( { errors: ["No se pudo borrar el comentario"] } )
                 }
-            }).catch(error => {
+            }).catch(() => {
                    this.setState( { errors: ["No se pudo borrar el comentario"] } )
             });
         }
@@ -550,9 +562,10 @@ class Profile extends Component {
 
     handleDeleteAccount = () => {
         const ans = confirm("¿Estás seguro de que quieres borrar tu cuenta? Todos tus datos se borrarán y no podrás recuperarlos.");
+        const { token } = this.state;
 
         if (ans) {
-            axios.delete('/api/v1.0/user/deleteaccount').then(res => {
+            axios.delete('/api/v1.0/user/deleteaccount', { data: { token: token } }).then(res => {
                 if (res.data.success === true) {
                     sessionStorage.removeItem('auth');
                     sessionStorage.removeItem('is_admin');

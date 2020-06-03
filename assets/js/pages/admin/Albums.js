@@ -16,8 +16,9 @@ class Albums extends Component {
 
     state = {
         loading: true,
-        albums: [],
+        items: [],
         artists: [],
+        token: '',
         total_albums: [],
         active_page : 1,
         albums_per_page: 5,
@@ -33,6 +34,7 @@ class Albums extends Component {
         this._isMounted = true;
         if (this._isMounted) {
             this.getAlbums();
+            this.getToken();
             this.getArtists();
         }
     }
@@ -43,12 +45,22 @@ class Albums extends Component {
     getAlbums = () => {
         axios.get('/api/v1.0/album').then(res => {
             if (res.data.success === true){
-                this._isMounted && this.setState( { albums: res.data.results, total_albums: res.data.results, loading: false } );
+                this._isMounted && this.setState( { items: res.data.results, total_albums: res.data.results, loading: false } );
             } else {
                 <Redirect to={'error404'}/>
             }
 
         })
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     getArtists = () =>  {
@@ -70,20 +82,20 @@ class Albums extends Component {
         if (search_request !== ""){
 
             // Filter albums searching in his name and artist alias
-            const search_results = this.state.albums.filter( (album) => {
+            const search_results = this.state.items.filter( (album) => {
                 let album_slug = album.name + album.artist.alias;
                 return album_slug.toLowerCase().indexOf(search_request) !== -1;
             } )
-            this.setState( {albums: search_results} )
+            this.setState( {items: search_results} )
         } else {
             // if search value is empty reset products
-            this.setState( { albums: this.state.total_albums } )
+            this.setState( { items: this.state.total_albums } )
         }
 
     }
 
     orderByNewest = () => {
-        const newest = this.state.albums.sort( function compare( a, b ) {
+        const newest = this.state.items.sort( function compare( a, b ) {
             if ( new Date(a.created_at.date) > new Date(b.created_at.date) ){
                 return -1;
             }
@@ -92,11 +104,11 @@ class Albums extends Component {
             }
             return 0;
         } );
-        this.setState( { albums : newest, active_page: 1 } );
+        this.setState( { items : newest, active_page: 1 } );
     }
 
     orderByOldest = () => {
-        const oldest = this.state.albums.sort( function compare( a, b ) {
+        const oldest = this.state.items.sort( function compare( a, b ) {
             if ( new Date(a.created_at.date) < new Date(b.created_at.date) ){
                 return -1;
             }
@@ -105,7 +117,7 @@ class Albums extends Component {
             }
             return 0;
         } );
-        this.setState( { albums : oldest, active_page: 1 } );
+        this.setState( { items : oldest, active_page: 1 } );
     }
 
     // Set how many items show per page
@@ -122,17 +134,17 @@ class Albums extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
 
             let {total_albums} = this.state;
 
-            axios.delete(`/api/v1.0/album/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/album/delete/${id}`, { data: { token: token } }).then(res => {
                 if (res.data.success === true) {
                     total_albums = total_albums.filter(function( item ) {
                         return item.id !== parseInt(id);
                     });
-                    this.setState({ total_albums: total_albums, albums: total_albums ,message: 'Álbum eliminado' });
+                    this.setState({ total_albums: total_albums, items: total_albums ,message: 'Álbum eliminado' });
                 }
             }).catch(error => {
                 this.setState( { message: "No se pudo borrar el album" } )
@@ -142,12 +154,12 @@ class Albums extends Component {
 
     /* PAGE WHERE SHOWS ALL ITEMS */
     _renderIndex = () => {
-        const { active_page, albums_per_page, albums, message} = this.state;
+        const { active_page, albums_per_page, items, message} = this.state;
 
         // Logic for pagination
         const indexLastEvent = active_page * albums_per_page;
         const indexFirstEvent = indexLastEvent - albums_per_page;
-        const currentAlbums = albums.slice(indexFirstEvent, indexLastEvent);
+        const currentAlbums = items.slice(indexFirstEvent, indexLastEvent);
 
         return (
             <div className={"row"}>
@@ -200,7 +212,7 @@ class Albums extends Component {
                                 </div>
                                 <div className="col-sm-12 col-md-3">
                                     <button className="btn btn-primary btn-success mt-3"
-                                            onClick={() => this.setState({section:"new"}) }>Crear album</button>
+                                            onClick={() => this.setState({section:"new"}) }>Crear álbum</button>
                                 </div>
                             </div>
                             <table className="table table-bordered" id="dataTable" width={100}
@@ -267,7 +279,7 @@ class Albums extends Component {
                                 <Pagination
                                     activePage={active_page}
                                     itemsCountPerPage={albums_per_page}
-                                    totalItemsCount={albums.length}
+                                    totalItemsCount={items.length}
                                     pageRangeDisplayed={4}
                                     onChange={this.handlePageChange.bind(this)}
                                     itemClass="page-item"
@@ -289,7 +301,7 @@ class Albums extends Component {
             <div className={"row"}>
                 <div className="card shadow mb-4 w-100">
                     <div className="card-header py-3">
-                        <h5 className="m-0 font-weight-bold text-sr">Crear album</h5>
+                        <h5 className="m-0 font-weight-bold text-sr">Crear álbum</h5>
                         {
                             errors.hasOwnProperty('cant_delete') ?
                                 <h6 className={"text-danger"}>{errors.cant_delete}</h6> : null
@@ -416,7 +428,7 @@ class Albums extends Component {
                                     <div className="form-group row">
                                         <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                             <button name="submit" type="submit"
-                                                    className="btn btn-success">Crear album
+                                                    className="btn btn-success">Crear álbum
                                             </button>
                                             <button className="btn btn-primary ml-2"
                                                     onClick={() => this.setState({section:"index"})}>Volver atrás
@@ -443,13 +455,14 @@ class Albums extends Component {
         const duration = document.querySelector('#duration').value;
         const released_at = document.querySelector('#released_at').value;
         const img = document.querySelector('#img').files[0];
+        const {token} = this.state;
 
         let { total_albums } = this.state;
 
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name, artist: artist, price: price, duration: duration, released_at: released_at })
+            body: JSON.stringify({ name: name, artist: artist, price: price, duration: duration, released_at: released_at, token: token })
         };
 
         this.setState( { sending: true } )
@@ -474,7 +487,7 @@ class Albums extends Component {
                                     // Update albums list
                                     total_albums.unshift(album);
 
-                                    this.setState({ total_albums:total_albums, albums: total_albums, submited: true,
+                                    this.setState({ total_albums:total_albums, items: total_albums, submited: true,
                                         message:"¡Álbum creado!",success: true,section: "index", sending: false })
                                 }else
                                     this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
@@ -490,12 +503,14 @@ class Albums extends Component {
                         album = data.results;
                         // Update albums list
                         total_albums.unshift(album);
-                        this.setState({ total_albums:total_albums, albums: total_albums, submited: true, success: true, message:"¡Álbum creado!",
+                        this.setState({ total_albums:total_albums, items: total_albums, submited: true, success: true, message:"¡Álbum creado!",
                             section: "index", sending: false })
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+                console.log(e)
+        });
 
 
     }

@@ -16,6 +16,7 @@ class Event extends Component {
     state = {
         event: {},
         artists: [],
+        token: '',
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -29,6 +30,7 @@ class Event extends Component {
         if (this._isMounted){
             const {event} = this.props.match.params;
             this.getEvent(event);
+            this.getToken();
             this.getArtists();
         }
     }
@@ -56,6 +58,16 @@ class Event extends Component {
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     getArtists = () =>  {
@@ -378,9 +390,9 @@ class Event extends Component {
     /* DELETE CALL */
     handleDelete = (event) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
-            axios.delete(`/api/v1.0/event/delete/${event.id}`).then(res => {
+            axios.delete(`/api/v1.0/event/delete/${event.id}`, {data: {token:token}}).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -410,13 +422,14 @@ class Event extends Component {
         const prefix_serial_number = document.querySelector('#prefix_serial_number').value;
         const ticket_quantity = document.querySelector('#ticket_quantity').value;
         const img = document.querySelector('#img').files[0];
+        const {token} = this.state;
         const {event} = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: name, artist: artist, place: place, city: city, country: country,
-                                        date: date, prefix_serial_number: prefix_serial_number, ticket_quantity: ticket_quantity})
+                                        date: date, prefix_serial_number: prefix_serial_number, ticket_quantity: ticket_quantity, token: token})
         };
 
         this.setState( { sending: true } )
@@ -434,7 +447,9 @@ class Event extends Component {
                         this.setState({ event:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
 
             // Make the API call
             axios.post(`/api/v1.0/event/upload-img/${event.id}`, formData, {})
@@ -457,7 +472,9 @@ class Event extends Component {
                         this.setState({ event:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
         }
 
     }

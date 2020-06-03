@@ -14,7 +14,8 @@ class Artist extends Component {
     }
 
     state = {
-        item: {},
+        artist: {},
+        token: '',
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -27,6 +28,7 @@ class Artist extends Component {
         this._isMounted = true;
         if (this._isMounted){
             const {artist} = this.props.match.params;
+            this.getToken();
             this.getArtist(artist);
         }
     }
@@ -38,13 +40,22 @@ class Artist extends Component {
     getArtist( id ) {
         axios.get(`/api/v1.0/artist/${id}`).then(res => {
             if (res.data.success === true) {
-                const item = res.data.results;
+                const artist = res.data.results;
 
-                this.setState({item: item, loading: false});
+                this.setState({artist: artist, loading: false});
             }
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     static propTypes = {
@@ -306,10 +317,11 @@ class Artist extends Component {
     /* DELETE CALL */
     handleDelete = (artist) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+        const {token} = this.state
 
         if (ans) {
             // API call to delete artist
-            axios.delete(`/api/v1.0/artist/delete/${artist.id}`).then(res => {
+            axios.delete(`/api/v1.0/artist/delete/${artist.id}`, { data: { token: token } }).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -337,12 +349,13 @@ class Artist extends Component {
         const is_from = document.querySelector('#is_from').value;
         const bio = document.querySelector('#bio').value;
         const img = document.querySelector('#img').files[0];
+        const {token} = this.state;
         const {artist} = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name, surname: surname, alias: alias, birth: birth, is_from: is_from, bio: bio })
+            body: JSON.stringify({ name: name, surname: surname, alias: alias, birth: birth, is_from: is_from, bio: bio, token: token })
         };
 
         this.setState( { sending: true } )
@@ -357,16 +370,16 @@ class Artist extends Component {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
-                        this.setState({ item:data.results })
+                        this.setState({ artist:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })});
 
             // Make the API call to upload image
             axios.post(`/api/v1.0/artist/upload-img/${artist.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
-                        this.setState({ item:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
+                        this.setState({ artist:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                 } )
@@ -383,14 +396,14 @@ class Artist extends Component {
                         this.setState({ artist:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })});
         }
 
     }
 
     render() {
 
-        const { item, loading, section, errors } = this.state;
+        const { artist, loading, section, errors } = this.state;
 
         return(
             <div id="wrapper">
@@ -400,7 +413,7 @@ class Artist extends Component {
                         <Header/>
                         <div className="container-fluid">
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
-                                <h1 className="h3 mb-0 text-gray-800">Artista {item.alias}</h1>
+                                <h1 className="h3 mb-0 text-gray-800">Artista {artist.alias}</h1>
                             </div>
                             {
                                 loading ?
@@ -418,11 +431,11 @@ class Artist extends Component {
                                             <div className="card-body">
                                                 {
                                                     section === "Mostrar" ?
-                                                        this._renderInfo(item) : null
+                                                        this._renderInfo(artist) : null
                                                 }
                                                 {
                                                     section === "Editar" ?
-                                                        this._renderUpdateInfo(item) : null
+                                                        this._renderUpdateInfo(artist) : null
                                                 }
                                             </div>
                                         </div>

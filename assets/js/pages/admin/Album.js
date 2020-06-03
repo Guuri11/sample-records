@@ -14,8 +14,9 @@ class Album extends Component {
     }
 
     state = {
-        item: {},
+        album: {},
         artists: [],
+        token: '',
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -29,6 +30,7 @@ class Album extends Component {
         if (this._isMounted){
             const {album} = this.props.match.params;
             this.getAlbum(album);
+            this.getToken();
             this.getArtists();
         }
     }
@@ -49,14 +51,25 @@ class Album extends Component {
     getAlbum( id ) {
         axios.get(`/api/v1.0/album/${id}`).then(res => {
             if (res.data.success === true) {
-                const item = res.data.results;
+                const album = res.data.results;
 
-                this.setState({item: item, loading: false});
+                this.setState({album: album, loading: false});
             }
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
     }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
 
     getArtists = () =>  {
         axios.get(`/api/v1.0/artist`).then(res => {
@@ -304,10 +317,11 @@ class Album extends Component {
     /* DELETE CALL */
     handleDelete = (album) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+        const {token} = this.state;
 
         if (ans) {
             // Api call to delete album
-            axios.delete(`/api/v1.0/album/delete/${album.id}`).then(res => {
+            axios.delete(`/api/v1.0/album/delete/${album.id}`, { data: { token: token } }).then(res => {
                 if (res.data.success === true) {
                     // Render to albums page
                     this.props.history.push(
@@ -335,12 +349,13 @@ class Album extends Component {
         const duration = document.querySelector('#duration').value;
         const released_at = document.querySelector('#released_at').value;
         const img = document.querySelector('#img').files[0];
+        const { token } = this.state;
         const {album} = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name, artist: artist, price: price, duration: duration, released_at: released_at })
+            body: JSON.stringify({ name: name, artist: artist, price: price, duration: duration, released_at: released_at , token: token})
         };
 
         this.setState( { sending: true } )
@@ -355,16 +370,18 @@ class Album extends Component {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
-                        this.setState({ item:data.results })
+                        this.setState({ album:data.results })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
 
             // Make the API call
             axios.post(`/api/v1.0/album/upload-img/${album.id}`, formData, {})
                 .then(res=> {
                     if (res.data.success){
-                        this.setState({ item:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
+                        this.setState({ album:res.data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                 } )
@@ -378,17 +395,19 @@ class Album extends Component {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success){
-                        this.setState({ item:data.results, submited: true, success: true, section: "Mostrar", sending: false })
+                        this.setState({ album:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                     }else
                         this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-                }).catch(e=>{});
+                }).catch(e=>{
+                this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            });
         }
 
     }
 
 
     render() {
-        const { item, artists, loading, section, errors } = this.state;
+        const { album, artists, loading, section, errors } = this.state;
 
         return(
             <div id="wrapper">
@@ -398,7 +417,7 @@ class Album extends Component {
                         <Header/>
                         <div className="container-fluid">
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
-                                <h1 className="h3 mb-0 text-gray-800">Álbum {item.name}</h1>
+                                <h1 className="h3 mb-0 text-gray-800">Álbum {album.name}</h1>
                             </div>
                             {
                                 loading ?
@@ -416,11 +435,11 @@ class Album extends Component {
                                             <div className="card-body">
                                                 {
                                                     section === "Mostrar" ?
-                                                        this._renderInfo(item) : null
+                                                        this._renderInfo(album) : null
                                                 }
                                                 {
                                                     section === "Editar" ?
-                                                        this._renderUpdateInfo(item,artists) : null
+                                                        this._renderUpdateInfo(album,artists) : null
                                                 }
                                             </div>
                                         </div>

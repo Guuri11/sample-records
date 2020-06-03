@@ -17,6 +17,7 @@ class Events extends Component {
     state = {
         loading: true,
         items: [],
+        token: '',
         total_items: [],
         artists: [],
         active_page : 1,
@@ -33,6 +34,7 @@ class Events extends Component {
         this._isMounted = true;
         if (this._isMounted) {
             this.getArtists();
+            this.getToken();
             this.getEvents();
         }
     }
@@ -51,12 +53,23 @@ class Events extends Component {
         }).catch(e =>{})
     }
 
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
+
     getArtists = () =>  {
         axios.get(`/api/v1.0/artist`).then(res => {
             if (res.data.success === true) {
                 const artists = res.data.results;
 
-                this.setState({artists: artists, loading: false});
+                this.setState({artists: artists});
             }
         }).catch(error => {
             this.props.history.push('/admin/error404');
@@ -122,12 +135,13 @@ class Events extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
+        const {token} = this.state;
 
         if (ans) {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/event/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/event/delete/${id}`, { data: {token: token} }).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -533,6 +547,7 @@ class Events extends Component {
         const prefix_serial_number = document.querySelector('#prefix_serial_number').value;
         const ticket_quantity = document.querySelector('#ticket_quantity').value;
         const price = document.querySelector('#price').value;
+        const {token} = this.state;
         const img = document.querySelector('#img').files[0];
 
         let {total_items} = this.state;
@@ -541,7 +556,7 @@ class Events extends Component {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: name, artist: artist, place: place, city: city, country: country,
-                date: date, prefix_serial_number: prefix_serial_number, ticket_quantity: ticket_quantity, price: price})
+                date: date, prefix_serial_number: prefix_serial_number, ticket_quantity: ticket_quantity, price: price, token: token})
         };
 
         this.setState( { sending: true } )
@@ -587,7 +602,9 @@ class Events extends Component {
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors ? data.error.errors:{} , submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors ? data.error.errors:{} , submited: true, sending: false })
+        });
 
     }
 

@@ -17,6 +17,7 @@ class Songs extends Component {
     state = {
         loading: true,
         items: [],
+        token: '',
         albums: [],
         artists: [],
         total_items: [],
@@ -35,6 +36,7 @@ class Songs extends Component {
         if (this._isMounted) {
             this.getAlbums();
             this.getArtists();
+            this.getToken();
             this.getSongs();
         }
     }
@@ -51,6 +53,16 @@ class Songs extends Component {
             }
 
         }).catch(e => {})
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     getArtists = () =>  {
@@ -137,12 +149,12 @@ class Songs extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/song/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/song/delete/${id}`, {data: {token: token}}).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -524,13 +536,13 @@ class Songs extends Component {
         const released_at = document.querySelector('#released_at').value;
         const song_file = document.querySelector('#song').files[0];
         const img = document.querySelector('#img').files[0];
-
+        const {token} = this.state;
         const { total_items } = this.state;
 
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name, album: album, artist: artist, duration: duration, video_src: video_src, released_at: released_at })
+            body: JSON.stringify({ name: name, album: album, artist: artist, duration: duration, video_src: video_src, released_at: released_at, token: token })
         };
 
         this.setState( { sending: true } )
@@ -642,7 +654,9 @@ class Songs extends Component {
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
 
 
     }

@@ -15,6 +15,7 @@ class Category extends Component {
 
     state = {
         category: {},
+        token: '',
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -28,6 +29,7 @@ class Category extends Component {
         this._isMounted = true;
         if (this._isMounted){
             const {category} = this.props.match.params;
+            this.getToken();
             this.getCategory(category);
         }
     }
@@ -55,6 +57,16 @@ class Category extends Component {
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     _renderInfo = (category) => {
@@ -155,9 +167,9 @@ class Category extends Component {
     /* DELETE CALL */
     handleDelete = (category) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
-            axios.delete(`/api/v1.0/category/delete/${category.id}`).then(res => {
+            axios.delete(`/api/v1.0/category/delete/${category.id}`, { data: {token:token} }).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -179,12 +191,13 @@ class Category extends Component {
         e.preventDefault();
 
         const name = document.querySelector('#name').value;
+        const {token} = this.state;
         const {category} = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name })
+            body: JSON.stringify({ name: name, token: token })
         };
         this.setState( { sending: true } )
 
@@ -196,7 +209,9 @@ class Category extends Component {
                     this.setState({ category:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
 
     }
 

@@ -17,6 +17,7 @@ class Blog extends Component {
     state = {
         loading: true,
         items: [],
+        token: '',
         total_items: [],
         artists: [],
         tags: [],
@@ -35,7 +36,8 @@ class Blog extends Component {
         if (this._isMounted) {
             this.getPosts();
             this.getArtists();
-            this.getTags()
+            this.getToken();
+            this.getTags();
         }
     }
     componentWillUnmount() {
@@ -52,6 +54,17 @@ class Blog extends Component {
 
         })
     }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
 
     getArtists = () =>  {
         axios.get(`/api/v1.0/artist`).then(res => {
@@ -136,12 +149,12 @@ class Blog extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
 
             let {total_items} = this.state;
 
-            axios.delete(`/api/v1.0/post/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/post/delete/${id}`, { data: { token: token } }).then(res => {
                 if (res.data.success === true) {
                     total_items = total_items.filter(function( item ) {
                         return item.id !== parseInt(id);
@@ -458,6 +471,7 @@ class Blog extends Component {
         const description = document.querySelector('#description').value;
         const tags = document.querySelector('#tag').selectedOptions;
         const img = document.querySelector('#img').files[0];
+        const {token} = this.state;
         let arr_tags = [];
 
         // tags variable cant be stringify: https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value
@@ -471,7 +485,7 @@ class Blog extends Component {
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title: title, artist: artist, description: description, tag: arr_tags })
+            body: JSON.stringify({ title: title, artist: artist, description: description, tag: arr_tags, token: token })
         };
 
         this.setState( { sending: true } )
@@ -515,7 +529,9 @@ class Blog extends Component {
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
     }
 
 

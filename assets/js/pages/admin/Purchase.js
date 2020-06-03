@@ -16,6 +16,7 @@ class Purchase extends Component {
     state = {
         purchase: {},
         users: [],
+        token: '',
         loading: true,
         section: 'Mostrar',
         submited: false,
@@ -28,7 +29,8 @@ class Purchase extends Component {
         this._isMounted = true;
         if (this._isMounted){
             const {purchase} = this.props.match.params;
-            this.getPurchase(purchase)
+            this.getPurchase(purchase);
+            this.getToken();
             this.getUsers();
         }
     }
@@ -55,6 +57,16 @@ class Purchase extends Component {
         }).catch(error => {
             this.props.history.push('/admin/error404');
         });
+    }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
     }
 
     getUsers() {
@@ -410,9 +422,9 @@ class Purchase extends Component {
     /* DELETE CALL */
     handleDelete = (purchase) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const { token } = this.state;
         if (ans) {
-            axios.delete(`/api/v1.0/purchase/delete/${purchase.id}`).then(res => {
+            axios.delete(`/api/v1.0/purchase/delete/${purchase.id}`, { data: { token: token }}).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -443,13 +455,15 @@ class Purchase extends Component {
         const final_price = document.querySelector('#final_price').value;
         const user = document.querySelector('#user').value;
         const comment = document.querySelector('#comment').value;
+        const {token} = this.state;
         const {purchase} = this.state;
 
         const requestOptions = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ serial_number: serial_number, date: date, received: received, user: user,
-                address: address, town: town, city: city, country: country, final_price: final_price, comment: comment
+                address: address, town: town, city: city, country: country, final_price: final_price, comment: comment,
+                token: token
             })
         };
         this.setState( { sending: true } )
@@ -463,7 +477,10 @@ class Purchase extends Component {
                 }else
                     this.setState({ success: false, errors: data.error.errors ? data.error.errors: data.error.code === 0 ? {serial_number:"Número de serie repetido"}:''
                         , submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors ? data.error.errors: data.error.code === 0 ? {serial_number:"Número de serie repetido"}:''
+                , submited: true, sending: false })
+        });
 
     }
 

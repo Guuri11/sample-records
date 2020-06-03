@@ -45,9 +45,9 @@ class Event extends Component {
         this._isMounted = true;
         if (this._isMounted){
             const {id} = this.props.match.params;
-            this.getEvent({ id });
             this.getComments({id});
             this.userCanComment();
+            this.getEvent({ id });
         }
     }
 
@@ -64,7 +64,7 @@ class Event extends Component {
                 const month = new Date(event.date.date).getMonth();
                 const year = new Date(event.date.date).getFullYear();
 
-                this.setState({event: event, day: day, month: month, year: year, loading: false});
+               this._isMounted && this.setState({event: event, day: day, month: month, year: year, loading: false});
             }
         }).catch(error => {
             this.props.history.push('/error404');
@@ -74,10 +74,8 @@ class Event extends Component {
     // Api call to get all the comments
     getComments({ id }) {
         axios.get(`/api/v1.0/comment/?event=${id}`).then(res => {
-            this.setState( { comments: res.data.results } )
-        }).catch( e => {
-            console.warn('No hay comentarios');
-        })
+            this._isMounted && this.setState( { comments: res.data.results } )
+        }).catch(() => console.warn(('No hay comentarios')) )
     }
 
     // Check if user can comment
@@ -85,9 +83,9 @@ class Event extends Component {
         // check that user is loggued and get data
         axios.get('/api/v1.0/user/datatocomment').then(res => {
             if (res.data.success)
-                this.setState( { user_data: res.data.results, can_comment: true, loading: false } )
-        }).catch(error => {
-            this.setState( { can_comment : false, loading: false } );
+                this._isMounted && this.setState( { user_data: res.data.results, can_comment: true } )
+        }).catch(() => {
+            this._isMounted && this.setState( { can_comment : false } );
         });
     }
 
@@ -225,7 +223,7 @@ class Event extends Component {
                                                     :
                                                     null
                                             }
-                                            <small>{event.artist.alias}</small>
+                                            <small>{event.artist.alias !== undefined ? event.artist.alias:'' }</small>
                                             <h3>En directo en {event.city}</h3>
                                             <h4 className={"text-info"}>{event.ticket_price} €</h4>
                                             <div className="even-date">

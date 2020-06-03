@@ -16,6 +16,7 @@ class Comment extends Component {
     state = {
         comment: {},
         users: [],
+        token: '',
         relation: '',
         items_relation: [],
         loading: true,
@@ -30,7 +31,8 @@ class Comment extends Component {
         this._isMounted = true;
         if (this._isMounted){
             const {comment} = this.props.match.params;
-            this.getComment(comment)
+            this.getComment(comment);
+            this.getToken();
             this.getUsers();
         }
     }
@@ -61,6 +63,17 @@ class Comment extends Component {
             this.props.history.push('/admin/error404');
         });
     }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
 
     // Ex: If comment is from a post, get all posts so we can edit from which post is the comment
     getItemsRelation() {
@@ -300,9 +313,9 @@ class Comment extends Component {
     /* DELETE CALL */
     handleDelete = (comment) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const { token } = this.state;
         if (ans) {
-            axios.delete(`/api/v1.0/comment/delete/${comment.id}`).then(res => {
+            axios.delete(`/api/v1.0/comment/delete/${comment.id}`, { data: {token:token } }).then(res => {
                 if (res.data.success === true) {
                     this.props.history.push(
                         {
@@ -326,6 +339,7 @@ class Comment extends Component {
         const comment_value = document.querySelector('#comment').value;
         const user = document.querySelector('#user').value;
         const commented_on = document.querySelector('#item').value;
+        const {token} = this.state;
         const {comment, relation} = this.state;
 
         const requestOptions = {
@@ -335,7 +349,8 @@ class Comment extends Component {
                 post: relation === "post" ? commented_on : null,
                 product: relation === "product" ? commented_on : null,
                 event: relation === "event" ? commented_on : null,
-                purchase: relation === "purchase" ? commented_on : null
+                purchase: relation === "purchase" ? commented_on : null,
+                token: token
             })
         };
         this.setState( { sending: true } )
@@ -348,7 +363,9 @@ class Comment extends Component {
                     this.setState({ comment:data.results, submited: true, success: true, section: "Mostrar", sending: false })
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
 
     }
     

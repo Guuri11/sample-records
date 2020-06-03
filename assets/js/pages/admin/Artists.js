@@ -16,7 +16,8 @@ class Artists extends Component {
 
     state = {
         loading: true,
-        artists: [],
+        items: [],
+        token: '',
         total_artists: [],
         active_page : 1,
         artists_per_page: 10,
@@ -31,6 +32,7 @@ class Artists extends Component {
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {
+            this.getToken();
             this.getArtists();
         }
     }
@@ -41,13 +43,24 @@ class Artists extends Component {
     getArtists = () => {
         axios.get('/api/v1.0/artist').then(res => {
             if (res.data.success === true){
-                this._isMounted && this.setState( { artists: res.data.results, total_artists: res.data.results, loading: false } );
+                this._isMounted && this.setState( { items: res.data.results, total_artists: res.data.results, loading: false } );
             } else {
                 <Redirect to={'error404'}/>
             }
 
         })
     }
+
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
 
     // Filter by search
     handleSearch = (e) => {
@@ -56,20 +69,20 @@ class Artists extends Component {
         if (search_request !== ""){
 
             // Filter artists searching in his name and artist alias
-            const search_results = this.state.artists.filter( (artist) => {
+            const search_results = this.state.items.filter( (artist) => {
                 let artist_slug = artist.name + artist.alias + artist.surname;
                 return artist_slug.toLowerCase().indexOf(search_request) !== -1;
             } )
-            this.setState( {artists: search_results} )
+            this.setState( {items: search_results} )
         } else {
             // if search value is empty reset products
-            this.setState( { artists: this.state.total_artists } )
+            this.setState( { items: this.state.total_artists } )
         }
 
     }
 
     orderByNewest = () => {
-        const newest = this.state.artists.sort( function compare( a, b ) {
+        const newest = this.state.items.sort( function compare( a, b ) {
             if ( new Date(a.created_at.date) > new Date(b.created_at.date) ){
                 return -1;
             }
@@ -78,11 +91,11 @@ class Artists extends Component {
             }
             return 0;
         } );
-        this.setState( { artists : newest, active_page: 1 } );
+        this.setState( { items : newest, active_page: 1 } );
     }
 
     orderByOldest = () => {
-        const oldest = this.state.artists.sort( function compare( a, b ) {
+        const oldest = this.state.items.sort( function compare( a, b ) {
             if ( new Date(a.created_at.date) < new Date(b.created_at.date) ){
                 return -1;
             }
@@ -91,7 +104,7 @@ class Artists extends Component {
             }
             return 0;
         } );
-        this.setState( { artists : oldest, active_page: 1 } );
+        this.setState( { items : oldest, active_page: 1 } );
     }
 
     // Set how many item show per page
@@ -108,16 +121,16 @@ class Artists extends Component {
     /* DELETE CALL */
     handleDelete = (id) => {
         const ans = confirm("¿Estás seguro de que quieres eliminar el siguiente recurso? No podrás recuperarlo más tarde");
-
+        const {token} = this.state;
         if (ans) {
             let {total_artists} = this.state;
 
-            axios.delete(`/api/v1.0/artist/delete/${id}`).then(res => {
+            axios.delete(`/api/v1.0/artist/delete/${id}`, { data: {token: token} }).then(res => {
                 if (res.data.success === true) {
                     total_artists = total_artists.filter(function( item ) {
                         return item.id !== parseInt(id);
                     });
-                    this.setState({ total_artists: total_artists, artists: total_artists ,message: 'Artista eliminado' });
+                    this.setState({ total_artists: total_artists, items: total_artists ,message: 'Artista eliminado' });
                 }
             }).catch(error => {
                 this.setState( { message: "No se pudo borrar al artista" } )
@@ -127,12 +140,12 @@ class Artists extends Component {
 
     _renderIndex = () => {
 
-        const { active_page, artists_per_page, artists, message} = this.state;
+        const { active_page, artists_per_page, items, message} = this.state;
 
         // Logic for pagination
         const indexLastEvent = active_page * artists_per_page;
         const indexFirstEvent = indexLastEvent - artists_per_page;
-        const currentArtists = artists.slice(indexFirstEvent, indexLastEvent);
+        const currentArtists = items.slice(indexFirstEvent, indexLastEvent);
 
         return (
             <div className={"row"}>
@@ -268,7 +281,7 @@ class Artists extends Component {
                                 <Pagination
                                     activePage={active_page}
                                     itemsCountPerPage={artists_per_page}
-                                    totalItemsCount={artists.length}
+                                    totalItemsCount={items.length}
                                     pageRangeDisplayed={4}
                                     onChange={this.handlePageChange.bind(this)}
                                     itemClass="page-item"
@@ -455,13 +468,14 @@ class Artists extends Component {
         const is_from = document.querySelector('#is_from').value;
         const bio = document.querySelector('#bio').value;
         const img = document.querySelector('#img').files[0];
+        const {token} = this.state;
 
         const {total_artists} = this.state;
 
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name, surname: surname, alias: alias, birth: birth, is_from: is_from, bio: bio })
+            body: JSON.stringify({ name: name, surname: surname, alias: alias, birth: birth, is_from: is_from, bio: bio, token: token })
         };
 
         this.setState( { sending: true } )
@@ -485,7 +499,7 @@ class Artists extends Component {
                                     // Update albums list
                                     total_artists.unshift(artist);
 
-                                    this.setState({ total_artists:total_artists, artists: total_artists, submited: true,
+                                    this.setState({ total_artists:total_artists, items: total_artists, submited: true,
                                         message:"¡Artista creado!",success: true,section: "index", sending: false })
                                 }else
                                     this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
@@ -500,12 +514,14 @@ class Artists extends Component {
                         artist = data.results;
                         // Update albums list
                         total_artists.unshift(artist);
-                        this.setState({ total_artists:total_artists, artists: total_artists, submited: true,
+                        this.setState({ total_artists:total_artists, items: total_artists, submited: true,
                             message:"¡Artista creado!",success: true,section: "index", sending: false})
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
-            }).catch(e=>{});
+            }).catch(e=>{
+            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+        });
     }
 
 
