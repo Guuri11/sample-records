@@ -1,5 +1,15 @@
-# sample-records
+# Sample Records
 Proyecto Symfony y React JS simulando la web de una discográfica
+
+# Introducción
+Proyecto final del grado superior de DAW 2019-2020. Se trata de una aplicación que simula la gestión total de una discográfica con Symfony 5 en el Backend y React JS en el Frontend. 
+
+Los servicios que ofrece son:
+- Gestión de usuarios
+- Gestión de noticias
+- Gestión de ventas y productos
+- Gestión de ventas de tickets de los eventos de los artistas
+- Una plataforma de música inspirada en Spotify
 
 # Requisitos
 - Composer
