@@ -19,6 +19,7 @@ class Product extends Component {
     state = {
         product: {},
         comments:[],
+        token: '',
         user_data: [],
         can_comment: false,
         sending: false,
@@ -60,6 +61,18 @@ class Product extends Component {
         });
     }
 
+    // CSRF Token
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
+
     // Api call to get all the comments
     getComments({ id }) {
         axios.get(`/api/v1.0/comment/?product=${id}`).then(res => {
@@ -85,12 +98,14 @@ class Product extends Component {
         e.preventDefault();
         if (this.state.can_comment) {
             const comment = document.querySelector('#comment_user').value;
+            const {token} = this.state;
+
             const { user_data, product } = this.state;
             this.setState( { sending:true, } )
             const requestOptions = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ comment: comment, user: user_data.email, product: product.id})
+                body: JSON.stringify({ comment: comment, user: user_data.email, product: product.id, token: token})
             };
 
             // Make the Event call

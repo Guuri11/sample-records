@@ -17,6 +17,7 @@ class Post extends Component {
 
     state = {
         post: {},
+        token: '',
         day: '',
         month: '',
         year: '',
@@ -67,6 +68,17 @@ class Post extends Component {
         });
     }
 
+    // CSRF Token
+    getToken() {
+        axios.get('/api/v1.0/user/token').then(res => {
+            if (res.data.success === true) {
+                const token = res.data.results;
+
+                this.setState({token: token});
+            }
+        }).catch();
+    }
+
     getComments({ id }) {
         axios.get(`/api/v1.0/comment/?post=${id}`).then(res => {
                 if (res.data.success)
@@ -88,12 +100,13 @@ class Post extends Component {
         e.preventDefault();
         if (this.state.can_comment) {
             const comment = document.querySelector('#comment_user').value;
+            const {token} = this.state;
             const { user_data, post } = this.state;
             this.setState( { sending:true, } )
             const requestOptions = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ comment: comment, user: user_data.email, post: post.id})
+                body: JSON.stringify({ comment: comment, user: user_data.email, post: post.id, token: token})
             };
 
             // Make the Post call
