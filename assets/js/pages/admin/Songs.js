@@ -22,7 +22,7 @@ class Songs extends Component {
         artists: [],
         total_items: [],
         active_page : 1,
-        items_per_page: 10,
+        items_per_page: 5,
         message: this.props.location.state ? this.props.location.state.delete_success: '',
         section: "index",
         submited: false,
@@ -506,7 +506,7 @@ class Songs extends Component {
                                     <div className="form-group row">
                                         <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                             <button name="submit" type="submit"
-                                                    className="btn btn-success">Actualizar
+                                                    className="btn btn-success">Crear
                                             </button>
                                             <button className="btn btn-primary ml-2"
                                                     onClick={() => this.setState({section:"index"})}>Volver atrás

@@ -20,7 +20,7 @@ class Categories extends Component {
         token: '',
         total_items: [],
         active_page : 1,
-        items_per_page: 10,
+        items_per_page: 5,
         message: this.props.location.state ? this.props.location.state.delete_success: '',
         section: "index",
         submited: false,
@@ -277,7 +277,7 @@ class Categories extends Component {
             <div className={"row"}>
                 <div className="card shadow mb-4 w-100">
                     <div className="card-header py-3">
-                        <h5 className="m-0 font-weight-bold text-sr">Crear Tag</h5>
+                        <h5 className="m-0 font-weight-bold text-sr">Crear categoria</h5>
                         {
                             errors.hasOwnProperty('cant_delete') ?
                                 <h6 className={"text-danger"}>{errors.cant_delete}</h6> : null

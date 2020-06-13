@@ -44,6 +44,7 @@ class Post extends Component {
         if (this._isMounted){
             const {id} = this.props.match.params;
             this.getPost({ id });
+            this.getToken();
             this.getComments({id});
             this.userCanComment();
         }

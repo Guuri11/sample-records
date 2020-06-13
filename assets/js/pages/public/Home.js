@@ -147,7 +147,7 @@ class Home extends Component{
                             {
                                 return (
                                     <div key={i} className={i === 0 ? "carousel-item carousel-height active" : "carousel-item carousel-height" }>
-                                        <img src={item.img_name} className="d-block img-fluid"/>
+                                        <img src={item.img_name} className="d-block img-fluid" alt={item.hasOwnProperty('name') ? item.name : item.title}/>
                                         <div className="carousel-caption">
                                             <h3>{item.artist.alias}</h3>
                                             <p>
@@ -159,14 +159,14 @@ class Home extends Component{
                             })
                         }
 
-                        <a href="" className="carousel-control-prev" role="button" data-slide="prev">
+                        <p className="carousel-control-prev" role="button" data-slide="prev">
                             <span className="carousel-control-prev-icon"/>
                             <span className="sr-only">Previous</span>
-                        </a>
-                        <a href="" className="carousel-control-next" role="button" data-slide="next">
+                        </p>
+                        <p className="carousel-control-next" role="button" data-slide="next">
                             <span className="carousel-control-next-icon"/>
                             <span className="sr-only">Next</span>
-                        </a>
+                        </p>
 
                     </div>
                 </div>

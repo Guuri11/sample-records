@@ -19,7 +19,7 @@ class Purchases extends Component {
         token: '',
         total_items: [],
         active_page : 1,
-        items_per_page: 10,
+        items_per_page: 5,
         message: ''
     }
 

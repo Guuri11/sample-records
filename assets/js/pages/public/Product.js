@@ -42,6 +42,7 @@ class Product extends Component {
         if (this._isMounted){
             const {id} = this.props.match.params;
             this.getProduct({id});
+            this.getToken();
             this.getComments({id});
             this.userCanComment();
         }

@@ -22,7 +22,7 @@ class Products extends Component {
         artists: [],
         total_items: [],
         active_page : 1,
-        items_per_page: 10,
+        items_per_page: 5,
         message: this.props.location.state ? this.props.location.state.delete_success: '',
         section: "index",
         submited: false,
@@ -338,7 +338,7 @@ class Products extends Component {
             <div className={"row"}>
                 <div className="card shadow mb-4 w-100">
                     <div className="card-header py-3">
-                        <h5 className="m-0 font-weight-bold text-sr">Crear artista</h5>
+                        <h5 className="m-0 font-weight-bold text-sr">Crear producto</h5>
                         {
                             errors.hasOwnProperty('cant_delete') ?
                                 <h6 className={"text-danger"}>{errors.cant_delete}</h6> : null
@@ -535,7 +535,7 @@ class Products extends Component {
                                     <div className="form-group row">
                                         <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                                             <button name="submit" type="submit"
-                                                    className="btn btn-success">Actualizar
+                                                    className="btn btn-success">Crear
                                             </button>
                                             <button className="btn btn-primary ml-2"
                                                     onClick={() => this.setState({section:"index"})}>Volver atrás

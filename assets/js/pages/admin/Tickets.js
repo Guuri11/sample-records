@@ -21,7 +21,7 @@ class Tickets extends Component {
         events: [],
         total_items: [],
         active_page : 1,
-        items_per_page: 10,
+        items_per_page: 5,
         message: this.props.location.state ? this.props.location.state.delete_success: '',
         section: "index",
         submited: false,

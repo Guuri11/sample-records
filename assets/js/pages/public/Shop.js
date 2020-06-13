@@ -197,7 +197,7 @@ class Shop extends Component {
                     categories_checkbox.forEach(category_checkbox => {
                         artists_checkbox.forEach( artist_checkbox => {
                             if ( (category_checkbox.checked && product.category.name.toLowerCase() === category_checkbox.defaultValue.toLowerCase())
-                                && (artist_checkbox.checked && product.artist.alias.toLowerCase() === artist_checkbox.defaultValue.toLowerCase()))
+                                && (artist_checkbox.checked && product.artist !== null && product.artist.alias.toLowerCase() === artist_checkbox.defaultValue.toLowerCase()))
                                 matchCategory.push(product);
                         } )
                     })

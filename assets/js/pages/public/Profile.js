@@ -534,10 +534,11 @@ class Profile extends Component {
             // Make the API call
             axios.post("/api/v1.0/user/profile/change-profile-image", formData, {})
                 .then(res => { // then print response status
+                    console.log(res.data);
                 if (res.data.success){
                     this.setState({ profile_img: res.data.results.profile_image })
                 }
-            }).catch()
+            }).catch(e => console.log(e.response))
         }
     }
 

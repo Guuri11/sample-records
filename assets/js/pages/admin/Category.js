@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import Loading from "../../components/public/Loading";
 import Header from "../../components/admin/Header";
+import {Link} from "react-router-dom";
 
 class Category extends Component {
 
@@ -94,9 +95,12 @@ class Category extends Component {
                     <div className="form-group row">
                         <div className="col-12 mb-2">
                             <button name="submit" type="submit"
-                                    className="btn btn-primary"
+                                    className="btn btn-success"
                                     onClick={ () => this.setState( { section: "Editar" } ) }>Editar
                             </button>
+                            <Link to={'/admin/categorias'} className="btn btn-primary ml-2"
+                            >Volver atrás
+                            </Link>
                             <button name="submit" type="submit"
                                     className="btn btn-danger ml-2" onClick={ this.handleDelete.bind(this, category) }>Borrar
                             </button>

@@ -22,7 +22,7 @@ class Blog extends Component {
         artists: [],
         tags: [],
         active_page : 1,
-        items_per_page: 10,
+        items_per_page: 5,
         message: this.props.location.state ? this.props.location.state.delete_success: '',
         section: "index",
         submited: false,
@@ -324,7 +324,7 @@ class Blog extends Component {
             <div className={"row"}>
                 <div className="card shadow mb-4 w-100">
                     <div className="card-header py-3">
-                        <h5 className="m-0 font-weight-bold text-sr">Crear artista</h5>
+                        <h5 className="m-0 font-weight-bold text-sr">Crear noticia</h5>
                         {
                             errors.hasOwnProperty('cant_delete') ?
                                 <h6 className={"text-danger"}>{errors.cant_delete}</h6> : null
