@@ -88,7 +88,6 @@ class TwitterController extends AbstractController
      */
     public function getEventsTweets(Request $request, ApiUtils $apiUtils, TwitterService $twitterService): JsonResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $tweets = $twitterService->getEventTweets();
 
