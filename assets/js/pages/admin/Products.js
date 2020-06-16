@@ -531,6 +531,15 @@ class Products extends Component {
                                         </div>
                                     </div>
 
+                                    <div className="form-group row">
+                                        <label htmlFor="description" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Publicar en Twitter
+                                        </label>
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <textarea cols={80} rows={10} name={"tweet"} id={"tweet"}
+                                                      value={"¡Ya tenemos a la venta el nuevo [producto], corre y compralo!"}/>
+                                        </div>
+                                    </div>
 
                                     <div className="form-group row">
                                         <div className="col-12 col-sm-12 col-md-3 col-lg-3">
@@ -563,6 +572,7 @@ class Products extends Component {
         const stock = document.querySelector('#stock').value;
         const available = document.querySelector('#available').value;
         const description = document.querySelector('#description').value;
+        const tweet = document.querySelector('#tweet').value;
         const artist = document.querySelector('#artist').value;
         const category = document.querySelector('#category').value;
         const img = document.querySelector('#img').files[0];
@@ -600,6 +610,17 @@ class Products extends Component {
 
                                     this.setState({ total_items:total_items, items: total_items, submited: true,
                                         message:"¡Producto creado!",success: true,section: "index", sending: false })
+
+                                    // Check if user wrote a tweet to send
+                                    if (tweet !== ""){
+                                        const options = {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ text: tweet, image: product.img_name.substr(1),token: token })
+                                        }
+
+                                        fetch('/api/v1.0/twitter/post', options)
+                                    }
                                 }else
                                     this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                             } )
@@ -615,6 +636,17 @@ class Products extends Component {
                         total_items.unshift(product);
                         this.setState({ total_items:total_items, items: total_items, submited: true,
                             message:"¡Producto creado!",success: true,section: "index", sending: false})
+
+                        // Check if user wrote a tweet to send
+                        if (tweet !== ""){
+                            const options = {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ text: tweet, image:"",token: token })
+                            }
+
+                            fetch('/api/v1.0/twitter/post', options)
+                        }
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })

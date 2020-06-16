@@ -7,6 +7,7 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-sodium": "*",
+        "abraham/twitteroauth": "^1.1",
         "guzzlehttp/psr7": "^1.6",
         "liip/imagine-bundle": "^2.3",
         "nelmio/api-doc-bundle": "^3.6",

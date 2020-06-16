@@ -441,6 +441,15 @@ class Blog extends Component {
                                         </div>
                                     </div>
 
+                                    <div className="form-group row">
+                                        <label htmlFor="description" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Publicar en Twitter
+                                        </label>
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <textarea cols={80} rows={10} name={"tweet"} id={"tweet"}
+                                                      value={"[Titulo]. Entra en nuestra web para saber más!"}/>
+                                        </div>
+                                    </div>
 
                                     <div className="form-group row">
                                         <div className="col-12 col-sm-12 col-md-3 col-lg-3">
@@ -469,6 +478,7 @@ class Blog extends Component {
         const title = document.querySelector('#title').value;
         const artist = document.querySelector('#artist').value;
         const description = document.querySelector('#description').value;
+        const tweet = document.querySelector('#tweet').value;
         const tags = document.querySelector('#tag').selectedOptions;
         const img = document.querySelector('#img').files[0];
         const {token} = this.state;
@@ -511,10 +521,23 @@ class Blog extends Component {
 
                                     this.setState({ total_items:total_items, items: total_items, submited: true,
                                         message:"¡Noticia creada!",success: true,section: "index", sending: false })
+
+                                    // Check if user wrote a tweet to send
+                                    if (tweet !== ""){
+                                        const options = {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ text: tweet, image: post.img_name.substr(1),token: token })
+                                        }
+
+                                        fetch('/api/v1.0/twitter/post', options)
+                                    }
                                 }else
                                     this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                             } )
                             .catch(e=>{
+                                console.log(e.response)
+
                                 let {errors} = this.state;
                                 errors.cant_upload_img = "No se ha podido subir la imagen";
                                 this.setState({ success: false, errors: errors, submited: true, sending: false }) })
@@ -526,11 +549,22 @@ class Blog extends Component {
                         total_items.unshift(post);
                         this.setState({ total_items:total_items, items: total_items, submited: true,
                             message:"¡Noticia creada!",success: true,section: "index", sending: false})
+
+                        // Check if user wrote a tweet to send
+                        if (tweet !== ""){
+                            const options = {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ text: tweet, image:"",token: token })
+                            }
+
+                            fetch('/api/v1.0/twitter/post', options)
+                        }
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
             }).catch(e=>{
-            this.setState({ success: false, errors: data.error.errors, submited: true, sending: false })
+            this.setState({ success: false, errors: e.response.errors, submited: true, sending: false })
         });
     }
 

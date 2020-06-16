@@ -6,6 +6,7 @@ import axios from "axios";
 import {Link, Redirect} from "react-router-dom";
 import Pagination from "react-js-pagination";
 import Breadcrumb from "../../components/public/Breadcumb";
+import { TwitterTweetEmbed } from 'react-twitter-embed';
 
 class Events extends Component {
 
@@ -18,6 +19,7 @@ class Events extends Component {
         success: false,
         loading: true,
         events: [],
+        tweets: [],
         active_page : 1,
         events_per_page: 9,
         comments:[],
@@ -31,6 +33,7 @@ class Events extends Component {
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {
+            this.getTweets();
             this.getEvents();
         }
     }
@@ -54,6 +57,16 @@ class Events extends Component {
                 <Redirect to={'error404'}/>
             }
 
+        })
+    }
+
+    getTweets() {
+        axios.get('/api/v1.0/twitter/events-tweets').then(res => {
+            if (res.data.success === true){
+                this.setState( { tweets: res.data.results } )
+            } else {
+                this.setState( { tweets: [] } )
+            }
         })
     }
 
@@ -109,7 +122,7 @@ class Events extends Component {
     }
 
     render() {
-        const { events, active_page, events_per_page, loading } = this.state;
+        const { events, tweets, active_page, events_per_page, loading } = this.state;
 
         return (
             <div>
@@ -123,7 +136,7 @@ class Events extends Component {
                         <span/>
                         :
                         <div className="row">
-                            <div className="col-12">
+                            <div className={tweets.length > 0 ? "col-12 col-sm-9": "col-12"}>
                                 <section className="events-area section-padding-100">
                                     <div className="container">
 
@@ -146,6 +159,25 @@ class Events extends Component {
                                     </div>
                                 </section>
                             </div>
+                            {
+                                tweets.length > 0 ?
+                                    <div className="col-12 col-sm-3 section-padding-100 pr-5">
+                                        {
+                                            tweets.length > 0 ?
+                                                tweets.map(tweet => {
+                                                    return (
+                                                        <div key={tweet}>
+                                                            <TwitterTweetEmbed tweetId={tweet}/>
+                                                        </div>
+                                                    )
+                                                })
+                                                :
+                                                null
+                                        }
+                                    </div>
+                                    :
+                                    null
+                            }
                         </div>
                 }
                 <Footer/>

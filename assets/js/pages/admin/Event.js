@@ -190,7 +190,7 @@ class Event extends Component {
                                     className="btn btn-success"
                                     onClick={ () => this.setState( { section: "Editar" } ) }>Editar
                             </button>
-                            <Link to={'/admin/eventos/eventos'} className="btn btn-primary ml-2"
+                            <Link to={'/admin/eventos'} className="btn btn-primary ml-2"
                             >Volver atrás
                             </Link>
                             <button name="submit" type="submit"

@@ -513,6 +513,14 @@ class Events extends Component {
                                         </div>
                                     </div>
 
+                                    <div className="form-group row">
+                                        <label htmlFor="description" className="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label font-weight-bolder">
+                                            Publicar en Twitter
+                                        </label>
+                                        <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                                            <textarea cols={80} rows={10} name={"tweet"} id={"tweet"} value={"¡[Artista] dará un concierto en [Ciudad]! Ya puedes compras las entradas en nuestra web,¡¿ A qué esperas?!"}/>
+                                        </div>
+                                    </div>
 
                                     <div className="form-group row">
                                         <div className="col-12 col-sm-12 col-md-3 col-lg-3">
@@ -547,6 +555,7 @@ class Events extends Component {
         const prefix_serial_number = document.querySelector('#prefix_serial_number').value;
         const ticket_quantity = document.querySelector('#ticket_quantity').value;
         const price = document.querySelector('#price').value;
+        const tweet = document.querySelector('#tweet').value;
         const {token} = this.state;
         const img = document.querySelector('#img').files[0];
 
@@ -583,6 +592,18 @@ class Events extends Component {
 
                                     this.setState({ total_items:total_items, items: total_items, submited: true,
                                         message:"¡Evento creado!",success: true,section: "index", sending: false })
+
+                                    // Check if user wrote a tweet to send
+                                    if (tweet !== ""){
+                                        const options = {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ text: tweet, image: event.img_name.substr(1),token: token })
+                                        }
+
+                                        fetch('/api/v1.0/twitter/post', options)
+                                    }
+
                                 }else
                                     this.setState({ success: false, errors: res.data.error.errors, submited: true, sending: false })
                             } )
@@ -599,6 +620,17 @@ class Events extends Component {
                         total_items.unshift(event);
                         this.setState({ total_items:total_items, items: total_items, submited: true, success: true, message:"¡Evento creado!",
                             section: "index", sending: false })
+
+                        // Check if user wrote a tweet to send
+                        if (tweet !== ""){
+                            const options = {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ text: tweet, image:"",token: token })
+                            }
+
+                            fetch('/api/v1.0/twitter/post', options)
+                        }
                     }
                 }else
                     this.setState({ success: false, errors: data.error.errors ? data.error.errors:{} , submited: true, sending: false })

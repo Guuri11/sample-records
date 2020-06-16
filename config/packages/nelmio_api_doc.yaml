@@ -2211,6 +2211,45 @@ nelmio_api_doc:
                           description: Error in the process
                     tags:
                         - ticket
+            "/api/v1.0/twitter/post":
+              post:
+                parameters:
+                  - name: Twitter Service
+                    in: body
+                    required: true
+                    description: Post a tweet about a new item or news.
+                    schema:
+                      type: array
+                      items:
+                        properties:
+                          text:
+                            type: string
+                          image:
+                            type: string
+                          token:
+                            type: string
+                        type: object
+                      example:
+                        text: "Hola mundo"
+                        image: "img/core/logo-black-complete.png"
+                        token: "Get token from /user/token endpoint FIRST"
+                responses:
+                  '200':
+                    description: Tweet posted
+                  '401':
+                    description: Unauthorized
+                tags:
+                  - twitter
+            "/api/v1.0/twitter/events-tweets":
+              get:
+                responses:
+                  '200':
+                    description: Tweets got
+                  '401':
+                    description: Unauthorized
+                tags:
+                  - twitter
+
             "/api/v1.0/user/":
                 get:
                     parameters:

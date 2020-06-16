@@ -3,7 +3,6 @@
 namespace App\Controller\Api\V1;
 
 use App\Entity\Tag;
-use App\Form\TagType;
 use App\Repository\TagRepository;
 use App\Service\ApiUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,9 +10,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Swagger\Annotations as SWG;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Exception;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
