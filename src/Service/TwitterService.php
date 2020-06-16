@@ -9,10 +9,10 @@ use Abraham\TwitterOAuth\TwitterOAuthException;
 class TwitterService extends TwitterOAuth
 {
 
-    private const API_KEY = "GwXfVd4zRXFF8w7ocEcsusqN5";
-    private const API_SECRET_KEY = "3CQws1gwGfvWAo9WHrVUmf9cCOwTUTHW7AarLuMKUArkdlV3BI";
-    private const ACCESS_TOKEN = "1259607165037416450-6UmxQAn7SaAYe0oaI7hwseE4D13zXz";
-    private const ACCESS_TOKEN_SECRET = "uK3j3uUnf5seeA3nj5W2Ji6nuFcPdAfJIdlZSPPcegYAJ";
+    private const API_KEY = "";
+    private const API_SECRET_KEY = "";
+    private const ACCESS_TOKEN = "";
+    private const ACCESS_TOKEN_SECRET = "";
 
     public function __construct()
     {
